@@ -1,6 +1,6 @@
 # DataView
 
-DataView is an PHP based abstraction around `wordpress/dataviews`. It provides an easy-to-understand way of composing
+DataView is an PHP based abstraction around [`@wordpress/dataviews`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/). It provides an easy-to-understand way of composing
 dataview based applications, with a set of default field types and rendering.
 
 ## Folder structure
