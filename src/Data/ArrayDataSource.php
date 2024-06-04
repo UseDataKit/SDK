@@ -63,7 +63,7 @@ final class ArrayDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function count() : int {
-		return count( $this->data );
+		return count( $this->get_data() );
 	}
 
 	/**
@@ -75,22 +75,25 @@ final class ArrayDataSource extends BaseDataSource {
 		$data = $this->data;
 
 		if ( $this->filters ) {
-			$data = array_filter( $data, function ( array $item ) : bool {
-				$matches = true;
-				foreach ( $this->filters as $filter ) {
-					if ( ! $filter->matches( $item ) ) {
-						$matches = false;
-						break;
+			$data = array_filter(
+				$data,
+				function ( array $item ) : bool {
+					$is_match = true;
+					foreach ( $this->filters as $filter ) {
+						if ( ! $filter->matches( $item ) ) {
+							$is_match = false;
+							break;
+						}
 					}
-				}
 
-				return $matches;			} );
+					return $is_match;
+				} );
 		}
 
 		if ( $this->sort ) {
-			$sort    = $this->sort->toArray();
+			$sort = $this->sort->to_array();
 			$is_desc = Sort::DESC === $sort['direction'];
-			$field   = $sort['field'];
+			$field = $sort['field'];
 
 			uasort( $data, static function ( array $a, array $b ) use ( $is_desc, $field ) : int {
 				if ( $is_desc ) {

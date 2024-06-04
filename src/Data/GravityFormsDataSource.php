@@ -192,7 +192,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 		if ( ! $this->sort ) {
 			return [];
 		}
-		$sort = $this->sort->toArray();
+		$sort = $this->sort->to_array();
 
 		return [
 			'key'       => $sort['field'],

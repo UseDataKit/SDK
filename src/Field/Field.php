@@ -2,7 +2,6 @@
 
 namespace DataKit\DataView\Field;
 
-use DataKit\DataView\DataView\Filter;
 use DataKit\DataView\DataView\Operator;
 use InvalidArgumentException;
 
@@ -66,7 +65,7 @@ abstract class Field {
 	/**
 	 * Create a new instance with the provided filter operators.
 	 *
-	 * @param string ...$filters The filters.
+	 * @param Operator ...$operators The operators.
 	 *
 	 * @return static A new instance with the filters applied.
 	 */

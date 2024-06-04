@@ -14,10 +14,14 @@ abstract class DataView {
 		protected DataSource $data_source,
 		protected ?Sort $sort = null,
 		protected ?Filters $filters = null,
-		protected $page = 1,
-		protected $per_page = 100,
+		protected int $page = 1,
+		protected int $per_page = 100,
 	) {
-		$this->add_field( ...$fields );
+		if ( $page < 1 ) {
+			$this->page = 1;
+		}
+
+		$this->ensure_valid_fields( ...$fields );
 	}
 
 	public static function create(
@@ -56,8 +60,13 @@ abstract class DataView {
 		);
 	}
 
-	// Todo : maybe this should be a field collection?
-	protected function add_field( Field ...$fields ) : void {
+	/**
+	 * Makes sure the fields are of the correct type.
+	 * @since $ver$
+	 *
+	 * @param Field ...$fields The fields.
+	 **/
+	protected function ensure_valid_fields( Field ...$fields ) : void {
 		$this->fields = array_merge( $this->fields, $fields );
 	}
 

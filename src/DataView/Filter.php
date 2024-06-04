@@ -32,10 +32,28 @@ final class Filter {
 		private mixed $value
 	) {
 		if (
-			empty( $this->field )
-			|| empty( $this->value )
+			empty( $field )
+			|| empty( $value )
 		) {
 			throw new InvalidArgumentException( 'Filter needs a field, operator and value' );
+		}
+
+		if (
+			! is_array( $value )
+			&& in_array( $operator, [ Operator::isNone, Operator::isAll, Operator::isAny, Operator::isNotAll ], true )
+		) {
+			throw new BadMethodCallException(
+				sprintf( '"value" parameter expects array, %s given.', get_debug_type( $value ) )
+			);
+		}
+
+		if (
+			( ! is_scalar( $value ) && ! ( $value instanceof Stringable ) )
+			&& in_array( $operator, [ Operator::is, Operator::isNot ], true )
+		) {
+			throw new BadMethodCallException(
+				sprintf( '"value" parameter expects string, %s given.', get_debug_type( $value ) )
+			);
 		}
 	}
 
@@ -52,7 +70,7 @@ final class Filter {
 			return (string) $value;
 		}
 
-		if ( is_array( $value ) ) {
+		if ( is_iterable( $value ) ) {
 			foreach ( $value as $key => $item ) {
 				$value[ $key ] = self::flatten_value( $item );
 			}
@@ -70,7 +88,7 @@ final class Filter {
 	/**
 	 * Serializes a Filter to an array.
 	 * @since $ver$
-	 * @return array The filter array.
+	 * @return array{field: string, operator: string, value: string} The filter array.
 	 */
 	public function to_array() : array {
 		return [
@@ -90,9 +108,14 @@ final class Filter {
 	 * @return self The filter.
 	 */
 	public static function from_array( array $array ) : self {
+		$operator = Operator::tryFrom( $array['operator'] ?? '' );
+		if ( ! $operator ) {
+			throw new \InvalidArgumentException( 'No valid operator provided.' );
+		}
+
 		return new self(
 			$array['field'] ?? '',
-			$array['operator'] ?? '',
+			$operator,
 			$array['value'] ?? '',
 		);
 	}
@@ -110,7 +133,13 @@ final class Filter {
 		$operator = Operator::tryFrom( $method );
 
 		if ( ! $operator ) {
-			throw new BadMethodCallException( sprintf( 'Static method "%s" not found', $method ) );
+			throw new BadMethodCallException( sprintf( 'Static method "%s" not found.', $method ) );
+		}
+
+		if ( count( $arguments ) !== 2 ) {
+			throw new BadMethodCallException(
+				sprintf( 'Method "%s" expects exactly 2 arguments, %d given.', $method, count( $arguments ) )
+			);
 		}
 
 		return new self( $arguments[0] ?? '', $operator, $arguments[1] ?? '' );
@@ -123,6 +152,7 @@ final class Filter {
 	 * @param array $data The dataset to match against.
 	 *
 	 * @return bool Whether the value matches the filter.
+	 * @todo this may need to be moved to a separate class.
 	 */
 	public function matches( array $data ) : bool {
 		$value = $data[ $this->field ] ?? null;
@@ -134,9 +164,9 @@ final class Filter {
 			Operator::is => $this->value === $value,
 			Operator::isNot => $this->value !== $value,
 			Operator::isAny => in_array( $value, $this->value, true ),
-			Operator::isAll => count( array_intersect( $value, $this->value ) ) === count( $value ),
-			Operator::isNone => ! in_array( $value, $this->value, true ),
-			Operator::isNotAll => count( array_intersect( $value, $this->value ) ) > count( $value ),
+			Operator::isAll => count( array_intersect( $value, $this->value ) ) === count( $this->value ),
+			Operator::isNone => count( array_intersect( $value, $this->value ) ) === 0,
+			Operator::isNotAll => count( array_intersect( $value, $this->value ) ) !== count( $this->value ),
 			default => false,
 		};
 	}

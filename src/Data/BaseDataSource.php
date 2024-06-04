@@ -2,7 +2,6 @@
 
 namespace DataKit\DataView\Data;
 
-use DataKit\DataView\DataView\Filter;
 use DataKit\DataView\DataView\Filters;
 use DataKit\DataView\DataView\Sort;
 
@@ -14,7 +13,7 @@ abstract class BaseDataSource implements DataSource {
 	/**
 	 * The filters to use.
 	 * @since $ver$
-	 * @var Filter[]|Filters|null
+	 * @var Filters|null
 	 */
 	protected ?Filters $filters = null;
 

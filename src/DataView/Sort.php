@@ -24,7 +24,10 @@ final class Sort {
 	 * @param string $field The field name.
 	 */
 	private function __construct( private string $field, private string $direction ) {
-		if ( empty( $this->field ) ) {
+		if (
+			empty( $field )
+			|| ! in_array( strtoupper( $direction ), [ self::ASC, self::DESC ], true )
+		) {
 			throw new InvalidArgumentException( 'A sort consists of a field and a direction.' );
 		}
 	}
@@ -34,7 +37,7 @@ final class Sort {
 	 * @since $ver$
 	 * @return array<string, string> The serialized sort object.
 	 */
-	public function toArray() : array {
+	public function to_array() : array {
 		return [
 			'field'     => $this->field,
 			'direction' => $this->direction,
@@ -49,15 +52,8 @@ final class Sort {
 	 *
 	 * @return self The sort object.
 	 */
-	public static function fromArray( array $array ) : self {
-		if (
-			! isset( $array['field'], $array['direction'] )
-			|| ! in_array( strtoupper( $array['direction'] ), [ self::ASC, self::DESC ], true )
-		) {
-			throw new InvalidArgumentException( 'A sort consists of a field and a direction.' );
-		}
-
-		return new self( $array['field'], strtoupper( $array['direction'] ) );
+	public static function from_array( array $array ) : self {
+		return new self( $array['field'] ?? '', $array['direction'] ?? '' );
 	}
 
 	/**

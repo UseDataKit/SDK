@@ -3,8 +3,9 @@
 namespace DataKit\DataView\DataView;
 
 use ArrayIterator;
+use DataKit\DataView\Field\Field;
+use InvalidArgumentException;
 use IteratorAggregate;
-use Traversable;
 
 /**
  * Represents a collection of fields.
@@ -36,6 +37,10 @@ final class Filters implements IteratorAggregate {
 	 * @return self The filter collection.
 	 */
 	public static function of( Filter ...$filters ) : self {
+		if ( ! $filters ) {
+			throw new InvalidArgumentException( 'No filters provided.' );
+		}
+
 		return new self( ...$filters );
 	}
 
@@ -47,7 +52,7 @@ final class Filters implements IteratorAggregate {
 	 *
 	 * @return self The filter collection.
 	 */
-	public function from_array( array $array ) : self {
+	public static function from_array( array $array ) : self {
 		$filters = [];
 		foreach ( $array as $filter ) {
 			$filters[] = Filter::from_array( $filter );
@@ -71,8 +76,9 @@ final class Filters implements IteratorAggregate {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
+	 * @return ArrayIterator|Field[] The field iterator.
 	 */
-	public function getIterator() : Traversable {
+	public function getIterator() : ArrayIterator {
 		return new ArrayIterator( $this->filters );
 	}
 }

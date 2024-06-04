@@ -5,33 +5,39 @@ namespace DataKit\DataView\DataView;
 use DataKit\DataView\Field\Field;
 use JsonException;
 
+/**
+ * Renderer that transforms a {@see DataView} into valid JSON.
+ * @since $ver$
+ */
 final class JsonDataViewRenderer {
 	public function render( DataView $data_view ) : string {
 		$output = [
-			'view'   => $this->get_view_object( $data_view ),
-			'fields' => $this->get_fields_object( $data_view ),
-			'data'   => $this->get_data_object( $data_view ),
+			'dataSource'       => $data_view->data_source()->id(),
+			'supportedLayouts' => $this->get_supported_layouts( $data_view ),
+			'paginationInfo'   => $this->get_pagination_info( $data_view ),
+			'view'             => $this->get_view_object( $data_view ),
+			'fields'           => $this->get_fields_object( $data_view ),
+			'data'             => $this->get_data_object( $data_view ),
 		];
 
 		try {
-			return json_encode( $output, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT );
+			return json_encode( $output, JSON_THROW_ON_ERROR );
 		} catch ( JsonException ) {
 			return '{}';
 		}
 	}
 
 	private function get_view_object( DataView $data_view ) : array {
-		return array_filter(
-			[
-				'type'         => $data_view->view(),
-				'filters'      => $data_view->filters()?->to_array(),
-				'perPage'      => $data_view->per_page(),
-				'page'         => $data_view->page(),
-				'sort'         => $data_view->sort()?->toArray(),
-				'hiddenFields' => $this->get_hidden_fields( $data_view->fields() ),
-			],
-			static fn( $value ) : bool => ! empty( $value ) || $value === false
-		);
+		return [
+			'search'       => '',
+			'type'         => $data_view->view(),
+			'filters'      => $data_view->filters()?->to_array(),
+			'perPage'      => $data_view->per_page(),
+			'page'         => $data_view->page(),
+			'sort'         => $data_view->sort()?->to_array(),
+			'hiddenFields' => $this->get_hidden_fields( $data_view->fields() ),
+			'layout'       => [],
+		];
 	}
 
 	private function get_fields_object( DataView $data_view ) : array {
@@ -39,7 +45,8 @@ final class JsonDataViewRenderer {
 		foreach ( $data_view->fields() as $field ) {
 			$fields[] = array_filter(
 				$field->toArray(),
-				static fn( $value ) => ! empty( $value ) || $value === false,
+				static fn( $value, $key ) => ! is_null( $value ) && 'render' !== $key,
+				ARRAY_FILTER_USE_BOTH,
 			);
 		}
 
@@ -78,5 +85,18 @@ final class JsonDataViewRenderer {
 		}
 
 		return $hidden_fields;
+	}
+
+	private function get_supported_layouts( DataView $data_view ) : array {
+		return [ $data_view->view()->value ];
+	}
+
+	private function get_pagination_info( DataView $data_view ) : array {
+		$total = $data_view->data_source()->count();
+
+		return [
+			'totalItems' => $total,
+			'totalPages' => ceil( $total / $data_view->per_page() ),
+		];
 	}
 }
