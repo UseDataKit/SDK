@@ -4,7 +4,6 @@ namespace DataKit\DataView\DataView;
 
 use BadMethodCallException;
 use InvalidArgumentException;
-use Stringable;
 
 /**
  * Represents a filter on Data Views and Data sources.
@@ -18,42 +17,44 @@ use Stringable;
  * @method static self isNotAll( string $field, array $value )
  */
 final class Filter {
+	private string $field;
+	private Operator $operator;
+
+	private $value;
+
 	/**
 	 * Creates the filter.
 	 * @since $ver$
 	 *
 	 * @param string $field The field name.
 	 * @param Operator $operator The operator.
-	 * @param string $value The filter value.
+	 * @param string|array $value The filter value.
 	 */
 	private function __construct(
-		private string $field,
-		private Operator $operator,
-		private mixed $value
+		string $field,
+		Operator $operator,
+		$value
 	) {
-		if (
-			empty( $field )
-			|| empty( $value )
-		) {
+		$this->value    = $value;
+		$this->operator = $operator;
+		$this->field    = $field;
+
+		if ( empty( $field ) || empty( $value ) ) {
 			throw new InvalidArgumentException( 'Filter needs a field, operator and value' );
 		}
 
 		if (
 			! is_array( $value )
-			&& in_array( $operator, [ Operator::isNone, Operator::isAll, Operator::isAny, Operator::isNotAll ], true )
+			&& in_array( (string) $operator, Operator::multiCases(), true )
 		) {
-			throw new BadMethodCallException(
-				sprintf( '"value" parameter expects array, %s given.', get_debug_type( $value ) )
-			);
+			throw new BadMethodCallException( '"value" parameter expects array.' );
 		}
 
 		if (
-			( ! is_scalar( $value ) && ! ( $value instanceof Stringable ) )
-			&& in_array( $operator, [ Operator::is, Operator::isNot ], true )
+			! self::is_stringable( $value )
+			&& in_array( (string) $operator, Operator::singleCases(), true )
 		) {
-			throw new BadMethodCallException(
-				sprintf( '"value" parameter expects string, %s given.', get_debug_type( $value ) )
-			);
+			throw new BadMethodCallException( '"value" parameter expects string.' );
 		}
 	}
 
@@ -65,8 +66,8 @@ final class Filter {
 	 *
 	 * @return mixed The flattened value.
 	 */
-	private static function flatten_value( mixed $value ) : mixed {
-		if ( $value instanceof Stringable ) {
+	private static function flatten_value( $value ) {
+		if ( self::is_stringable( $value ) ) {
 			return (string) $value;
 		}
 
@@ -78,11 +79,19 @@ final class Filter {
 			return $value;
 		}
 
-		if ( is_scalar( $value ) ) {
-			return $value;
+		return null;
+	}
+
+	private static function is_stringable( $value ) : bool {
+		if ( is_scalar( $value ) || is_null( $value ) ) {
+			return true;
 		}
 
-		return null;
+		if ( is_object( $value ) && method_exists( $value, '__toString' ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -93,7 +102,7 @@ final class Filter {
 	public function to_array() : array {
 		return [
 			'field'    => $this->field,
-			'operator' => $this->operator->value,
+			'operator' => (string) $this->operator,
 			'value'    => self::flatten_value( $this->value ),
 		];
 	}
@@ -160,14 +169,21 @@ final class Filter {
 			return false;
 		}
 
-		return match ( $this->operator ) {
-			Operator::is => $this->value === $value,
-			Operator::isNot => $this->value !== $value,
-			Operator::isAny => in_array( $value, $this->value, true ),
-			Operator::isAll => count( array_intersect( $value, $this->value ) ) === count( $this->value ),
-			Operator::isNone => count( array_intersect( $value, $this->value ) ) === 0,
-			Operator::isNotAll => count( array_intersect( $value, $this->value ) ) !== count( $this->value ),
-			default => false,
-		};
+		switch ( $this->operator ) {
+			case Operator::is():
+				return $this->value === $value;
+			case Operator::isNot():
+				return $this->value !== $value;
+			case Operator::isAny():
+				return in_array( $value, $this->value, true );
+			case Operator::isAll():
+				return count( array_intersect( $value, $this->value ) ) === count( $this->value );
+			case Operator::isNone():
+				return count( array_intersect( $value, $this->value ) ) === 0;
+			case Operator::isNotAll():
+				return count( array_intersect( $value, $this->value ) ) !== count( $this->value );
+			default:
+				return false;
+		}
 	}
 }

@@ -13,19 +13,36 @@ abstract class Field {
 	protected string $render = '';
 	protected bool $is_hidden = false;
 	protected array $elements = [];
+	protected string $id;
+	protected string $header;
+	protected $is_sortable = true;
+	protected $is_hideable = true;
+	protected array $operators = [];
+	protected $is_primary = true;
+	protected ?string $default_value = null;
 
 	protected function __construct(
-		protected string $id,
-		protected string $header,
-		protected $is_sortable = true,
-		protected $is_hideable = true,
-		protected array $operators = [],
-		protected $is_primary = true,
-		protected ?string $default_value = null,
+		string $id,
+		string $header,
+		$is_sortable = true,
+		$is_hideable = true,
+		array $operators = [],
+		$is_primary = true,
+		?string $default_value = null
 	) {
+		$this->default_value = $default_value;
+		$this->is_primary    = $is_primary;
+		$this->operators     = $operators;
+		$this->is_hideable   = $is_hideable;
+		$this->is_sortable   = $is_sortable;
+		$this->header        = $header;
+		$this->id            = $id;
 	}
 
-	public static function create( ...$args ) : static {
+	/**
+	 * @return static
+	 */
+	public static function create( ...$args ) {
 		$instance = new static( ... $args );
 
 		if ( ! $instance->render() ) {
@@ -69,63 +86,87 @@ abstract class Field {
 	 *
 	 * @return static A new instance with the filters applied.
 	 */
-	public function filterable_by( Operator ...$operators ) : static {
+	public function filterable_by( Operator ...$operators ) {
 		$clone            = clone $this;
 		$clone->operators = $operators;
 
 		return $clone;
 	}
 
-	public function not_sortable() : static {
+	/**
+	 * @return static
+	 */
+	public function not_sortable() {
 		$clone              = clone $this;
 		$clone->is_sortable = false;
 
 		return $clone;
 	}
 
-	public function sortable() : static {
+	/**
+	 * @return static
+	 */
+	public function sortable() {
 		$clone              = clone $this;
 		$clone->is_sortable = true;
 
 		return $clone;
 	}
 
-	public function not_hideable() : static {
+	/**
+	 * @return static
+	 */
+	public function not_hideable() {
 		$clone              = clone $this;
 		$clone->is_hideable = false;
 
 		return $clone;
 	}
 
-	public function hideable() : static {
+	/**
+	 * @return static
+	 */
+	public function hideable() {
 		$clone              = clone $this;
 		$clone->is_hideable = true;
 
 		return $clone;
 	}
 
-	public function primary() : static {
+	/**
+	 * @return static
+	 */
+	public function primary() {
 		$clone             = clone $this;
 		$clone->is_primary = true;
 
 		return $clone;
 	}
 
-	public function secondary() : static {
+	/**
+	 * @return static
+	 */
+	public function secondary() {
 		$clone             = clone $this;
 		$clone->is_primary = false;
 
 		return $clone;
 	}
 
-	public function hidden() : static {
+	/**
+	 * @return static
+	 */
+	public function hidden() {
 		$clone            = clone $this;
 		$clone->is_hidden = true;
 
 		return $clone;
 	}
 
-	public function visible() : static {
+	/**
+	 * @return static
+	 */
+	public function visible()  {
 		$clone            = clone $this;
 		$clone->is_hidden = false;
 
@@ -139,7 +180,7 @@ abstract class Field {
 
 		return [
 			'operators' => array_map(
-				static fn( Operator $operator ) : string => $operator->value,
+				static fn( Operator $operator ) : string => (string) $operator,
 				$this->operators
 			),
 			'isPrimary' => $this->is_primary,
@@ -150,7 +191,10 @@ abstract class Field {
 		return $this->is_hidden;
 	}
 
-	public function default_value( ?string $default_value ) : static {
+	/**
+	 * @return static
+	 */
+	public function default_value( ?string $default_value ) {
 		$clone                = clone $this;
 		$clone->default_value = $default_value;
 

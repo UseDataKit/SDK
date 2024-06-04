@@ -21,12 +21,12 @@ final class FilterTest extends TestCase {
 	 */
 	public static function constructors_provider() : array {
 		return [
-			'is'       => [ Operator::is, 'value' ],
-			'isNot'    => [ Operator::isNot, 'value' ],
-			'isNone'   => [ Operator::isNone, [ 'value', 'another' ] ],
-			'isAny'    => [ Operator::isAny, [ 'value', 'another' ] ],
-			'isAll'    => [ Operator::isAll, [ 'value', 'another' ] ],
-			'isNotAll' => [ Operator::isNotAll, [ 'value', 'another' ] ],
+			'is'       => [ Operator::is(), 'value' ],
+			'isNot'    => [ Operator::isNot(), 'value' ],
+			'isNone'   => [ Operator::isNone(), [ 'value', 'another' ] ],
+			'isAny'    => [ Operator::isAny(), [ 'value', 'another' ] ],
+			'isAll'    => [ Operator::isAll(), [ 'value', 'another' ] ],
+			'isNotAll' => [ Operator::isNotAll(), [ 'value', 'another' ] ],
 		];
 	}
 
@@ -37,12 +37,12 @@ final class FilterTest extends TestCase {
 	 */
 	public static function invalid_constructors_provider() : array {
 		return [
-			'is'       => [ Operator::is, [ 'value' ] ],
-			'isNot'    => [ Operator::isNot, [ 'value' ] ],
-			'isNone'   => [ Operator::isNone, 'value' ],
-			'isAny'    => [ Operator::isAny, 'value' ],
-			'isAll'    => [ Operator::isAll, 'value' ],
-			'isNotAll' => [ Operator::isNotAll, 'value' ],
+			'is'       => [ Operator::is(), [ 'value' ] ],
+			'isNot'    => [ Operator::isNot(), [ 'value' ] ],
+			'isNone'   => [ Operator::isNone(), 'value' ],
+			'isAny'    => [ Operator::isAny(), 'value' ],
+			'isAll'    => [ Operator::isAll(), 'value' ],
+			'isNotAll' => [ Operator::isNotAll(), 'value' ],
 		];
 	}
 
@@ -107,16 +107,16 @@ final class FilterTest extends TestCase {
 	/**
 	 * Test case for {@see Filter::__callStatic()}.
 	 * @since $ver$
+	 * @dataProvider constructors_provider
 	 */
-	#[DataProvider( 'constructors_provider' )]
-	public function test_constructors( Operator $operator, string|array $value ) : void {
-		$method = $operator->value;
+	public function test_constructors( Operator $operator, $value ) : void {
+		$method = (string) $operator;
 		$filter = Filter::$method( 'field', $value );
 		$array  = $filter->to_array();
 
 		self::assertSame( [
 			'field'    => 'field',
-			'operator' => $operator->value,
+			'operator' => (string) $operator,
 			'value'    => $value,
 		], $array );
 	}
@@ -124,12 +124,12 @@ final class FilterTest extends TestCase {
 	/**
 	 * Test case for {@see Filter::__callStatic()} with invalid arguments.
 	 * @since $ver$
+	 * @dataProvider invalid_constructors_provider
 	 */
-	#[DataProvider( 'invalid_constructors_provider' )]
-	public function test_invalid_constructors( Operator $operator, string|array $value ) : void {
+	public function test_invalid_constructors( Operator $operator, $value ) : void {
 		$this->expectException( BadMethodCallException::class );
 
-		$method = $operator->value;
+		$method = (string) $operator;
 		Filter::$method( 'field', $value );
 	}
 
@@ -147,8 +147,8 @@ final class FilterTest extends TestCase {
 	/**
 	 * Test case for {@see Filter::__callStatic()} with missing arguments.
 	 * @since $ver$
+	 * @dataProvider missing_arguments_provider
 	 */
-	#[DataProvider( 'missing_arguments_provider' )]
 	public function test_missing_arguments_constructor( array $arguments, string $expected_message ) : void {
 		$this->expectException( 'BadMethodCallException' );
 		$this->expectExceptionMessage( $expected_message );
@@ -159,8 +159,8 @@ final class FilterTest extends TestCase {
 	/**
 	 * Test case for {@see Filter::matches()}.
 	 * @since $ver$
+	 * @dataProvider match_provider
 	 */
-	#[DataProvider( 'match_provider' )]
 	public function test_matches( Filter $filter, bool $expected_result ) : void {
 		self::assertSame(
 			$expected_result,
@@ -189,8 +189,8 @@ final class FilterTest extends TestCase {
 	/**
 	 * Test case for {@see Filter::from_array()} with invalid values.
 	 * @since $ver$
+	 * @dataProvider invalid_array_provider
 	 */
-	#[DataProvider( 'invalid_array_provider' )]
 	public function test_from_array_invalid( array $invalid_array, string $expected_exception ) : void {
 		$this->expectException( $expected_exception );
 		Filter::from_array( $invalid_array );

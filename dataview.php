@@ -32,27 +32,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once 'vendor/autoload.php';
 
 add_action( 'plugins_loaded', static function () : void {
-//
-//	$data_source = new GravityFormsDataSource( 1 );
-//	$view        = DataView::table(
-//		[
-//			EnumField::create( 'status', 'Status', [ 'active' => 'Active', 'trash' => 'Trash', 'spam' => 'Spam' ] )
-//			         ->filterable_by( Operator::is )
-//			         ->primary(),
-//			TextField::create( 'date_created', 'Date' )
-//			         ->not_hideable(),
-//			TextField::create( '2', 'Email' )
-//			         ->filterable_by( Operator::is, Operator::isNot )
-//			         ->default_value( 'Not provided' )
-//			         ->secondary(),
-//		],
-//		$data_source,
-//		Sort::asc( 'date_created' ),
-//		Filters::of(
-//			Filter::is( '1.3', 'test' ),
-//		),
-//	);
-//
-//	$renderer = new JsonDataViewRenderer();
-//	$json     = $renderer->render( $view );
+
+	$data_source = new GravityFormsDataSource( 1 );
+	$view        = DataView::table(
+		[
+			EnumField::create( 'status', 'Status', [ 'active' => 'Active', 'trash' => 'Trash', 'spam' => 'Spam' ] )
+			         ->filterable_by( Operator::is )
+			         ->primary(),
+			TextField::create( 'date_created', 'Date' )
+			         ->not_hideable(),
+			TextField::create( '2', 'Email' )
+			         ->filterable_by( Operator::is, Operator::isNot, Operator::contains )
+			         ->default_value( 'Not provided' )
+			         ->secondary(),
+		],
+		$data_source,
+		Sort::asc( 'date_created' ),
+		Filters::of(
+			Filter::is( '1.3', 'test' ),
+		),
+	);
+
+	$renderer = new JsonDataViewRenderer();
+	$json     = $renderer->render( $view );
 } );
+
+
+// Create view collection
+// register view on an ID
+// Add rest endpoint to retrieve data based on the provided filters
+
+// [_temp_dataview id='someid']

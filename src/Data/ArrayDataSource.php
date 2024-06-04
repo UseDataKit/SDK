@@ -11,6 +11,10 @@ use RuntimeException;
  * @since $ver$
  */
 final class ArrayDataSource extends BaseDataSource {
+	private string $id;
+	private string $name;
+	private array $data = [];
+
 	/**
 	 * Creates the data source.
 	 * @since $ver$
@@ -20,10 +24,13 @@ final class ArrayDataSource extends BaseDataSource {
 	 * @param array $data The data.
 	 */
 	public function __construct(
-		private string $id,
-		private string $name,
-		private array $data = [],
+		string $id,
+		string $name,
+		array $data = []
 	) {
+		$this->data = $data;
+		$this->name = $name;
+		$this->id   = $id;
 	}
 
 	/**
@@ -55,7 +62,12 @@ final class ArrayDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ) : array {
-		return $this->data[ $id ] ?? throw new RuntimeException( 'Dataset for id not found.' );
+		$result = $this->data[ $id ] ?? null;
+		if ( ! $result ) {
+			throw new RuntimeException( 'Dataset for id not found.' );
+		}
+
+		return $result;
 	}
 
 	/**

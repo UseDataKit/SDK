@@ -26,8 +26,9 @@ abstract class BaseDataSource implements DataSource {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
+	 * @return static
 	 */
-	public function filter_by( ?Filters $filters ) : static {
+	public function filter_by( ?Filters $filters ) {
 		$clone          = clone $this;
 		$clone->filters = $filters;
 
@@ -37,8 +38,9 @@ abstract class BaseDataSource implements DataSource {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
+	 * @return static
 	 */
-	public function sort_by( ?Sort $sort ) : static {
+	public function sort_by( ?Sort $sort ) {
 		$clone       = clone $this;
 		$clone->sort = $sort;
 

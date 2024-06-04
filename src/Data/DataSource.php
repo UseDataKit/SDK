@@ -59,7 +59,7 @@ interface DataSource extends Countable {
 	 *
 	 * @return static The (possibly immutable) data source.
 	 */
-	public function filter_by( ?Filters $filters ) : static;
+	public function filter_by( ?Filters $filters );
 
 	/**
 	 * Sets the filters for the data source.
@@ -69,5 +69,5 @@ interface DataSource extends Countable {
 	 *
 	 * @return static The (possibly immutable) data source.
 	 */
-	public function sort_by( ?Sort $sort ) : static;
+	public function sort_by( ?Sort $sort );
 }

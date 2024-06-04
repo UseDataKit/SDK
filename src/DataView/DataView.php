@@ -8,15 +8,25 @@ use DataKit\DataView\Field\Field;
 abstract class DataView {
 	protected View $view;
 	protected array $fields = [];
+	protected DataSource $data_source;
+	protected ?Sort $sort = null;
+	protected ?Filters $filters = null;
+	protected int $page = 1;
+	protected int $per_page = 100;
 
 	protected function __construct(
 		array $fields,
-		protected DataSource $data_source,
-		protected ?Sort $sort = null,
-		protected ?Filters $filters = null,
-		protected int $page = 1,
-		protected int $per_page = 100,
+		DataSource $data_source,
+		?Sort $sort = null,
+		?Filters $filters = null,
+		int $page = 1,
+		int $per_page = 100
 	) {
+		$this->per_page    = $per_page;
+		$this->page        = $page;
+		$this->filters     = $filters;
+		$this->sort        = $sort;
+		$this->data_source = $data_source;
 		if ( $page < 1 ) {
 			$this->page = 1;
 		}
@@ -24,12 +34,15 @@ abstract class DataView {
 		$this->ensure_valid_fields( ...$fields );
 	}
 
+	/**
+	 * @return static
+	 */
 	public static function create(
 		array $fields,
 		DataSource $data_source,
 		?Sort $sort = null,
 		?Filters $filters = null
-	) : static {
+	) {
 		if ( $sort ) {
 			$data_source = $data_source->sort_by( $sort );
 		}

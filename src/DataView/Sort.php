@@ -15,6 +15,8 @@ final class Sort {
 	 */
 	public const ASC = 'ASC';
 	public const DESC = 'DESC';
+	private string $field;
+	private string $direction;
 
 	/**
 	 * Creates a sort instance.
@@ -23,7 +25,9 @@ final class Sort {
 	 * @param string $direction The direction.
 	 * @param string $field The field name.
 	 */
-	private function __construct( private string $field, private string $direction ) {
+	private function __construct( string $field, string $direction ) {
+		$this->direction = $direction;
+		$this->field     = $field;
 		if (
 			empty( $field )
 			|| ! in_array( strtoupper( $direction ), [ self::ASC, self::DESC ], true )
