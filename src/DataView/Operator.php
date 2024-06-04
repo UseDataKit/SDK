@@ -15,7 +15,7 @@ use InvalidArgumentException;
  * @method static self isNone()
  * @method static self isNotAll()
  */
-final class Operator {
+final class Operator extends EnumObject {
 	private const is = 'is';
 	private const isNot = 'isNot';
 	private const isAny = 'isAny';
@@ -23,67 +23,29 @@ final class Operator {
 	private const isNone = 'isNone';
 	private const isNotAll = 'isNotAll';
 
-	private string $value;
-
 	/**
-	 * @return string[]
+	 * A list of operators applicable to single values.
+	 * @since $ver$
+	 * @return self[] The operators.
 	 */
-	public static function cases() : array {
-		return [
-			self::is,
-			self::isNot,
-			self::isAny,
-			self::isAll,
-			self::isNone,
-			self::isNotAll,
-		];
-	}
-
 	public static function singleCases() : array {
 		return [
-			self::is,
-			self::isNot,
+			self::is(),
+			self::isNot(),
 		];
-	}
-
-	public static function multiCases() : array {
-		return [
-			self::isAny,
-			self::isAll,
-			self::isNone,
-			self::isNotAll,
-		];
-	}
-
-	private function __construct( string $value ) {
-		if ( ! in_array( $value, self::cases(), true ) ) {
-			throw new \InvalidArgumentException( 'No valid operator provided.' );
-		}
-
-		$this->value = $value;
-	}
-
-	public static function tryFrom( string $type ) : ?self {
-		try {
-			return new self ( $type );
-		} catch ( \InvalidArgumentException $e ) {
-			return null;
-		}
-	}
-
-	public static function __callStatic( string $method, array $arguments ) : self {
-		$type = self::tryFrom( $method );
-		if ( ! $type ) {
-			throw new InvalidArgumentException( 'No valid operator provided.' );
-		}
-
-		return $type;
 	}
 
 	/**
+	 * A list of operators applicable to multiple values.
 	 * @since $ver$
+	 * @return self[] The operators.
 	 */
-	public function __toString() : string {
-		return $this->value;
+	public static function multiCases() : array {
+		return [
+			self::isAny(),
+			self::isAll(),
+			self::isNone(),
+			self::isNotAll(),
+		];
 	}
 }

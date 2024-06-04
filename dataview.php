@@ -37,12 +37,12 @@ add_action( 'plugins_loaded', static function () : void {
 	$view        = DataView::table(
 		[
 			EnumField::create( 'status', 'Status', [ 'active' => 'Active', 'trash' => 'Trash', 'spam' => 'Spam' ] )
-			         ->filterable_by( Operator::is )
+			         ->filterable_by( Operator::is() )
 			         ->primary(),
 			TextField::create( 'date_created', 'Date' )
 			         ->not_hideable(),
 			TextField::create( '2', 'Email' )
-			         ->filterable_by( Operator::is, Operator::isNot, Operator::contains )
+			         ->filterable_by( Operator::is(), Operator::isNot() )
 			         ->default_value( 'Not provided' )
 			         ->secondary(),
 		],
@@ -55,6 +55,8 @@ add_action( 'plugins_loaded', static function () : void {
 
 	$renderer = new JsonDataViewRenderer();
 	$json     = $renderer->render( $view );
+	echo $json;
+	exit;
 } );
 
 

@@ -51,4 +51,4 @@ $view = DataView::table(
 );
 
 $renderer = new JsonDataViewRenderer();
-echo $renderer->render( $view );
+echo $renderer->render( $view, true );

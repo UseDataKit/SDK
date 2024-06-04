@@ -63,7 +63,7 @@ abstract class DataView {
 		array $fields,
 		DataSource $data_source,
 		?Sort $sort = null,
-		?Filters $filters = null,
+		?Filters $filters = null
 	) : TableDataView {
 		return TableDataView::create(
 			$fields,

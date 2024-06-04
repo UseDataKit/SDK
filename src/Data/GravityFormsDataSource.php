@@ -123,7 +123,10 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 		$filters                  = $this->top_level_filters();
 		$filters['field_filters'] = array_filter(
-			array_map( $this->transform_filter_to_field_filter( ... ), $this->filters->to_array() )
+			array_map(
+				\Closure::fromCallable( [ $this, 'transform_filter_to_field_filter' ] ),
+				$this->filters->to_array()
+			)
 		);
 
 		return $filters;
@@ -160,13 +163,14 @@ final class GravityFormsDataSource extends BaseDataSource {
 	private function map_operator( string $operator ) : string {
 		$case = Operator::tryFrom( $operator );
 
-		return match ( $case ) {
-			Operator::is => 'IS',
-			Operator::isNot => 'IS NOT',
-			Operator::isAny => 'IN',
-			Operator::isNone => 'NOT IN',
-			default => 'CONTAINS',
-		};
+		$lookup = [
+			(string) Operator::is()     => 'IS',
+			(string) Operator::isNot()  => 'IS NOT',
+			(string) Operator::isAny()  => 'IN',
+			(string) Operator::isNone() => 'NOT IN',
+		];
+
+		return $lookup[ (string) $case ] ?? 'CONTAINS';
 	}
 
 	/**

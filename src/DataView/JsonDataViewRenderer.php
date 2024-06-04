@@ -10,7 +10,7 @@ use JsonException;
  * @since $ver$
  */
 final class JsonDataViewRenderer {
-	public function render( DataView $data_view ) : string {
+	public function render( DataView $data_view, bool $is_pretty = false ) : string {
 		$output = [
 			'dataSource'       => $data_view->data_source()->id(),
 			'supportedLayouts' => $this->get_supported_layouts( $data_view ),
@@ -21,8 +21,13 @@ final class JsonDataViewRenderer {
 		];
 
 		try {
-			return json_encode( $output, JSON_THROW_ON_ERROR );
-		} catch ( JsonException ) {
+			$flags = JSON_THROW_ON_ERROR;
+			if ( $is_pretty ) {
+				$flags |= JSON_PRETTY_PRINT;
+			}
+
+			return json_encode( $output, $flags );
+		} catch ( JsonException $e ) {
 			return '{}';
 		}
 	}
@@ -30,14 +35,30 @@ final class JsonDataViewRenderer {
 	private function get_view_object( DataView $data_view ) : array {
 		return [
 			'search'       => '',
-			'type'         => $data_view->view(),
-			'filters'      => $data_view->filters()?->to_array(),
+			'type'         => (string) $data_view->view(),
+			'filters'      => $this->get_filters( $data_view ),
 			'perPage'      => $data_view->per_page(),
 			'page'         => $data_view->page(),
-			'sort'         => $data_view->sort()?->to_array(),
+			'sort'         => $this->get_sort( $data_view ),
 			'hiddenFields' => $this->get_hidden_fields( $data_view->fields() ),
 			'layout'       => [],
 		];
+	}
+
+	private function get_sort( DataView $data_view ) : ?array {
+		if ( ! $data_view->sort() ) {
+			return null;
+		}
+
+		return $data_view->sort()->to_array();
+	}
+
+	private function get_filters( DataView $data_view ) : ?array {
+		if ( ! $data_view->filters() ) {
+			return null;
+		}
+
+		return $data_view->filters()->to_array();
 	}
 
 	private function get_fields_object( DataView $data_view ) : array {
@@ -88,7 +109,7 @@ final class JsonDataViewRenderer {
 	}
 
 	private function get_supported_layouts( DataView $data_view ) : array {
-		return [ $data_view->view()->value ];
+		return [ (string) $data_view->view() ];
 	}
 
 	private function get_pagination_info( DataView $data_view ) : array {

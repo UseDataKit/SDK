@@ -45,14 +45,14 @@ final class Filter {
 
 		if (
 			! is_array( $value )
-			&& in_array( (string) $operator, Operator::multiCases(), true )
+			&& in_array( $operator, Operator::multiCases(), false )
 		) {
 			throw new BadMethodCallException( '"value" parameter expects array.' );
 		}
 
 		if (
 			! self::is_stringable( $value )
-			&& in_array( (string) $operator, Operator::singleCases(), true )
+			&& in_array( $operator, Operator::singleCases(), false )
 		) {
 			throw new BadMethodCallException( '"value" parameter expects string.' );
 		}
@@ -82,6 +82,14 @@ final class Filter {
 		return null;
 	}
 
+	/**
+	 * Returns whether the value is a string, or able to cast to a string.
+	 * @since $ver$
+	 *
+	 * @param mixed $value The value to check.
+	 *
+	 * @return bool Whether the value is stringable.
+	 */
 	private static function is_stringable( $value ) : bool {
 		if ( is_scalar( $value ) || is_null( $value ) ) {
 			return true;

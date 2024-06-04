@@ -18,7 +18,8 @@
 		}
 	],
 	"require": {
-		"php": "^7.4"
+		"php": "^7.4",
+		"ext-json": "*"
 	},
 	"config": {
 		"platform": {
