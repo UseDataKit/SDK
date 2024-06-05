@@ -13,7 +13,7 @@ use RuntimeException;
 final class ArrayDataSource extends BaseDataSource {
 	private string $id;
 	private string $name;
-	private array $data = [];
+	private array $data;
 
 	/**
 	 * Creates the data source.
