@@ -2,10 +2,15 @@
 
 namespace DataKit\DataView;
 
+use DataKit\DataView\Components\Shortcode;
 use DataKit\DataView\DataView\DataView;
 use DataKit\DataView\DataView\DataViewRepository;
 use DataKit\DataView\Rest\Router;
 
+/**
+ * Entry point for the plugin.
+ * @since $ver$
+ */
 final class DataViewPlugin {
 	/**
 	 * The singleton plugin instance.
@@ -31,8 +36,10 @@ final class DataViewPlugin {
 		$this->data_view_repository = $data_view_repository;
 
 		Router::get_instance( $this->data_view_repository );
+		Shortcode::get_instance( $this->data_view_repository );
 
 		add_action( 'data-view/register-data-view', [ $this, 'register_data_view' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'register_scripts' ] );
 	}
 
 	/**
@@ -41,16 +48,28 @@ final class DataViewPlugin {
 	 *
 	 * @param DataView $data_view The DataView.
 	 */
-	public function register_data_view( DataView $data_view ) : void {
+	public function register_data_view( DataView $data_view ): void {
 		$this->data_view_repository->save( $data_view );
 	}
 
 	/**
-	 * Return and maybe initialize the singleton router.
+	 * Register the scripts and styles.
+	 * @since $ver$
+	 */
+	public function register_scripts(): void {
+		$assets_dir = plugin_dir_url( DATAVIEW_PLUGIN_PATH );
+
+		wp_register_script( 'datakit/data-view', $assets_dir . 'assets/js/data-view.js' );
+		wp_register_style( 'datakit/data-view', $assets_dir . 'assets/css/data-view.css' );
+		wp_add_inline_script( 'datakit/data-view', 'let datakit_dataviews = {};', 'before' );
+	}
+
+	/**
+	 * Return and maybe initialize the singleton plugin.
 	 * @since $ver$
 	 * @return self The router.
 	 */
-	public static function get_instance( DataViewRepository $repository ) : self {
+	public static function get_instance( DataViewRepository $repository ): self {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self( $repository );
 		}

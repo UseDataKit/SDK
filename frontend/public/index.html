@@ -8,12 +8,72 @@
     <link rel="stylesheet" href="/public/css/main.css">
 
     <script type="module" src="/src/main.js"></script>
+    <script>
+        let datakit_dataviews = {};
+        datakit_dataviews['test'] = {
+            "supportedLayouts": ["table"],
+            "paginationInfo": { "totalItems": 3, "totalPages": 1 },
+            "view": {
+                "search": "",
+                "type": "table",
+                "filters": [],
+                "perPage": 100,
+                "page": 1,
+                "sort": { "field": "author", "direction": "ASC" },
+                "hiddenFields": ["author_url"],
+                "layout": []
+            },
+            "fields": [{
+                "id": "title",
+                "header": "Title",
+                "enableHiding": false,
+                "enableSorting": true,
+                "elements": []
+            }, {
+                "id": "description",
+                "header": "Description",
+                "enableHiding": true,
+                "enableSorting": false,
+                "elements": []
+            }, {
+                "id": "author",
+                "header": "Author",
+                "enableHiding": true,
+                "enableSorting": true,
+                "elements": []
+            }, {
+                "id": "author_url",
+                "header": "Author URL",
+                "enableHiding": true,
+                "enableSorting": true,
+                "elements": []
+            }],
+            "data": [{
+                "id": 1,
+                "title": "Third result",
+                "author": "Aaron Applesteen",
+                "description": "Third description",
+                "author_url": null
+            }, {
+                "id": 2,
+                "title": "First result",
+                "author": "Doeke Norg",
+                "author_url": "https:\/\/doeken.org",
+                "description": "First description"
+            }, {
+                "id": 3,
+                "title": "Second result",
+                "author": "GravityKit",
+                "author_url": "https:\/\/gravitykit.com",
+                "description": "Second description"
+            }]
+        }
+    </script>
 </head>
 
 <body>
 <div class="wp-core-ui">
-    <div data-dataview="
-{&quot;dataSource&quot;:&quot;gravity-forms-1&quot;,&quot;supportedLayouts&quot;:[&quot;table&quot;],&quot;paginationInfo&quot;:{&quot;totalItems&quot;:7,&quot;totalPages&quot;:1},&quot;view&quot;:{&quot;search&quot;:&quot;&quot;,&quot;type&quot;:&quot;table&quot;,&quot;filters&quot;:[{&quot;field&quot;:&quot;1.3&quot;,&quot;operator&quot;:&quot;is&quot;,&quot;value&quot;:&quot;test&quot;}],&quot;perPage&quot;:100,&quot;page&quot;:1,&quot;sort&quot;:{&quot;field&quot;:&quot;date_created&quot;,&quot;direction&quot;:&quot;ASC&quot;},&quot;hiddenFields&quot;:[],&quot;layout&quot;:[]},&quot;fields&quot;:[{&quot;id&quot;:&quot;status&quot;,&quot;header&quot;:&quot;Status&quot;,&quot;enableHiding&quot;:true,&quot;enableSorting&quot;:true,&quot;elements&quot;:[{&quot;label&quot;:&quot;Active&quot;,&quot;value&quot;:&quot;active&quot;},{&quot;label&quot;:&quot;Trash&quot;,&quot;value&quot;:&quot;trash&quot;},{&quot;label&quot;:&quot;Spam&quot;,&quot;value&quot;:&quot;spam&quot;}],&quot;filterBy&quot;:{&quot;operators&quot;:[&quot;is&quot;],&quot;isPrimary&quot;:true}},{&quot;id&quot;:&quot;date_created&quot;,&quot;header&quot;:&quot;Date&quot;,&quot;enableHiding&quot;:false,&quot;enableSorting&quot;:true,&quot;elements&quot;:[]},{&quot;id&quot;:&quot;2&quot;,&quot;header&quot;:&quot;Email&quot;,&quot;enableHiding&quot;:true,&quot;enableSorting&quot;:true,&quot;elements&quot;:[],&quot;filterBy&quot;:{&quot;operators&quot;:[&quot;is&quot;,&quot;isNot&quot;],&quot;isPrimary&quot;:false}}],&quot;data&quot;:[{&quot;id&quot;:&quot;31&quot;,&quot;form_id&quot;:&quot;1&quot;,&quot;post_id&quot;:null,&quot;date_created&quot;:&quot;2022-04-05 18:29:24&quot;,&quot;date_updated&quot;:&quot;2022-04-05 18:29:24&quot;,&quot;is_starred&quot;:&quot;0&quot;,&quot;is_read&quot;:&quot;0&quot;,&quot;ip&quot;:&quot;127.0.0.1&quot;,&quot;source_url&quot;:&quot;https:\/\/gravity-export.test\/?gf_page=preview&amp;id=1&quot;,&quot;user_agent&quot;:&quot;Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/99.0.4844.84 Safari\/537.36&quot;,&quot;currency&quot;:&quot;EUR&quot;,&quot;payment_status&quot;:null,&quot;payment_date&quot;:null,&quot;payment_amount&quot;:null,&quot;payment_method&quot;:null,&quot;transaction_id&quot;:null,&quot;is_fulfilled&quot;:null,&quot;created_by&quot;:&quot;1&quot;,&quot;transaction_type&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;1.3&quot;:&quot;Test&quot;,&quot;1.6&quot;:&quot;Norg&quot;,&quot;2&quot;:&quot;test@doeken.org&quot;,&quot;3&quot;:&quot;Eerste keuze|1.3&quot;,&quot;4&quot;:&quot;Tweede keuze&quot;,&quot;11&quot;:&quot;&quot;,&quot;1.2&quot;:&quot;&quot;,&quot;1.4&quot;:&quot;&quot;,&quot;1.8&quot;:&quot;&quot;,&quot;6.1&quot;:&quot;&quot;,&quot;6.2&quot;:&quot;&quot;,&quot;6.3&quot;:&quot;&quot;,&quot;7&quot;:&quot;&quot;,&quot;8&quot;:&quot;&quot;,&quot;9&quot;:&quot;&quot;,&quot;10&quot;:&quot;&quot;,&quot;is_approved&quot;:false,&quot;workflow_current_status_timestamp&quot;:false},{&quot;id&quot;:&quot;245&quot;,&quot;form_id&quot;:&quot;1&quot;,&quot;post_id&quot;:null,&quot;date_created&quot;:&quot;2022-10-31 09:57:39&quot;,&quot;date_updated&quot;:&quot;2022-10-31 09:57:39&quot;,&quot;is_starred&quot;:&quot;0&quot;,&quot;is_read&quot;:&quot;0&quot;,&quot;ip&quot;:&quot;127.0.0.1&quot;,&quot;source_url&quot;:&quot;https:\/\/gravity-export.test\/?gf_page=preview&amp;id=1&amp;showhidden=1&amp;disable_notifications=1&quot;,&quot;user_agent&quot;:&quot;Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/106.0.0.0 Safari\/537.36&quot;,&quot;currency&quot;:&quot;EUR&quot;,&quot;payment_status&quot;:null,&quot;payment_date&quot;:null,&quot;payment_amount&quot;:null,&quot;payment_method&quot;:null,&quot;transaction_id&quot;:null,&quot;is_fulfilled&quot;:null,&quot;created_by&quot;:&quot;1&quot;,&quot;transaction_type&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;1.3&quot;:&quot;test&quot;,&quot;3&quot;:&quot;Eerste keuze|1.3&quot;,&quot;11&quot;:&quot;&quot;,&quot;1.2&quot;:&quot;&quot;,&quot;1.4&quot;:&quot;&quot;,&quot;1.6&quot;:&quot;&quot;,&quot;1.8&quot;:&quot;&quot;,&quot;2&quot;:&quot;Not provided&quot;,&quot;4&quot;:&quot;&quot;,&quot;6.1&quot;:&quot;&quot;,&quot;6.2&quot;:&quot;&quot;,&quot;6.3&quot;:&quot;&quot;,&quot;7&quot;:&quot;&quot;,&quot;8&quot;:&quot;&quot;,&quot;9&quot;:&quot;&quot;,&quot;10&quot;:&quot;&quot;,&quot;is_approved&quot;:false,&quot;workflow_current_status_timestamp&quot;:false},{&quot;id&quot;:&quot;246&quot;,&quot;form_id&quot;:&quot;1&quot;,&quot;post_id&quot;:null,&quot;date_created&quot;:&quot;2022-10-31 09:58:48&quot;,&quot;date_updated&quot;:&quot;2022-10-31 09:58:48&quot;,&quot;is_starred&quot;:&quot;0&quot;,&quot;is_read&quot;:&quot;0&quot;,&quot;ip&quot;:&quot;127.0.0.1&quot;,&quot;source_url&quot;:&quot;https:\/\/gravity-export.test\/?gf_page=preview&amp;id=1&amp;showhidden=1&amp;disable_notifications=1&quot;,&quot;user_agent&quot;:&quot;Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/106.0.0.0 Safari\/537.36&quot;,&quot;currency&quot;:&quot;EUR&quot;,&quot;payment_status&quot;:null,&quot;payment_date&quot;:null,&quot;payment_amount&quot;:null,&quot;payment_method&quot;:null,&quot;transaction_id&quot;:null,&quot;is_fulfilled&quot;:null,&quot;created_by&quot;:&quot;1&quot;,&quot;transaction_type&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;1.3&quot;:&quot;test&quot;,&quot;3&quot;:&quot;Eerste keuze|1.3&quot;,&quot;11&quot;:&quot;&quot;,&quot;1.2&quot;:&quot;&quot;,&quot;1.4&quot;:&quot;&quot;,&quot;1.6&quot;:&quot;&quot;,&quot;1.8&quot;:&quot;&quot;,&quot;2&quot;:&quot;Not provided&quot;,&quot;4&quot;:&quot;&quot;,&quot;6.1&quot;:&quot;&quot;,&quot;6.2&quot;:&quot;&quot;,&quot;6.3&quot;:&quot;&quot;,&quot;7&quot;:&quot;&quot;,&quot;8&quot;:&quot;&quot;,&quot;9&quot;:&quot;&quot;,&quot;10&quot;:&quot;&quot;,&quot;is_approved&quot;:false,&quot;workflow_current_status_timestamp&quot;:false},{&quot;id&quot;:&quot;247&quot;,&quot;form_id&quot;:&quot;1&quot;,&quot;post_id&quot;:null,&quot;date_created&quot;:&quot;2022-10-31 09:59:18&quot;,&quot;date_updated&quot;:&quot;2022-10-31 09:59:18&quot;,&quot;is_starred&quot;:&quot;0&quot;,&quot;is_read&quot;:&quot;0&quot;,&quot;ip&quot;:&quot;127.0.0.1&quot;,&quot;source_url&quot;:&quot;https:\/\/gravity-export.test\/?gf_page=preview&amp;id=1&amp;showhidden=1&amp;disable_notifications=1&quot;,&quot;user_agent&quot;:&quot;Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/106.0.0.0 Safari\/537.36&quot;,&quot;currency&quot;:&quot;EUR&quot;,&quot;payment_status&quot;:null,&quot;payment_date&quot;:null,&quot;payment_amount&quot;:null,&quot;payment_method&quot;:null,&quot;transaction_id&quot;:null,&quot;is_fulfilled&quot;:null,&quot;created_by&quot;:&quot;1&quot;,&quot;transaction_type&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;1.3&quot;:&quot;test&quot;,&quot;3&quot;:&quot;Eerste keuze|1.3&quot;,&quot;is_approved&quot;:&quot;3&quot;,&quot;11&quot;:&quot;&quot;,&quot;1.2&quot;:&quot;&quot;,&quot;1.4&quot;:&quot;&quot;,&quot;1.6&quot;:&quot;&quot;,&quot;1.8&quot;:&quot;&quot;,&quot;2&quot;:&quot;Not provided&quot;,&quot;4&quot;:&quot;&quot;,&quot;6.1&quot;:&quot;&quot;,&quot;6.2&quot;:&quot;&quot;,&quot;6.3&quot;:&quot;&quot;,&quot;7&quot;:&quot;&quot;,&quot;8&quot;:&quot;&quot;,&quot;9&quot;:&quot;&quot;,&quot;10&quot;:&quot;&quot;,&quot;workflow_current_status_timestamp&quot;:false},{&quot;id&quot;:&quot;255&quot;,&quot;form_id&quot;:&quot;1&quot;,&quot;post_id&quot;:null,&quot;date_created&quot;:&quot;2022-10-31 10:20:47&quot;,&quot;date_updated&quot;:&quot;2022-10-31 10:20:47&quot;,&quot;is_starred&quot;:&quot;0&quot;,&quot;is_read&quot;:&quot;0&quot;,&quot;ip&quot;:&quot;127.0.0.1&quot;,&quot;source_url&quot;:&quot;https:\/\/gravity-export.test\/?gf_page=preview&amp;id=1&amp;showhidden=1&amp;disable_notifications=1&quot;,&quot;user_agent&quot;:&quot;Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/106.0.0.0 Safari\/537.36&quot;,&quot;currency&quot;:&quot;EUR&quot;,&quot;payment_status&quot;:null,&quot;payment_date&quot;:null,&quot;payment_amount&quot;:null,&quot;payment_method&quot;:null,&quot;transaction_id&quot;:null,&quot;is_fulfilled&quot;:null,&quot;created_by&quot;:&quot;1&quot;,&quot;transaction_type&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;1.3&quot;:&quot;Test&quot;,&quot;3&quot;:&quot;Eerste keuze|1.3&quot;,&quot;is_approved&quot;:&quot;3&quot;,&quot;11&quot;:&quot;&quot;,&quot;1.2&quot;:&quot;&quot;,&quot;1.4&quot;:&quot;&quot;,&quot;1.6&quot;:&quot;&quot;,&quot;1.8&quot;:&quot;&quot;,&quot;2&quot;:&quot;Not provided&quot;,&quot;4&quot;:&quot;&quot;,&quot;6.1&quot;:&quot;&quot;,&quot;6.2&quot;:&quot;&quot;,&quot;6.3&quot;:&quot;&quot;,&quot;7&quot;:&quot;&quot;,&quot;8&quot;:&quot;&quot;,&quot;9&quot;:&quot;&quot;,&quot;10&quot;:&quot;&quot;,&quot;workflow_current_status_timestamp&quot;:false},{&quot;id&quot;:&quot;19669&quot;,&quot;form_id&quot;:&quot;1&quot;,&quot;post_id&quot;:null,&quot;date_created&quot;:&quot;2023-11-06 11:31:34&quot;,&quot;date_updated&quot;:&quot;2023-11-06 11:31:34&quot;,&quot;is_starred&quot;:&quot;0&quot;,&quot;is_read&quot;:&quot;0&quot;,&quot;ip&quot;:&quot;127.0.0.1&quot;,&quot;source_url&quot;:&quot;https:\/\/gravity-export.test\/?gf_page=preview&amp;id=1&quot;,&quot;user_agent&quot;:&quot;Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/118.0.0.0 Safari\/537.36&quot;,&quot;currency&quot;:&quot;USD&quot;,&quot;payment_status&quot;:null,&quot;payment_date&quot;:null,&quot;payment_amount&quot;:null,&quot;payment_method&quot;:null,&quot;transaction_id&quot;:null,&quot;is_fulfilled&quot;:null,&quot;created_by&quot;:&quot;1&quot;,&quot;transaction_type&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;1.3&quot;:&quot;test&quot;,&quot;1.6&quot;:&quot;test&quot;,&quot;3&quot;:&quot;Eerste keuze|130&quot;,&quot;9&quot;:&quot;https:\/\/gravity-export.test\/wp-content\/uploads\/gravity_forms\/1-5b4023ed8a3ff98299d7620ebfa60279\/2023\/11\/resize-chart.gif&quot;,&quot;10&quot;:&quot;[]&quot;,&quot;is_approved&quot;:&quot;3&quot;,&quot;11&quot;:&quot;&quot;,&quot;1.2&quot;:&quot;&quot;,&quot;1.4&quot;:&quot;&quot;,&quot;1.8&quot;:&quot;&quot;,&quot;2&quot;:&quot;Not provided&quot;,&quot;4&quot;:&quot;&quot;,&quot;6.1&quot;:&quot;&quot;,&quot;6.2&quot;:&quot;&quot;,&quot;6.3&quot;:&quot;&quot;,&quot;7&quot;:&quot;&quot;,&quot;8&quot;:&quot;&quot;,&quot;workflow_current_status_timestamp&quot;:false},{&quot;id&quot;:&quot;19707&quot;,&quot;form_id&quot;:&quot;1&quot;,&quot;post_id&quot;:null,&quot;date_created&quot;:&quot;2023-12-11 13:26:13&quot;,&quot;date_updated&quot;:&quot;2023-12-11 13:26:13&quot;,&quot;is_starred&quot;:&quot;0&quot;,&quot;is_read&quot;:&quot;0&quot;,&quot;ip&quot;:&quot;127.0.0.1&quot;,&quot;source_url&quot;:&quot;https:\/\/gravity-export.test\/?gf_page=preview&amp;id=1&quot;,&quot;user_agent&quot;:&quot;Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/119.0.0.0 Safari\/537.36&quot;,&quot;currency&quot;:&quot;USD&quot;,&quot;payment_status&quot;:null,&quot;payment_date&quot;:null,&quot;payment_amount&quot;:null,&quot;payment_method&quot;:null,&quot;transaction_id&quot;:null,&quot;is_fulfilled&quot;:null,&quot;created_by&quot;:&quot;1&quot;,&quot;transaction_type&quot;:null,&quot;status&quot;:&quot;active&quot;,&quot;11&quot;:&quot;test&quot;,&quot;1.3&quot;:&quot;test&quot;,&quot;3&quot;:&quot;Eerste keuze|130&quot;,&quot;10&quot;:&quot;[]&quot;,&quot;is_approved&quot;:&quot;3&quot;,&quot;1.2&quot;:&quot;&quot;,&quot;1.4&quot;:&quot;&quot;,&quot;1.6&quot;:&quot;&quot;,&quot;1.8&quot;:&quot;&quot;,&quot;2&quot;:&quot;Not provided&quot;,&quot;4&quot;:&quot;&quot;,&quot;6.1&quot;:&quot;&quot;,&quot;6.2&quot;:&quot;&quot;,&quot;6.3&quot;:&quot;&quot;,&quot;7&quot;:&quot;&quot;,&quot;8&quot;:&quot;&quot;,&quot;9&quot;:&quot;&quot;,&quot;workflow_current_status_timestamp&quot;:false}]}"></div><br />
+    <div data-dataview="test"></div>
 </div>
 </body>
 </html>

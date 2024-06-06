@@ -21,6 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once 'vendor/autoload.php';
 
+const DATAVIEW_PLUGIN_PATH = __FILE__;
+
 // Initialize the plugin.
 DataViewPlugin::get_instance(
 	new ArrayDataViewRepository(),
