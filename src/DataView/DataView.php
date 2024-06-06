@@ -254,6 +254,13 @@ final class DataView {
 		return $clone;
 	}
 
+	public function with_sort( ?Sort $sort ): self {
+		$clone       = clone $this;
+		$clone->sort = $sort;
+
+		return $clone;
+	}
+
 	/**
 	 * Returns the data needed to set up a
 	 * @return array

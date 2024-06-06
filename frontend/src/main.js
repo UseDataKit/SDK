@@ -12,6 +12,7 @@ const views = document.querySelectorAll( '[data-dataview]' );
 
     const dataViewData = datakit_dataviews[ dataViewID ];
     const wrapper = createRoot( dataview );
-    const dataView = createElement( DataView, dataViewData );
+    const dataView = createElement( DataView, { id: dataViewID, ...dataViewData } );
+
     wrapper.render( dataView );
 } );

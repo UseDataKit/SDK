@@ -19,9 +19,9 @@ final class ArrayDataSource extends BaseDataSource {
 	 * Creates the data source.
 	 * @since $ver$
 	 *
-	 * @param string $id The ID.
+	 * @param string $id   The ID.
 	 * @param string $name The name.
-	 * @param array $data The data.
+	 * @param array  $data The data.
 	 */
 	public function __construct(
 		string $id,
@@ -37,7 +37,7 @@ final class ArrayDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function id() : string {
+	public function id(): string {
 		return $this->id;
 	}
 
@@ -45,7 +45,7 @@ final class ArrayDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function name() : string {
+	public function name(): string {
 		return $this->name;
 	}
 
@@ -53,7 +53,7 @@ final class ArrayDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_ids( int $limit = 100, int $offset = 0 ) : array {
+	public function get_data_ids( int $limit = 100, int $offset = 0 ): array {
 		return array_slice( array_keys( $this->get_data() ), $offset, $limit );
 	}
 
@@ -61,11 +61,13 @@ final class ArrayDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_by_id( string $id ) : array {
+	public function get_data_by_id( string $id ): array {
 		$result = $this->data[ $id ] ?? null;
 		if ( ! $result ) {
 			throw new RuntimeException( 'Dataset for id not found.' );
 		}
+
+		$result['id'] = $id;
 
 		return $result;
 	}
@@ -74,7 +76,7 @@ final class ArrayDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function count() : int {
+	public function count(): int {
 		return count( $this->get_data() );
 	}
 
@@ -83,13 +85,13 @@ final class ArrayDataSource extends BaseDataSource {
 	 * @since $ver$
 	 * @return array The filtered data.
 	 */
-	private function get_data() : array {
+	private function get_data(): array {
 		$data = $this->data;
 
 		if ( $this->filters ) {
 			$data = array_filter(
 				$data,
-				function ( array $item ) : bool {
+				function ( array $item ): bool {
 					$is_match = true;
 					foreach ( $this->filters as $filter ) {
 						if ( ! $filter->matches( $item ) ) {
@@ -103,11 +105,11 @@ final class ArrayDataSource extends BaseDataSource {
 		}
 
 		if ( $this->sort ) {
-			$sort = $this->sort->to_array();
+			$sort    = $this->sort->to_array();
 			$is_desc = Sort::DESC === $sort['direction'];
-			$field = $sort['field'];
+			$field   = $sort['field'];
 
-			uasort( $data, static function ( array $a, array $b ) use ( $is_desc, $field ) : int {
+			uasort( $data, static function ( array $a, array $b ) use ( $is_desc, $field ): int {
 				if ( $is_desc ) {
 					[ $b, $a ] = [ $a, $b ];
 				}

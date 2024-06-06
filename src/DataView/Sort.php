@@ -26,11 +26,12 @@ final class Sort {
 	 * @param string $field The field name.
 	 */
 	private function __construct( string $field, string $direction ) {
-		$this->direction = $direction;
+		$this->direction = strtoupper( $direction );
 		$this->field     = $field;
+
 		if (
 			empty( $field )
-			|| ! in_array( strtoupper( $direction ), [ self::ASC, self::DESC ], true )
+			|| ! in_array( $this->direction, [ self::ASC, self::DESC ], true )
 		) {
 			throw new InvalidArgumentException( 'A sort consists of a field and a direction.' );
 		}

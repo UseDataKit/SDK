@@ -2,9 +2,9 @@
 
 namespace DataKit\DataView\Rest;
 
-use DataKit\DataView\DataView\DataViewNotFoundException;
 use DataKit\DataView\DataView\DataViewRepository;
 use DataKit\DataView\DataView\Filters;
+use DataKit\DataView\DataView\Sort;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -19,7 +19,7 @@ final class Router {
 	 * @since $ver$
 	 * @var string
 	 */
-	private const NAMESPACE = 'data-view/v1';
+	public const NAMESPACE = 'data-view/v1';
 
 	/**
 	 * The singleton router instance.
@@ -50,7 +50,7 @@ final class Router {
 	 * @since $ver$
 	 * @return void
 	 */
-	public function register_routes(): void {
+	public function register_routes() : void {
 		register_rest_route( self::NAMESPACE, '/' . 'view/(?<id>[^/]+)', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -59,7 +59,7 @@ final class Router {
 				'args'                => [
 					'search'  => [
 						'default'           => '',
-						'sanitize_callback' => fn( $value ): string => (string) $value,
+						'sanitize_callback' => fn( $value ) : string => (string) $value,
 					],
 					'filters' => [
 						'default'           => [],
@@ -87,15 +87,18 @@ final class Router {
 	 * @since $ver$
 	 * @return bool
 	 */
-	public function get_view_permissions_check(): bool {
+	public function get_view_permissions_check() : bool {
 		//todo
 		return true;
 	}
 
 	/**
-	 * @param WP_REST_Request $request
+	 * Returns the data for a DataView.
+	 * @since $ver$
 	 *
-	 * @return array|WP_Error
+	 * @param WP_REST_Request $request The request object.
+	 *
+	 * @return array|WP_Error The data or error object.
 	 */
 	public function get_view( WP_REST_Request $request ) {
 		try {
@@ -104,11 +107,15 @@ final class Router {
 
 			// Update view with provided params.
 			$data_view = $data_view
-				->with_filters(Filters::from_array( $params['filters'] ?? [] ) )
+				->with_filters( Filters::from_array( $params['filters'] ?? [] ) )
 				->with_search( $params['search'] ?? '' );
 
 			if ( $params['page'] ?? 0 ) {
 				$data_view = $data_view->with_pagination( $params['page'], $params['per_page'] ?? null );
+			}
+
+			if ( $params['sort'] ?? [] ) {
+				$data_view = $data_view->with_sort( Sort::from_array( $params['sort'] ) );
 			}
 
 			return $data_view->to_array();
@@ -122,7 +129,7 @@ final class Router {
 	 * @since $ver$
 	 * @return self The router.
 	 */
-	public static function get_instance( DataViewRepository $repository ): self {
+	public static function get_instance( DataViewRepository $repository ) : self {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self( $repository );
 		}
