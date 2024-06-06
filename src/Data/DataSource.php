@@ -69,7 +69,7 @@ interface DataSource extends Countable {
 	 *
 	 * @return static The (possibly immutable) data source.
 	 */
-	//Todo: add public function search_by ( string $search );
+	public function search_by ( string $search );
 
 	/**
 	 * Sets the filters for the data source.

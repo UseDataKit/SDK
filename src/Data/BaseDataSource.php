@@ -24,6 +24,12 @@ abstract class BaseDataSource implements DataSource {
 	protected ?Sort $sort = null;
 
 	/**
+	 * The string to search by.
+	 * @since $ver$
+	 */
+	protected string $search = '';
+
+	/**
 	 * @inheritDoc
 	 * @since $ver$
 	 * @return static
@@ -43,6 +49,17 @@ abstract class BaseDataSource implements DataSource {
 	public function sort_by( ?Sort $sort ) {
 		$clone       = clone $this;
 		$clone->sort = $sort;
+
+		return $clone;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function search_by( string $search ) {
+		$clone         = clone $this;
+		$clone->search = $search;
 
 		return $clone;
 	}

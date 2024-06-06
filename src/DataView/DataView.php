@@ -123,17 +123,10 @@ final class DataView {
 	 * @return DataSource The data source.
 	 */
 	private function data_source(): DataSource {
-		$data_source = $this->data_source;
-
-		if ( $this->sort ) {
-			$data_source = $data_source->sort_by( $this->sort );
-		}
-
-		if ( $this->filters ) {
-			$data_source = $data_source->filter_by( $this->filters );
-		}
-
-		return $data_source;
+		return $this->data_source
+			->sort_by( $this->sort )
+			->filter_by( $this->filters )
+			->search_by( $this->search );
 	}
 
 	/**
@@ -149,12 +142,10 @@ final class DataView {
 	 * Returns the data object for Data View.
 	 * @since $ver$
 	 *
-	 * @param DataSource|null $data_source An optional different data source.
-	 *
 	 * @return array The data object.
 	 */
-	public function data( ?DataSource $data_source = null ): array {
-		$data_source ??= $this->data_source();
+	private function data(): array {
+		$data_source = $this->data_source();
 
 		$object = [];
 

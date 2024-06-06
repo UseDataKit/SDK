@@ -88,21 +88,39 @@ final class ArrayDataSource extends BaseDataSource {
 	private function get_data(): array {
 		$data = $this->data;
 
-		if ( $this->filters ) {
-			$data = array_filter(
-				$data,
-				function ( array $item ): bool {
-					$is_match = true;
+		$data = array_filter(
+			$data,
+			function ( array $item ): bool {
+				$is_match = true;
+
+				if ( $this->search ) {
+					// Crude search on entire entry.
+					foreach ( $item as $value ) {
+						$is_match = false;
+						if ( stripos( (string) $value, $this->search ) !== false ) {
+							$is_match = true;
+							break;
+						}
+					}
+
+					if ( ! $is_match ) {
+						return false;
+					}
+				}
+
+				if ( $this->filters ) {
 					foreach ( $this->filters as $filter ) {
 						if ( ! $filter->matches( $item ) ) {
 							$is_match = false;
 							break;
 						}
 					}
+				}
 
-					return $is_match;
-				} );
-		}
+
+				return $is_match;
+			} );
+
 
 		if ( $this->sort ) {
 			$sort    = $this->sort->to_array();
