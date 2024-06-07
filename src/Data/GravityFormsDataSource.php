@@ -117,17 +117,31 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @return array {field_filters: array} The search criteria.
 	 */
 	private function get_search_criteria() : array {
-		if ( ! $this->filters ) {
+		if ( ! $this->filters && ! $this->search ) {
 			return [];
 		}
 
-		$filters                  = $this->top_level_filters();
-		$filters['field_filters'] = array_filter(
-			array_map(
-				\Closure::fromCallable( [ $this, 'transform_filter_to_field_filter' ] ),
-				$this->filters->to_array()
-			)
-		);
+		$filters = [];
+
+		if ( $this->filters ) {
+			$filters                  = $this->top_level_filters();
+			$filters['field_filters'] = array_filter(
+				array_map(
+					\Closure::fromCallable( [ $this, 'transform_filter_to_field_filter' ] ),
+					$this->filters->to_array()
+				)
+			);
+		}
+
+		if ( $this->search ) {
+			$filters['field_filters'] ??= [];
+
+			$filters['field_filters'][] = [
+				'field'    => '0',
+				'operator' => 'contains',
+				'value'    => $this->search,
+			];
+		}
 
 		return $filters;
 	}
@@ -141,7 +155,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @return null|array{key: string, value:string|int|float|array, operator:string} The field filter criteria.
 	 */
 	private function transform_filter_to_field_filter( array $filter ) : ?array {
-		if ( in_array( $filter['field'], [ 'status', 'start_date', 'end_date' ], true ) ) {
+		if ( in_array( $filter['field'], self::$top_level_filters, true ) ) {
 			return null;
 		}
 
