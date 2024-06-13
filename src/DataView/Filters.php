@@ -81,4 +81,22 @@ final class Filters implements IteratorAggregate {
 	public function getIterator() : ArrayIterator {
 		return new ArrayIterator( $this->filters );
 	}
+
+	/**
+	 * Returns whether the entry matches the filters.
+	 * @since $ver$
+	 *
+	 * @param array $data The data to match against.
+	 *
+	 * @return bool whether the entry matches the filters.
+	 */
+	public function match( array $data ) : bool {
+		foreach ( $this->filters as $filter ) {
+			if ( ! $filter->matches( $data ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

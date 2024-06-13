@@ -44,7 +44,7 @@ final class ArrayDataSourceTest extends TestCase {
 		self::assertCount( 3, $source );
 		self::assertSame( [ 'user::1', 'user::2', 'user::3' ], $source->get_data_ids() );
 		self::assertSame(
-			[ 'name' => 'Vlad', 'email' => 'vlad@gravitykit.com' ],
+			[ 'name' => 'Vlad', 'email' => 'vlad@gravitykit.com', 'id' => 'user::2' ],
 			$source->get_data_by_id( 'user::2' ),
 		);
 
@@ -63,6 +63,12 @@ final class ArrayDataSourceTest extends TestCase {
 		);
 
 		self::assertSame( [ 'user::1', 'user::2' ], $not_doeke->get_data_ids() );
-		self::assertCount(2, $not_doeke);
+		self::assertCount( 2, $not_doeke );
+
+		$search_by_vlad = $source->search_by( 'vlad' );
+		self::assertSame( [ 'user::2' ], $search_by_vlad->get_data_ids() );
+
+		$search_by_zack_or_vlad = $source->search_by( 'vlad zack' );
+		self::assertSame( [ 'user::1', 'user::2' ], $search_by_zack_or_vlad->get_data_ids() );
 	}
 }

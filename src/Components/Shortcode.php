@@ -73,6 +73,14 @@ final class Shortcode {
 			$dataview = $this->data_view_repository->get( $id );
 			$js       = sprintf( 'datakit_dataviews["%s"] = %s;', esc_attr( $id ), json_encode( $dataview->to_array() ) );
 
+			if (
+				wp_is_block_theme()
+				&& ! wp_script_is( 'datakit/data-view', 'registered' )
+			) {
+				add_action( 'wp_enqueue_scripts', function () use ( $js ) {
+					wp_add_inline_script( 'datakit/data-view', $js, 'before' );
+				} );
+			}
 			wp_add_inline_script( 'datakit/data-view', $js, 'before' );
 
 			$this->rendered[] = $id;

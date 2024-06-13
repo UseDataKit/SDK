@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { stringify } from 'qs';
 
 import '@wordpress/dataviews/build-style/style.css';
+import '@wordpress/components/build-style/style.css';
 
 export default function DataView( { id, view, fields, data, paginationInfo, supportedLayouts } ) {
     const [viewState, setView] = useState( view );

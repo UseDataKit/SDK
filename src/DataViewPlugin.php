@@ -40,6 +40,7 @@ final class DataViewPlugin {
 
 		add_action( 'data-view/register-data-view', [ $this, 'register_data_view' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_scripts' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'register_scripts' ] );
 	}
 
 	/**
@@ -48,7 +49,7 @@ final class DataViewPlugin {
 	 *
 	 * @param DataView $data_view The DataView.
 	 */
-	public function register_data_view( DataView $data_view ) : void {
+	public function register_data_view( DataView $data_view ): void {
 		$this->data_view_repository->save( $data_view );
 	}
 
@@ -56,10 +57,10 @@ final class DataViewPlugin {
 	 * Register the scripts and styles.
 	 * @since $ver$
 	 */
-	public function register_scripts() : void {
+	public function register_scripts(): void {
 		$assets_dir = plugin_dir_url( DATAVIEW_PLUGIN_PATH );
 
-		wp_register_script( 'datakit/data-view', $assets_dir . 'assets/js/data-view.js' );
+		wp_register_script( 'datakit/data-view', $assets_dir . 'assets/js/data-view.js', [], null, true );
 		wp_register_style( 'datakit/data-view', $assets_dir . 'assets/css/data-view.css' );
 		wp_add_inline_script(
 			'datakit/data-view',
@@ -75,7 +76,7 @@ final class DataViewPlugin {
 	 * @since $ver$
 	 * @return self The plugin.
 	 */
-	public static function get_instance( DataViewRepository $repository ) : self {
+	public static function get_instance( DataViewRepository $repository ): self {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self( $repository );
 		}

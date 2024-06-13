@@ -173,6 +173,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @param string $operator The field operator.
 	 *
 	 * @return string The Gravity Forms search operator.
+	 * @todo this needs to be fixed for all cases.
 	 */
 	private function map_operator( string $operator ) : string {
 		$case = Operator::tryFrom( $operator );
