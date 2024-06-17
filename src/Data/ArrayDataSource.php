@@ -3,15 +3,15 @@
 namespace DataKit\DataView\Data;
 
 use DataKit\DataView\Data\DataMatcher\ArrayDataMatcher;
+use DataKit\DataView\Data\Exception\DataNotFoundException;
 use DataKit\DataView\DataView\Filters;
 use DataKit\DataView\DataView\Sort;
-use RuntimeException;
 
 /**
  * A data source backed by a kay/value array.
  * @since $ver$
  */
-final class ArrayDataSource extends BaseDataSource {
+final class ArrayDataSource extends BaseDataSource implements MutableDataSource {
 	private string $id;
 	private string $name;
 	private array $data;
@@ -54,7 +54,7 @@ final class ArrayDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_ids( int $limit = 100, int $offset = 0 ) : array {
+	public function get_data_ids( int $limit = 20, int $offset = 0 ) : array {
 		return array_slice( array_keys( $this->get_data() ), $offset, $limit );
 	}
 
@@ -65,7 +65,7 @@ final class ArrayDataSource extends BaseDataSource {
 	public function get_data_by_id( string $id ) : array {
 		$result = $this->data[ $id ] ?? null;
 		if ( ! $result ) {
-			throw new RuntimeException( 'Dataset for id not found.' );
+			throw DataNotFoundException::with_id( $this, $id );
 		}
 
 		$result['id'] = $id;
@@ -119,5 +119,19 @@ final class ArrayDataSource extends BaseDataSource {
 
 
 		return $data;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function delete_data_by_id( string ...$ids ) : void {
+		foreach ( $ids as $id ) {
+			if ( ! isset( $this->data[ $id ] ) ) {
+				throw DataNotFoundException::with_id( $this, $id );
+			}
+
+			unset( $this->data[ $id ] );
+		}
 	}
 }

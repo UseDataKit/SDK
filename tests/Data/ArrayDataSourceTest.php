@@ -3,11 +3,12 @@
 namespace DataKit\DataView\Tests\Data;
 
 use DataKit\DataView\Data\ArrayDataSource;
+use DataKit\DataView\Data\Exception\DataNotFoundException;
 use DataKit\DataView\DataView\Filter;
 use DataKit\DataView\DataView\Filters;
 use DataKit\DataView\DataView\Sort;
 use PHPUnit\Framework\TestCase;
-
+use Throwable;
 
 /**
  * Unit tests for {@see ArrayDataSource}
@@ -15,11 +16,18 @@ use PHPUnit\Framework\TestCase;
  */
 final class ArrayDataSourceTest extends TestCase {
 	/**
-	 * Test case for
+	 * The data source under test.
+	 * @since $ver$
+	 * @var ArrayDataSource
+	 */
+	private ArrayDataSource $source;
+
+	/**
+	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function test_data_source() : void {
-		$source = new ArrayDataSource(
+	protected function setUp() : void {
+		$this->source = new ArrayDataSource(
 			'test',
 			'Test data set',
 			[
@@ -37,26 +45,32 @@ final class ArrayDataSourceTest extends TestCase {
 				],
 			],
 		);
+	}
 
-		self::assertSame( 'test', $source->id() );
-		self::assertSame( 'Test data set', $source->name() );
+	/**
+	 * Test case for
+	 * @since $ver$
+	 */
+	public function test_data_source() : void {
+		self::assertSame( 'test', $this->source->id() );
+		self::assertSame( 'Test data set', $this->source->name() );
 
-		self::assertCount( 3, $source );
-		self::assertSame( [ 'user::1', 'user::2', 'user::3' ], $source->get_data_ids() );
+		self::assertCount( 3, $this->source );
+		self::assertSame( [ 'user::1', 'user::2', 'user::3' ], $this->source->get_data_ids() );
 		self::assertSame(
 			[ 'name' => 'Vlad', 'email' => 'vlad@gravitykit.com', 'id' => 'user::2' ],
-			$source->get_data_by_id( 'user::2' ),
+			$this->source->get_data_by_id( 'user::2' ),
 		);
 
-		self::assertSame( [ 'user::1' ], $source->get_data_ids( 1 ) );
-		self::assertSame( [ 'user::3' ], $source->get_data_ids( 1, 2 ) );
+		self::assertSame( [ 'user::1' ], $this->source->get_data_ids( 1 ) );
+		self::assertSame( [ 'user::3' ], $this->source->get_data_ids( 1, 2 ) );
 
-		$asc  = $source->sort_by( Sort::asc( 'name' ) );
-		$desc = $source->sort_by( Sort::desc( 'name' ) );
+		$asc  = $this->source->sort_by( Sort::asc( 'name' ) );
+		$desc = $this->source->sort_by( Sort::desc( 'name' ) );
 		self::assertSame( [ 'user::3', 'user::2', 'user::1' ], $asc->get_data_ids() );
 		self::assertSame( [ 'user::1', 'user::2', 'user::3' ], $desc->get_data_ids() );
 
-		$not_doeke = $source->filter_by(
+		$not_doeke = $this->source->filter_by(
 			Filters::of(
 				Filter::isNot( 'name', 'Doeke' ),
 			)
@@ -65,10 +79,38 @@ final class ArrayDataSourceTest extends TestCase {
 		self::assertSame( [ 'user::1', 'user::2' ], $not_doeke->get_data_ids() );
 		self::assertCount( 2, $not_doeke );
 
-		$search_by_vlad = $source->search_by( 'vlad' );
+		$search_by_vlad = $this->source->search_by( 'vlad' );
 		self::assertSame( [ 'user::2' ], $search_by_vlad->get_data_ids() );
 
-		$search_by_zack_or_vlad = $source->search_by( 'vlad zack' );
+		$search_by_zack_or_vlad = $this->source->search_by( 'vlad zack' );
 		self::assertSame( [ 'user::1', 'user::2' ], $search_by_zack_or_vlad->get_data_ids() );
+	}
+
+	/**
+	 * Test case for
+	 * @since $ver$
+	 */
+	public function test_not_found() : void {
+		$this->expectException( DataNotFoundException::class );
+		$this->source->get_data_by_id( 'invalid' );
+	}
+
+	/**
+	 * Test case for
+	 * @since $ver$
+	 */
+	public function test_delete_by_id() : void {
+		$data = $this->source->get_data_by_id( 'user::1' );
+		self::assertSame( 'Zack', $data['name'] );
+
+		$this->source->delete_data_by_id( 'user::1', 'user::2' );
+		self::assertSame( [ 'user::3' ], $this->source->get_data_ids() );
+
+		try {
+			$this->source->delete_data_by_id( 'user::1' );
+		} catch ( Throwable $e ) {
+			self::assertInstanceOf( DataNotFoundException::class, $e );
+			self::assertSame( $this->source, $e->data_source() );
+		}
 	}
 }
