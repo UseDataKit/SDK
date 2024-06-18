@@ -76,7 +76,13 @@ abstract class Field {
 	 * @return string
 	 */
 	public function render() : string {
-		return $this->render;
+		$function = sprintf(
+			'( data ) => %s(%s, data, %s)',
+			$this->render,
+			$this->id,
+			json_encode([]),
+		);
+		return '__RAW__'.$function.'__ENDRAW__';
 	}
 
 	/**
@@ -166,7 +172,7 @@ abstract class Field {
 	/**
 	 * @return static
 	 */
-	public function visible()  {
+	public function visible() {
 		$clone            = clone $this;
 		$clone->is_hidden = false;
 
@@ -212,41 +218,7 @@ abstract class Field {
 			'render'        => $this->render(),
 			'enableHiding'  => $this->is_hideable,
 			'enableSorting' => $this->is_sortable,
-			'elements'      => $this->get_elements(),
 			'filterBy'      => $this->get_filter_by(),
 		];
-	}
-
-	/**
-	 *
-	 * @return array{}
-	 */
-	protected function get_elements() : array {
-		return [];
-	}
-
-	/**
-	 * Sets and validates the elements.
-	 * @since $ver$
-	 *
-	 * @param array $elements The elements.
-	 */
-	protected function set_elements( array $elements ) : void {
-		foreach ( $elements as $key => $element ) {
-			if ( is_string( $key ) && is_string( $element ) ) {
-				$elements[ $key ] = $element = [
-					'label' => $element,
-					'value' => $key,
-				];
-			}
-
-			if (
-				! is_array( $element )
-				|| ! isset( $element['label'], $element['value'] )
-			) {
-				throw new InvalidArgumentException( 'An element must have a label and a value.' );
-			}
-		}
-		$this->elements = array_values( $elements );
 	}
 }

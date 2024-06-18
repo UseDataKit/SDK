@@ -2,7 +2,9 @@
 
 namespace DataKit\DataView\Components;
 
+use DataKit\DataView\DataView\DataView;
 use DataKit\DataView\DataView\DataViewRepository;
+use JsonException;
 
 /**
  * Responsible for registering and rendering shortcodes.
@@ -55,7 +57,7 @@ final class Shortcode {
 	 *
 	 * @return string The shortcode output.
 	 */
-	public function render_shortcode( array $attributes ): string {
+	public function render_shortcode( array $attributes ) : string {
 		$id = $attributes['id'] ?? null;
 
 		if (
@@ -71,7 +73,7 @@ final class Shortcode {
 			wp_enqueue_style( 'datakit/data-view' );
 
 			$dataview = $this->data_view_repository->get( $id );
-			$js       = sprintf( 'datakit_dataviews["%s"] = %s;', esc_attr( $id ), json_encode( $dataview->to_array() ) );
+			$js       = sprintf( 'datakit_dataviews["%s"] = %s;', esc_attr( $id ), $this->get_js( $dataview ) );
 
 			if (
 				wp_is_block_theme()
@@ -94,11 +96,30 @@ final class Shortcode {
 	 * @since $ver$
 	 * @return self The singleton.
 	 */
-	public static function get_instance( DataViewRepository $data_view_repository ): self {
+	public static function get_instance( DataViewRepository $data_view_repository ) : self {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self( $data_view_repository );
 		}
 
 		return self::$instance;
+	}
+
+	/**
+	 * Get a valid javascript object representation of a data view.
+	 * @since $ver$
+	 *
+	 * @param DataView $dataview The data view to parse.
+	 *
+	 * @return string A javascript object representation of the data view.
+	 */
+	private function get_js( DataView $dataview ) : string {
+		try {
+			return str_replace( [
+				'"__RAW__',
+				'__ENDRAW__"',
+			], '', json_encode( $dataview->to_array(), JSON_THROW_ON_ERROR ) );
+		} catch ( JsonException $e ) {
+			return '';
+		}
 	}
 }

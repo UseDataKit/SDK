@@ -5,7 +5,7 @@ import { stringify } from 'qs';
 import '@wordpress/dataviews/build-style/style.css';
 import '@wordpress/components/build-style/style.css';
 
-export default function DataView( { id, view, fields, data, paginationInfo, supportedLayouts } ) {
+export default function DataView( { id, view, fields, actions, data, paginationInfo, supportedLayouts } ) {
     const [viewState, setView] = useState( view );
     const [dataState, setData] = useState( data );
     const [paginationState, setPagination] = useState( paginationInfo );
@@ -57,6 +57,7 @@ export default function DataView( { id, view, fields, data, paginationInfo, supp
         id={id}
         view={viewState}
         fields={fields}
+        actions={actions}
         data={dataState}
         paginationInfo={paginationState}
         supportedLayouts={supportedLayouts}

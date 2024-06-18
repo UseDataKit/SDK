@@ -3,5 +3,5 @@
 namespace DataKit\DataView\Field;
 
 final class DateTimeField extends Field {
-	protected string $render = 'fields.datetime';
+	protected string $render = 'datakit_fields.datetime';
 }

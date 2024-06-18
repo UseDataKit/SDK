@@ -32,7 +32,9 @@ export default defineConfig( {
     build: {
         outDir: '../assets',
         rollupOptions: {
-            input: 'src/main.js',
+            input: {
+                main: 'src/main.js'
+            },
             output: {
                 sourcemap: isProduction ? false : 'inline',
                 entryFileNames: `js/${assetName}.js`,

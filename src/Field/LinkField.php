@@ -10,7 +10,7 @@ final class LinkField extends Field {
 	private string $type = self::TYPE_NONE;
 	private string $link = '#';
 
-	protected string $render = 'fields.link';
+	protected string $render = 'datakit_fields.link';
 
 	public function linkToField( string $field_id ) : self {
 		$clone       = clone $this;

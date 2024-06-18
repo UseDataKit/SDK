@@ -173,7 +173,7 @@ final class DataView {
 		foreach ( $this->fields as $field ) {
 			$fields[] = array_filter(
 				$field->toArray(),
-				static fn( $value, $key ) => ! is_null( $value ) && 'render' !== $key,
+				static fn( $value, $key ) => ! is_null( $value ),
 				ARRAY_FILTER_USE_BOTH,
 			);
 		}
