@@ -31,11 +31,19 @@
                 "header": "Status",
                 "enableHiding": true,
                 "enableSorting": true,
-                "elements": [{ "label": "Active", "value": "active" }, {
-                    "label": "Trash",
-                    "value": "trash"
-                }, { "label": "Spam", "value": "spam" }],
-                "filterBy": { "operators": ["is"], "isPrimary": true }
+                "elements": [
+                    { "label": "Active", "value": "active" },
+                    { "label": "Trash", "value": "trash" },
+                    { "label": "Spam", "value": "spam" }
+                ],
+                "filterBy": { "operators": ["is"], "isPrimary": true },
+                "render": (data) => datakit_fields.enum('status', data, {
+                    elements: [
+                        { "label": "Active", "value": "active" },
+                        { "label": "Trash", "value": "trash" },
+                        { "label": "Spam", "value": "spam" }
+                    ]
+                } )
             }, {
                 "id": "date_created",
                 "header": "Date",
@@ -896,7 +904,7 @@
             "fields": [{
                 "id": "featured_image",
                 "header": "Image",
-                "render": ( data ) => datakit_fields.image( 'featured_image', data ),
+                "render": ( data ) => datakit_fields.image( 'featured_image', data, {width: 40} ),
             }, {
                 "id": "title",
                 "header": "Title",

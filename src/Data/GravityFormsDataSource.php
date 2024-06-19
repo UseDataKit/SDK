@@ -194,7 +194,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @return string[] The filters.
 	 */
 	private function top_level_filters() : array {
-		$filters = [ 'status' => 'active' ];
+		$filters = [ ];
 
 		foreach ( $this->filters->to_array() as $filter ) {
 			if ( ! in_array( $filter['field'], self::$top_level_filters, true ) ) {

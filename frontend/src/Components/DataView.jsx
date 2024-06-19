@@ -15,13 +15,14 @@ export default function DataView( { id, view, fields, actions, data, paginationI
         const query_params = stringify( request );
         const url = new URL( `${datakit_rest_endpoint}/view/${id}?${query_params}` );
 
-        fetch( url ).then( ( response ) => {
-            if ( !response.ok ) {
-                throw new Error( 'Network response was not ok' );
-            }
+        fetch( url )
+            .then( ( response ) => {
+                if ( !response.ok ) {
+                    throw new Error( 'Network response was not ok' );
+                }
 
-            return response.json();
-        } )
+                return response.json();
+            } )
             .then( ( { data, paginationInfo } ) => {
                 setData( data );
                 setPagination( paginationInfo )

@@ -4,6 +4,7 @@ namespace DataKit\DataView\Field;
 
 use DataKit\DataView\DataView\Operator;
 use InvalidArgumentException;
+use JsonException;
 
 /**
  * Represents an (immutable) field on the view.
@@ -23,20 +24,10 @@ abstract class Field {
 
 	protected function __construct(
 		string $id,
-		string $header,
-		$is_sortable = true,
-		$is_hideable = true,
-		array $operators = [],
-		$is_primary = true,
-		?string $default_value = null
+		string $header
 	) {
-		$this->default_value = $default_value;
-		$this->is_primary    = $is_primary;
-		$this->operators     = $operators;
-		$this->is_hideable   = $is_hideable;
-		$this->is_sortable   = $is_sortable;
-		$this->header        = $header;
-		$this->id            = $id;
+		$this->header = $header;
+		$this->id     = $id;
 	}
 
 	/**
@@ -76,13 +67,18 @@ abstract class Field {
 	 * @return string
 	 */
 	public function render() : string {
-		$function = sprintf(
-			'( data ) => %s(%s, data, %s)',
-			$this->render,
-			$this->id,
-			json_encode([]),
-		);
-		return '__RAW__'.$function.'__ENDRAW__';
+		try {
+			$function = sprintf(
+				'( data ) => %s(%s, data, %s)',
+				$this->render,
+				json_encode( $this->id, JSON_THROW_ON_ERROR ),
+				json_encode( $this->context(), JSON_THROW_ON_ERROR ),
+			);
+		} catch ( JsonException $e ) {
+			return '';
+		}
+
+		return '__RAW__' . $function . '__ENDRAW__';
 	}
 
 	/**
@@ -211,6 +207,11 @@ abstract class Field {
 		return $data[ $this->id() ] ?? $this->default_value ?: $this->default_value;
 	}
 
+	/**
+	 * Returns the field as an array object.
+	 * @since $ver$
+	 * @return array[] The field configuration.
+	 */
 	public function toArray() : array {
 		return [
 			'id'            => $this->id(),
@@ -220,5 +221,14 @@ abstract class Field {
 			'enableSorting' => $this->is_sortable,
 			'filterBy'      => $this->get_filter_by(),
 		];
+	}
+
+	/**
+	 * Returns the context needed for the javascript part of the field.
+	 * @since $ver$
+	 * @return array[] The context.
+	 */
+	protected function context() : array {
+		return [];
 	}
 }

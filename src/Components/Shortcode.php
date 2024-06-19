@@ -73,7 +73,7 @@ final class Shortcode {
 			wp_enqueue_style( 'datakit/data-view' );
 
 			$dataview = $this->data_view_repository->get( $id );
-			$js       = sprintf( 'datakit_dataviews["%s"] = %s;', esc_attr( $id ), $this->get_js( $dataview ) );
+			$js       = sprintf( 'datakit_dataviews["%s"] = %s;', esc_attr( $id ), $dataview->to_js() );
 
 			if (
 				wp_is_block_theme()
@@ -113,13 +113,5 @@ final class Shortcode {
 	 * @return string A javascript object representation of the data view.
 	 */
 	private function get_js( DataView $dataview ) : string {
-		try {
-			return str_replace( [
-				'"__RAW__',
-				'__ENDRAW__"',
-			], '', json_encode( $dataview->to_array(), JSON_THROW_ON_ERROR ) );
-		} catch ( JsonException $e ) {
-			return '';
-		}
 	}
 }
