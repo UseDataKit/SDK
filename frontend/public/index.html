@@ -890,7 +890,8 @@
                     "label": "View entry",
                     "isPrimary": true,
                     "icon": "info",
-                    "callback": ( data ) => datakit_dataviews_actions.url( data, { url: '{author_url}' } ),
+                    "RenderModal": ( props ) => datakit_modal( { ...props, context: { url: 'test-url' } } ),
+                    "hideModalHeader": true,
                 },
                 {
                     "id": "delete",

@@ -15,6 +15,7 @@ final class Action {
 	private string $url = '';
 
 	private bool $is_destructive = false;
+	private bool $is_header_hidden = false;
 
 	private function __construct( string $id, string $label ) {
 		$this->id    = $id;
@@ -65,6 +66,20 @@ final class Action {
 		return $action;
 	}
 
+	public function hide_header() {
+		$action                   = clone $this;
+		$action->is_header_hidden = true;
+
+		return $action;
+	}
+
+	public function show_header() {
+		$action                   = clone $this;
+		$action->is_header_hidden = false;
+
+		return $action;
+	}
+
 
 	public function to_array(): array {
 		$result = [
@@ -77,7 +92,8 @@ final class Action {
 		];
 
 		if ( $this->type === self::TYPE_MODAL ) {
-			$result['RenderModal'] = $this->render_modal();
+			$result['RenderModal']     = $this->render_modal();
+			$result['hideModalHeader'] = $this->is_header_hidden;
 		}
 
 		return $result;
@@ -106,8 +122,22 @@ final class Action {
 		return '__RAW__' . $callback . '__ENDRAW__';
 	}
 
-	private function render_modal(): string {
-		return 'Modal';
+	private function render_modal(): ?string {
+		if ( $this->type !== self::TYPE_MODAL ) {
+			return null;
+		}
+
+		try {
+			$modal = sprintf(
+				'( props ) => %s({...props, context: %s})',
+				'datakit_modal',
+				json_encode( $this->context(), JSON_THROW_ON_ERROR ),
+			);
+		} catch ( JsonException $e ) {
+			return '';
+		}
+
+		return '__RAW__' . $modal . '__ENDRAW__';
 	}
 
 	private function context(): array {

@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { createElement } from 'react';
 import DataView from '@src/Components/DataView';
+import Modal from '@src/Components/Modal';
 
 import Text from '@src/Fields/Text';
 import Html from '@src/Fields/Html';
@@ -30,6 +31,8 @@ window.datakit_fields = new Proxy( {
 window.datakit_dataviews_actions = {
     url: ( data, context ) => Url( data, context ),
 };
+
+window.datakit_modal = Modal;
 
 const views = document.querySelectorAll( '[data-dataview]' );
 [...views].forEach( dataview => {

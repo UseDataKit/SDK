@@ -10,7 +10,7 @@ export function get( data, key, fallback = null ) {
         return fallback;
     }
 
-    return data.key;
+    return data[key];
 }
 
 /**
@@ -22,7 +22,7 @@ export function get( data, key, fallback = null ) {
  */
 export function replace_tags( value, data ) {
     return value.replace( /{([^}]+)}/g, ( _, key ) => {
-        let val = data.hasOwnProperty( key ) ? data[ key ] : key;
+        let val = data.hasOwnProperty( key ) ? data[ key ] : null;
 
         if ( val === null ) {
             val = '';
