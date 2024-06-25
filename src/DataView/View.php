@@ -1,6 +1,6 @@
 <?php
 
-namespace DataKit\DataView\DataView;
+namespace DataKit\DataViews\DataView;
 
 /**
  * Represents the valid view types.

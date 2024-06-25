@@ -1,12 +1,12 @@
 <?php
 
-namespace DataKit\DataView\Data;
+namespace DataKit\DataViews\Data;
 
 use ArrayIterator;
 use CallbackFilterIterator;
 use Closure;
-use DataKit\DataView\Data\DataMatcher\ArrayDataMatcher;
-use DataKit\DataView\DataView\Sort;
+use DataKit\DataViews\Data\DataMatcher\ArrayDataMatcher;
+use DataKit\DataViews\DataView\Sort;
 use InvalidArgumentException;
 use Iterator;
 use LimitIterator;

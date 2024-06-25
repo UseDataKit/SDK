@@ -1,11 +1,11 @@
 <?php
 
-namespace DataKit\DataView\Data;
+namespace DataKit\DataViews\Data;
 
 use Countable;
-use DataKit\DataView\Data\Exception\DataNotFoundException;
-use DataKit\DataView\DataView\Filters;
-use DataKit\DataView\DataView\Sort;
+use DataKit\DataViews\Data\Exception\DataNotFoundException;
+use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Sort;
 
 /**
  * Represents a read-only data source.

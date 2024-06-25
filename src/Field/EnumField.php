@@ -1,15 +1,31 @@
 <?php
 
-namespace DataKit\DataView\Field;
+namespace DataKit\DataViews\Field;
 
 use InvalidArgumentException;
 
 /**
+ * Represents a field with elements that renders the label of the corresponding element.
  * @since $ver$
  */
 final class EnumField extends Field {
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
 	protected string $render = 'datakit_fields.enum';
 
+	/**
+	 * Contains the list of elements.
+	 * @since $ver$
+	 * @var array{value:string, label:string}[].
+	 */
+	protected array $elements = [];
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
 	protected function __construct(
 		string $id,
 		string $header,

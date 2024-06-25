@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataView\Data;
+namespace DataKit\DataViews\Data;
 
-use DataKit\DataView\Data\Exception\DataNotFoundException;
+use DataKit\DataViews\Data\Exception\DataNotFoundException;
 
 /**
  * Represents a mutable data source.

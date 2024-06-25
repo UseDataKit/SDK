@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataView\Data;
+namespace DataKit\DataViews\Data;
 
-use DataKit\DataView\DataView\Operator;
+use DataKit\DataViews\DataView\Operator;
 use GFAPI;
 use RuntimeException;
 use WP_Error;

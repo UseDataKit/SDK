@@ -1,9 +1,9 @@
 <?php
 
-namespace DataKit\DataView\DataView;
+namespace DataKit\DataViews\DataView;
 
-use DataKit\DataView\Data\DataSource;
-use DataKit\DataView\Field\Field;
+use DataKit\DataViews\Data\DataSource;
+use DataKit\DataViews\Field\Field;
 use JsonException;
 
 /**
@@ -20,6 +20,7 @@ final class DataView {
 	private DataSource $data_source;
 	private ?Sort $sort;
 	private ?Filters $filters;
+	private ?Actions $actions;
 	private string $search = '';
 	private int $page = 1;
 	private int $per_page = 100;
@@ -29,12 +30,12 @@ final class DataView {
 	 *
 	 * @since $ver$
 	 *
-	 * @param View $view The View type.
-	 * @param string $id The DataView ID.
-	 * @param array $fields The fields.
-	 * @param DataSource $data_source The data source.
-	 * @param Sort|null $sort The sorting.
-	 * @param Filters|null $filters The filters.
+	 * @param View         $view        The View type.
+	 * @param string       $id          The DataView ID.
+	 * @param array        $fields      The fields.
+	 * @param DataSource   $data_source The data source.
+	 * @param Sort|null    $sort        The sorting.
+	 * @param Filters|null $filters     The filters.
 	 */
 	private function __construct(
 		View $view,
@@ -42,12 +43,14 @@ final class DataView {
 		array $fields,
 		DataSource $data_source,
 		?Sort $sort = null,
-		?Filters $filters = null
+		?Filters $filters = null,
+		?Actions $actions = null
 	) {
 		$this->id   = $id;
 		$this->view = $view;
 
 		$this->filters     = $filters;
+		$this->actions     = $actions;
 		$this->sort        = $sort;
 		$this->data_source = $data_source;
 
@@ -59,11 +62,11 @@ final class DataView {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $id The DataView ID.
-	 * @param array $fields The fields.
-	 * @param DataSource $data_source The data source.
-	 * @param Sort|null $sort The sorting.
-	 * @param Filters|null $filters The filters.
+	 * @param string       $id          The DataView ID.
+	 * @param array        $fields      The fields.
+	 * @param DataSource   $data_source The data source.
+	 * @param Sort|null    $sort        The sorting.
+	 * @param Filters|null $filters     The filters.
 	 */
 	public static function table(
 		string $id,
@@ -71,7 +74,7 @@ final class DataView {
 		DataSource $data_source,
 		?Sort $sort = null,
 		?Filters $filters = null
-	) : self {
+	): self {
 		return new self(
 			View::Table(),
 			$id,
@@ -88,7 +91,7 @@ final class DataView {
 	 *
 	 * @param Field ...$fields The fields.
 	 **/
-	private function ensure_valid_fields( Field ...$fields ) : void {
+	private function ensure_valid_fields( Field ...$fields ): void {
 		$this->fields = array_merge( $this->fields, $fields );
 	}
 
@@ -97,7 +100,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return string The ID.
 	 */
-	public function id() : string {
+	public function id(): string {
 		return $this->id;
 	}
 
@@ -106,7 +109,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return array The view data object.
 	 */
-	private function view() : array {
+	private function view(): array {
 		return [
 			'search'       => $this->search,
 			'type'         => (string) $this->view,
@@ -124,7 +127,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return DataSource The data source.
 	 */
-	private function data_source() : DataSource {
+	private function data_source(): DataSource {
 		return $this->data_source
 			->sort_by( $this->sort )
 			->filter_by( $this->filters )
@@ -136,7 +139,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return int The offset.
 	 */
-	private function offset() : int {
+	private function offset(): int {
 		return ( $this->page - 1 ) * $this->per_page;
 	}
 
@@ -146,16 +149,15 @@ final class DataView {
 	 *
 	 * @return array The data object.
 	 */
-	private function data() : array {
+	private function data(): array {
 		$data_source = $this->data_source();
 
 		$object = [];
 
 		foreach ( $data_source->get_data_ids( $this->per_page, $this->offset() ) as $data_id ) {
 			$data = $data_source->get_data_by_id( $data_id );
-
 			foreach ( $this->fields as $field ) {
-				$data[ $field->id() ] = $field->value( $data );
+				$data[ $field->uuid() ] = $field->value( $data );
 			}
 
 			$object[] = $data;
@@ -165,11 +167,11 @@ final class DataView {
 	}
 
 	/**
-	 * Returns all the fields object.
+	 * Returns all the field objects.
 	 * @since $ver$
 	 * @return array[] The fields as arrays.
 	 */
-	private function fields() : array {
+	private function fields(): array {
 		$fields = [];
 
 		foreach ( $this->fields as $field ) {
@@ -183,11 +185,24 @@ final class DataView {
 	}
 
 	/**
+	 * Returns all the action objects.
+	 * @since $ver$
+	 * @return array[] The fields as arrays.
+	 */
+	private function actions(): array {
+		if ( ! $this->actions ) {
+			return [];
+		}
+
+		return $this->actions->to_array();
+	}
+
+	/**
 	 * Returns the paginationInfo object.
 	 * @since $ver$
 	 * @return array The pagination information.
 	 */
-	private function pagination_info() : array {
+	private function pagination_info(): array {
 		$total = $this->data_source()->count();
 
 		return [
@@ -202,14 +217,14 @@ final class DataView {
 	 * @return string[] The supported layouts.
 	 * @todo  provide option to add more.
 	 */
-	private function supported_layouts() : array {
+	private function supported_layouts(): array {
 		return [ (string) $this->view ];
 	}
 
 	/**
 	 * @return string[] The field ID's.
 	 */
-	private function hidden_fields() : array {
+	private function hidden_fields(): array {
 		$hidden_fields = [];
 		foreach ( $this->fields as $field ) {
 			if ( ! $field->is_hidden() ) {
@@ -221,15 +236,21 @@ final class DataView {
 		return $hidden_fields;
 	}
 
-
-	public function with_filters( ?Filters $filters ) : self {
+	public function with_filters( ?Filters $filters ): self {
 		$clone          = clone $this;
 		$clone->filters = $filters;
 
 		return $clone;
 	}
 
-	public function with_pagination( int $page, int $per_page = null ) : self {
+	public function with_actions( ?Actions $actions ): self {
+		$clone          = clone $this;
+		$clone->actions = $actions;
+
+		return $clone;
+	}
+
+	public function with_pagination( int $page, int $per_page = null ): self {
 		$clone       = clone $this;
 		$clone->page = max( 1, $page );
 		if ( $per_page > 0 ) {
@@ -239,14 +260,14 @@ final class DataView {
 		return $clone;
 	}
 
-	public function with_search( string $search ) : self {
+	public function with_search( string $search ): self {
 		$clone         = clone $this;
 		$clone->search = $search;
 
 		return $clone;
 	}
 
-	public function with_sort( ?Sort $sort ) : self {
+	public function with_sort( ?Sort $sort ): self {
 		$clone       = clone $this;
 		$clone->sort = $sort;
 
@@ -257,13 +278,14 @@ final class DataView {
 	 * Returns the data needed to set up a
 	 * @return array
 	 */
-	public function to_array() : array {
+	public function to_array(): array {
 		return [
 			'supportedLayouts' => $this->supported_layouts(),
 			'paginationInfo'   => $this->pagination_info(),
 			'view'             => $this->view(),
 			'fields'           => $this->fields(),
 			'data'             => $this->data(),
+			'actions'          => $this->actions(),
 		];
 	}
 
@@ -272,7 +294,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return string The javascript object.
 	 */
-	public function to_js( bool $is_pretty = false ) : string {
+	public function to_js( bool $is_pretty = false ): string {
 		$flags = JSON_THROW_ON_ERROR;
 		if ( $is_pretty ) {
 			$flags |= JSON_PRETTY_PRINT;
@@ -281,7 +303,7 @@ final class DataView {
 		try {
 			return preg_replace_callback(
 				'/\"__RAW__(.*?)__ENDRAW__\"/s',
-				static fn( array $matches ) : string => stripcslashes( $matches[1] ),
+				static fn( array $matches ): string => stripcslashes( $matches[1] ),
 				json_encode( $this->to_array(), $flags )
 			);
 		} catch ( JsonException $e ) {

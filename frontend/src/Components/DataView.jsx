@@ -13,7 +13,7 @@ export default function DataView( { id, view, fields, actions, data, paginationI
 
     const updateData = ( request ) => {
         const query_params = stringify( request );
-        const url = new URL( `${datakit_rest_endpoint}/view/${id}?${query_params}` );
+        const url = new URL( `${datakit_dataviews_rest_endpoint}/view/${id}?${query_params}` );
 
         fetch( url )
             .then( ( response ) => {

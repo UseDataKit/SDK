@@ -1,9 +1,9 @@
 <?php
 
-namespace DataKit\DataView\Components;
+namespace DataKit\DataViews\Components;
 
-use DataKit\DataView\DataView\DataView;
-use DataKit\DataView\DataView\DataViewRepository;
+use DataKit\DataViews\DataView\DataView;
+use DataKit\DataViews\DataView\DataViewRepository;
 use JsonException;
 
 /**
@@ -69,21 +69,21 @@ final class Shortcode {
 
 		// Only add dataset once per id.
 		if ( ! in_array( $id, $this->rendered, true ) ) {
-			wp_enqueue_script( 'datakit/data-view' );
-			wp_enqueue_style( 'datakit/data-view' );
+			wp_enqueue_script( 'datakit/dataview' );
+			wp_enqueue_style( 'datakit/dataview' );
 
 			$dataview = $this->data_view_repository->get( $id );
 			$js       = sprintf( 'datakit_dataviews["%s"] = %s;', esc_attr( $id ), $dataview->to_js() );
 
 			if (
 				wp_is_block_theme()
-				&& ! wp_script_is( 'datakit/data-view', 'registered' )
+				&& ! wp_script_is( 'datakit/dataview', 'registered' )
 			) {
 				add_action( 'wp_enqueue_scripts', function () use ( $js ) {
-					wp_add_inline_script( 'datakit/data-view', $js, 'before' );
+					wp_add_inline_script( 'datakit/dataview', $js, 'before' );
 				} );
 			}
-			wp_add_inline_script( 'datakit/data-view', $js, 'before' );
+			wp_add_inline_script( 'datakit/dataview', $js, 'before' );
 
 			$this->rendered[] = $id;
 		}

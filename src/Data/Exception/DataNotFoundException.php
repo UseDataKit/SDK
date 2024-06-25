@@ -1,9 +1,9 @@
 <?php
 
-namespace DataKit\DataView\Data\Exception;
+namespace DataKit\DataViews\Data\Exception;
 
-use DataKit\DataView\Data\DataSource;
-use DataKit\DataView\DataViewException;
+use DataKit\DataViews\Data\DataSource;
+use DataKit\DataViews\DataViewException;
 use Throwable;
 
 /**

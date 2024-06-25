@@ -1,6 +1,6 @@
 <?php
 
-namespace DataKit\DataView\DataView;
+namespace DataKit\DataViews\DataView;
 
 /**
  * A DataView repository backed by an array.

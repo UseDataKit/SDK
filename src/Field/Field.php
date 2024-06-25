@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataView\Field;
+namespace DataKit\DataViews\Field;
 
-use DataKit\DataView\DataView\Operator;
+use DataKit\DataViews\DataView\Operator;
 use InvalidArgumentException;
 use JsonException;
 
@@ -11,27 +11,117 @@ use JsonException;
  * @since $ver$
  */
 abstract class Field {
-	protected string $render = '';
-	protected bool $is_hidden = false;
-	protected array $elements = [];
+	/**
+	 * The field id.
+	 * @since $ver$
+	 * @var string
+	 */
 	protected string $id;
+
+	/**
+	 * The label on the header.
+	 * @since $ver$
+	 * @var string
+	 */
 	protected string $header;
-	protected $is_sortable = true;
-	protected $is_hideable = true;
-	protected array $operators = [];
-	protected $is_primary = true;
+
+	/**
+	 * The render function.
+	 * @since $ver$
+	 * @var string
+	 */
+	protected string $render = '';
+
+	/**
+	 * Whether the field is hidden by default.
+	 * @since $ver$
+	 * @var bool
+	 */
+	protected bool $is_hidden = false;
+
+	/**
+	 * Whether the field is sortable.
+	 * @since $ver$
+	 * @var bool
+	 */
+	protected bool $is_sortable = true;
+
+	/**
+	 * Whether the field is hideable.
+	 * @since $ver$
+	 * @var bool
+	 */
+	protected bool $is_hideable = true;
+
+	/**
+	 * Whether the fields filter is a primary filter.
+	 * @since $ver$
+	 * @var bool
+	 */
+	protected bool $is_primary = true;
+
+	/**
+	 * The default value to use if the value is empty.
+	 * @since $ver$
+	 * @var string|null
+	 */
 	protected ?string $default_value = null;
 
+	/**
+	 * The filter operators.
+	 * @since $ver$
+	 * @var array
+	 */
+	protected array $operators = [];
+	/**
+	 * The callback to return the value.
+	 * @since $ver$
+	 * @var callable
+	 */
+	protected $callback;
+
+	/**
+	 * The context object for the javascript renderer.
+	 * @since $ver$
+	 * @var array
+	 */
+	protected array $context = [];
+
+	/**
+	 * Creates the field.
+	 * @since $ver$
+	 *
+	 * @param string $id The field id.
+	 * @param string $header The field label.
+	 */
 	protected function __construct(
 		string $id,
 		string $header
 	) {
-		$this->header = $header;
-		$this->id     = $id;
+		$this->header      = $header;
+		$this->id          = $id;
+		$this->is_sortable = false;
+
+		$this->callback = static fn( string $id, array $data ) => $data[ $id ] ?? null;
+		$this->context  = $this->default_context();
 	}
 
 	/**
-	 * @return static
+	 * Returns a unique string for this field instance.
+	 * @since $ver$
+	 * @return string
+	 */
+	final public function uuid() : string {
+		return sprintf( '%s-%s',
+			$this->id(),
+			md5( serialize( [ $this->id, $this->header ] ) ),
+		);
+	}
+
+	/**
+	 * Named constructor for easy creation.
+	 * @since $ver$
+	 * @return static The field instance.
 	 */
 	public static function create( ...$args ) {
 		$instance = new static( ... $args );
@@ -71,7 +161,7 @@ abstract class Field {
 			$function = sprintf(
 				'( data ) => %s(%s, data, %s)',
 				$this->render,
-				json_encode( $this->id, JSON_THROW_ON_ERROR ),
+				json_encode( $this->uuid(), JSON_THROW_ON_ERROR ),
 				json_encode( $this->context(), JSON_THROW_ON_ERROR ),
 			);
 		} catch ( JsonException $e ) {
@@ -203,8 +293,31 @@ abstract class Field {
 		return $clone;
 	}
 
+	/**
+	 * Set the callback for the field to alter the value.
+	 * @since $ver$
+	 *
+	 * @param callable $callback The callback.
+	 *
+	 * @return static The field.
+	 */
+	public function callback( callable $callback ) {
+		$clone           = clone $this;
+		$clone->callback = $callback;
+
+		return $clone;
+	}
+
+	/**
+	 * Returns the value of the field on the provided data set.
+	 * @since $ver$
+	 *
+	 * @param array $data The data set.
+	 *
+	 * @return mixed The value.
+	 */
 	public function value( array $data ) {
-		return $data[ $this->id() ] ?? $this->default_value ?: $this->default_value;
+		return ( $this->callback )( $this->id(), $data ) ?? $this->default_value ?: $this->default_value;
 	}
 
 	/**
@@ -229,6 +342,15 @@ abstract class Field {
 	 * @return array[] The context.
 	 */
 	protected function context() : array {
+		return $this->context;
+	}
+
+	/**
+	 * Returns the default context of the field.
+	 * @since $ver$
+	 * @return array
+	 */
+	protected function default_context() : array {
 		return [];
 	}
 }

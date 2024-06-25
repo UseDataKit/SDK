@@ -1,11 +1,11 @@
 <?php
 
-namespace DataKit\DataView\Data;
+namespace DataKit\DataViews\Data;
 
-use DataKit\DataView\Data\DataMatcher\ArrayDataMatcher;
-use DataKit\DataView\Data\Exception\DataNotFoundException;
-use DataKit\DataView\DataView\Filters;
-use DataKit\DataView\DataView\Sort;
+use DataKit\DataViews\Data\DataMatcher\ArrayDataMatcher;
+use DataKit\DataViews\Data\Exception\DataNotFoundException;
+use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Sort;
 
 /**
  * A data source backed by a kay/value array.

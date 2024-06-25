@@ -11,7 +11,7 @@
 
     <script>
         let datakit_dataviews = {};
-        const datakit_rest_endpoint = 'https://gravity-export.test/wp-json/data-view/v1';
+        const datakit_dataviews_rest_endpoint = 'https://gravity-export.test/wp-json/dataviews/v1';
 
         datakit_dataviews[ "dataview-1" ] = {
             "supportedLayouts": ["table"],
@@ -37,7 +37,7 @@
                     { "label": "Spam", "value": "spam" }
                 ],
                 "filterBy": { "operators": ["is"], "isPrimary": true },
-                "render": (data) => datakit_fields.enum('status', data, {
+                "render": ( data ) => datakit_fields.enum( 'status', data, {
                     elements: [
                         { "label": "Active", "value": "active" },
                         { "label": "Trash", "value": "trash" },
@@ -890,7 +890,7 @@
                     "label": "View entry",
                     "isPrimary": true,
                     "icon": "info",
-                    "callback": ( data ) => console.log( data ),
+                    "callback": ( data ) => datakit_dataviews_actions.url( data, { url: '{author_url}' } ),
                 },
                 {
                     "id": "delete",
@@ -904,7 +904,7 @@
             "fields": [{
                 "id": "featured_image",
                 "header": "Image",
-                "render": ( data ) => datakit_fields.image( 'featured_image', data, {width: 40} ),
+                "render": ( data ) => datakit_fields.image( 'featured_image', data, { width: 40, class: 'rounded' } ),
             }, {
                 "id": "title",
                 "header": "Title",
@@ -921,11 +921,19 @@
                 "header": "Author",
                 "enableHiding": true,
                 "enableSorting": true,
+                "render": ( data ) => datakit_fields.link( 'author', data, {
+                    use_new_window: true,
+                    type: 'field',
+                    link: 'author_url',
+                } ),
             }, {
                 "id": "author_url",
                 "header": "Author URL",
                 "enableHiding": true,
                 "enableSorting": true,
+                "render": ( data ) => datakit_fields.link( 'author_url', data, {
+                    type: 'none',
+                } ),
             }],
             "data": [{
                 "id": 1,

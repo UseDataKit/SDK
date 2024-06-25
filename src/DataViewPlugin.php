@@ -1,11 +1,11 @@
 <?php
 
-namespace DataKit\DataView;
+namespace DataKit\DataViews;
 
-use DataKit\DataView\Components\Shortcode;
-use DataKit\DataView\DataView\DataView;
-use DataKit\DataView\DataView\DataViewRepository;
-use DataKit\DataView\Rest\Router;
+use DataKit\DataViews\Components\Shortcode;
+use DataKit\DataViews\DataView\DataView;
+use DataKit\DataViews\DataView\DataViewRepository;
+use DataKit\DataViews\Rest\Router;
 
 /**
  * Entry point for the plugin.
@@ -38,7 +38,7 @@ final class DataViewPlugin {
 		Router::get_instance( $this->data_view_repository );
 		Shortcode::get_instance( $this->data_view_repository );
 
-		add_action( 'data-view/register-data-view', [ $this, 'register_data_view' ] );
+		add_action( 'datakit/dataview/register', [ $this, 'register_data_view' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_scripts' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_scripts' ] );
 	}
@@ -60,13 +60,13 @@ final class DataViewPlugin {
 	public function register_scripts(): void {
 		$assets_dir = plugin_dir_url( DATAVIEW_PLUGIN_PATH );
 
-		wp_register_script( 'datakit/data-view', $assets_dir . 'assets/js/data-view.js', [], null, true );
-		wp_register_style( 'datakit/data-view', $assets_dir . 'assets/css/data-view.css' );
+		wp_register_script( 'datakit/dataview', $assets_dir . 'assets/js/dataview.js', [], null, true );
+		wp_register_style( 'datakit/dataview', $assets_dir . 'assets/css/dataview.css' );
 		wp_add_inline_script(
-			'datakit/data-view',
+			'datakit/dataview',
 			implode( "\n", [
 				'let datakit_dataviews = {};',
-				sprintf( 'const datakit_rest_endpoint = "%s";', esc_attr( get_rest_url( null, Router::NAMESPACE ) ) ),
+				sprintf( 'const datakit_dataviews_rest_endpoint = "%s";', esc_attr( get_rest_url( null, Router::NAMESPACE ) ) ),
 			] ),
 			'before' );
 	}

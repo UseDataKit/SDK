@@ -40,7 +40,6 @@ const get_label = ( value, elements ) => {
  * @constructor
  */
 export default function Enum( { name, item, context } ) {
-    console.log( context );
     const value = get_value( item, name );
     const elements = context.elements || [];
 

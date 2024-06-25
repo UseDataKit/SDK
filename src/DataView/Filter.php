@@ -1,6 +1,6 @@
 <?php
 
-namespace DataKit\DataView\DataView;
+namespace DataKit\DataViews\DataView;
 
 use BadMethodCallException;
 use InvalidArgumentException;

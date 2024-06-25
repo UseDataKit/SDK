@@ -1,14 +1,14 @@
 {
-	"name": "datakit/data-view",
+	"name": "datakit/dataviews",
 	"type": "library",
 	"autoload": {
 		"psr-4": {
-			"DataKit\\DataView\\": "src/"
+			"DataKit\\DataViews\\": "src/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"DataKit\\DataView\\Tests\\": "tests/"
+			"DataKit\\DataViews\\Tests\\": "tests/"
 		}
 	},
 	"authors": [

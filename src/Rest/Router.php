@@ -1,10 +1,10 @@
 <?php
 
-namespace DataKit\DataView\Rest;
+namespace DataKit\DataViews\Rest;
 
-use DataKit\DataView\DataView\DataViewRepository;
-use DataKit\DataView\DataView\Filters;
-use DataKit\DataView\DataView\Sort;
+use DataKit\DataViews\DataView\DataViewRepository;
+use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Sort;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -19,7 +19,7 @@ final class Router {
 	 * @since $ver$
 	 * @var string
 	 */
-	public const NAMESPACE = 'data-view/v1';
+	public const NAMESPACE = 'dataviews/v1';
 
 	/**
 	 * The singleton router instance.
@@ -50,7 +50,7 @@ final class Router {
 	 * @since $ver$
 	 * @return void
 	 */
-	public function register_routes() : void {
+	public function register_routes(): void {
 		register_rest_route( self::NAMESPACE, '/' . 'view/(?<id>[^/]+)', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -59,7 +59,7 @@ final class Router {
 				'args'                => [
 					'search'  => [
 						'default'           => '',
-						'sanitize_callback' => fn( $value ) : string => (string) $value,
+						'sanitize_callback' => fn( $value ): string => (string) $value,
 					],
 					'filters' => [
 						'default'           => [],
@@ -87,7 +87,7 @@ final class Router {
 	 * @since $ver$
 	 * @return bool
 	 */
-	public function get_view_permissions_check() : bool {
+	public function get_view_permissions_check(): bool {
 		//todo
 		return true;
 	}
@@ -118,7 +118,10 @@ final class Router {
 				$data_view = $data_view->with_sort( Sort::from_array( $params['sort'] ) );
 			}
 
-			return $data_view->to_array();
+			return array_intersect_key(
+				$data_view->to_array(),
+				array_flip( [ 'paginationInfo', 'data' ] ),
+			);
 		} catch ( \Exception $e ) {
 			return new WP_Error( $e->getCode(), $e->getMessage() );
 		}
@@ -129,7 +132,7 @@ final class Router {
 	 * @since $ver$
 	 * @return self The router.
 	 */
-	public static function get_instance( DataViewRepository $repository ) : self {
+	public static function get_instance( DataViewRepository $repository ): self {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self( $repository );
 		}

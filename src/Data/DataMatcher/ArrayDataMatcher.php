@@ -1,6 +1,6 @@
 <?php
 
-namespace DataKit\DataView\Data\DataMatcher;
+namespace DataKit\DataViews\Data\DataMatcher;
 
 final class ArrayDataMatcher {
 	/**

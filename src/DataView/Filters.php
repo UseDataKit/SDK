@@ -1,9 +1,9 @@
 <?php
 
-namespace DataKit\DataView\DataView;
+namespace DataKit\DataViews\DataView;
 
 use ArrayIterator;
-use DataKit\DataView\Field\Field;
+use DataKit\DataViews\Field\Field;
 use InvalidArgumentException;
 use IteratorAggregate;
 

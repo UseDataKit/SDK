@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataView\DataView;
+namespace DataKit\DataViews\DataView;
 
-use DataKit\DataView\DataViewException;
+use DataKit\DataViews\DataViewException;
 use Exception;
 
 /**
