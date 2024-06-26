@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataView\Tests\Field;
+namespace DataKit\DataViews\Tests\Field;
 
-use DataKit\DataView\Field\Field;
+use DataKit\DataViews\Field\Field;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,9 +31,8 @@ abstract class AbstractFieldTestCase extends TestCase {
 	 */
 	protected function createField( string $id, string $header ) : Field {
 		$field_class = static::fieldClass();
-		$field       = call_user_func( [ $field_class, 'create' ], $id, $header );
 
-		return $field;
+		return call_user_func( [ $field_class, 'create' ], $id, $header );
 	}
 
 	/**
@@ -55,6 +54,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 		$field       = $this->createField( 'field_id', 'Field header' );
 		$field_array = $field->toArray();
 
+		var_dump( $field_array );
 		self::assertSame( 'field_id', $field_array['id'] );
 		self::assertSame( 'Field header', $field_array['header'] );
 		self::assertTrue( $field_array['enableHiding'] );

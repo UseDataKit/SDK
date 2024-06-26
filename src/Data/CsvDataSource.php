@@ -163,11 +163,10 @@ final class CsvDataSource extends BaseDataSource {
 	}
 
 	/**
-	 * Returns the field keys and their labels.
+	 * @inheritDoc
 	 * @since $ver$
-	 * @return array<string, string> Key => Label.
 	 */
-	private function fields() : array {
+	public function get_fields() : array {
 		return $this->file()->current() ?? [];
 	}
 
@@ -196,4 +195,5 @@ final class CsvDataSource extends BaseDataSource {
 
 		return true;
 	}
+
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace DataKit\DataView\Tests\DataView;
+namespace DataKit\DataViews\Tests\DataView;
 
-use DataKit\DataView\DataView\Filter;
-use DataKit\DataView\DataView\Filters;
+use DataKit\DataViews\DataView\Filter;
+use DataKit\DataViews\DataView\Filters;
 use PHPUnit\Framework\TestCase;
 
 /**

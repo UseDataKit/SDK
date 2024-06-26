@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataView\Tests\Field;
+namespace DataKit\DataViews\Tests\Field;
 
-use DataKit\DataView\Field\TextField;
+use DataKit\DataViews\Field\TextField;
 
 final class TextFieldTest extends AbstractFieldTestCase {
 	/**

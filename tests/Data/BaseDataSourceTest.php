@@ -1,11 +1,11 @@
 <?php
 
-namespace DataKit\DataView\Tests\Data;
+namespace DataKit\DataViews\Tests\Data;
 
-use DataKit\DataView\Data\BaseDataSource;
-use DataKit\DataView\DataView\Filter;
-use DataKit\DataView\DataView\Filters;
-use DataKit\DataView\DataView\Sort;
+use DataKit\DataViews\Data\BaseDataSource;
+use DataKit\DataViews\DataView\Filter;
+use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Sort;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -45,6 +45,10 @@ final class BaseDataSourceTest extends TestCase {
 
 			public function count() : int {
 				return 0;
+			}
+
+			public function get_fields() : array {
+				return [];
 			}
 		};
 	}

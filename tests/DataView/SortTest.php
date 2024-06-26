@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataView\Tests\DataView;
+namespace DataKit\DataViews\Tests\DataView;
 
-use DataKit\DataView\DataView\Sort;
+use DataKit\DataViews\DataView\Sort;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

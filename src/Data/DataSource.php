@@ -48,6 +48,13 @@ interface DataSource extends Countable {
 	public function get_data_by_id( string $id ) : array;
 
 	/**
+	 * Returns a value => label array of the available fields for the data source.
+	 * @since $ver$
+	 * @return array<string, string> The fields.
+	 */
+	public function get_fields() : array;
+
+	/**
 	 * Returns the total amount of results for this data source.
 	 *
 	 * This method should take into account any filtering that might be applied.

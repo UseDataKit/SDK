@@ -1,10 +1,10 @@
 <?php
 
-namespace DataKit\DataView\Tests\DataView;
+namespace DataKit\DataViews\Tests\DataView;
 
 use BadMethodCallException;
-use DataKit\DataView\DataView\Filter;
-use DataKit\DataView\DataView\Operator;
+use DataKit\DataViews\DataView\Filter;
+use DataKit\DataViews\DataView\Operator;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

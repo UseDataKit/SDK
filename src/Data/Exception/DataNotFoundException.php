@@ -3,14 +3,14 @@
 namespace DataKit\DataViews\Data\Exception;
 
 use DataKit\DataViews\Data\DataSource;
-use DataKit\DataViews\DataViewException;
+use DataKit\DataViews\DataViewsException;
 use Throwable;
 
 /**
  * Thrown when the data was not found.
  * @since $ver$
  */
-final class DataNotFoundException extends DataViewException {
+final class DataNotFoundException extends DataViewsException {
 	/**
 	 * The data source that triggered the exception.
 	 * @since $ver$

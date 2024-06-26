@@ -1,10 +1,10 @@
 <?php
 
-namespace DataKit\DataView\Tests\DataView;
+namespace DataKit\DataViews\Tests\DataView;
 
-use DataKit\DataView\Data\ArrayDataSource;
-use DataKit\DataView\DataView\DataView;
-use DataKit\DataView\Field\EnumField;
+use DataKit\DataViews\Data\ArrayDataSource;
+use DataKit\DataViews\DataView\DataView;
+use DataKit\DataViews\Field\EnumField;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,15 +20,16 @@ final class DataViewTest extends TestCase {
 		$view = DataView::table(
 			'test',
 			[
-				EnumField::create( 'test', 'Test', [ 'test' => 'Tes"\'t' ] ),
+				$field = EnumField::create( 'test', 'Test', [ 'test' => 'Tes"\'t' ] ),
 			],
 			new ArrayDataSource( 'test', 'Test', [
 				'test' => [ 'test' => 'Test' ]
 			] )
 		);
 
+		$uuid     = $field->uuid();
 		$expected = <<<TEXT
-"render":( data ) => datakit_fields.enum("test", data, {"elements":[{"label":"Tes\"'t","value":"test"}]}),
+"render":( data ) => datakit_fields.enum("$uuid", data, {"elements":[{"label":"Tes\"'t","value":"test"}]}),
 TEXT;
 
 		self::assertStringContainsString( $expected, $view->to_js() );

@@ -1,11 +1,11 @@
 <?php
 
-namespace DataKit\DataView\Tests\Data;
+namespace DataKit\DataViews\Tests\Data;
 
-use DataKit\DataView\Data\CsvDataSource;
-use DataKit\DataView\DataView\Filter;
-use DataKit\DataView\DataView\Filters;
-use DataKit\DataView\DataView\Sort;
+use DataKit\DataViews\Data\CsvDataSource;
+use DataKit\DataViews\DataView\Filter;
+use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Sort;
 use PHPUnit\Framework\TestCase;
 
 /**

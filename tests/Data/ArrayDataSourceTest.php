@@ -1,12 +1,12 @@
 <?php
 
-namespace DataKit\DataView\Tests\Data;
+namespace DataKit\DataViews\Tests\Data;
 
-use DataKit\DataView\Data\ArrayDataSource;
-use DataKit\DataView\Data\Exception\DataNotFoundException;
-use DataKit\DataView\DataView\Filter;
-use DataKit\DataView\DataView\Filters;
-use DataKit\DataView\DataView\Sort;
+use DataKit\DataViews\Data\ArrayDataSource;
+use DataKit\DataViews\Data\Exception\DataNotFoundException;
+use DataKit\DataViews\DataView\Filter;
+use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Sort;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -40,8 +40,9 @@ final class ArrayDataSourceTest extends TestCase {
 					'email' => 'vlad@gravitykit.com',
 				],
 				'user::3' => [
-					'name'  => 'Doeke',
-					'email' => 'doeke@gravitykit.com',
+					'name'      => 'Doeke',
+					'email'     => 'doeke@gravitykit.com',
+					'extra_key' => 'Extra value',
 				],
 			],
 		);
@@ -112,5 +113,16 @@ final class ArrayDataSourceTest extends TestCase {
 			self::assertInstanceOf( DataNotFoundException::class, $e );
 			self::assertSame( $this->source, $e->data_source() );
 		}
+	}
+
+	/**
+	 * Test case for
+	 * @since $ver$
+	 */
+	public function test_get_fields() : void {
+		self::assertSame(
+			[ 'name' => 'name', 'email' => 'email', 'extra_key' => 'extra_key' ],
+			$this->source->get_fields()
+		);
 	}
 }

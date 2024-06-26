@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataView\Tests\Field;
+namespace DataKit\DataViews\Tests\Field;
 
-use DataKit\DataView\Field\LinkField;
+use DataKit\DataViews\Field\LinkField;
 
 final class LinkFieldTest extends AbstractFieldTestCase {
 	/**

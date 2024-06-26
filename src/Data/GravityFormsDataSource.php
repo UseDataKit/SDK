@@ -2,8 +2,11 @@
 
 namespace DataKit\DataViews\Data;
 
+use DataKit\DataViews\Data\Exception\DataSourceNotFoundException;
 use DataKit\DataViews\DataView\Operator;
+use GF_Field;
 use GFAPI;
+use GFExport;
 use RuntimeException;
 use WP_Error;
 
@@ -34,6 +37,13 @@ final class GravityFormsDataSource extends BaseDataSource {
 	private array $entries;
 
 	/**
+	 * Microcache for the data source fields.
+	 * @since $ver$
+	 * @var array<string, string>
+	 */
+	private array $fields;
+
+	/**
 	 * Creates the data source.
 	 * @since $ver$
 	 *
@@ -42,7 +52,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	public function __construct( int $form_id ) {
 		$form = GFAPI::get_form( $form_id );
 		if ( ! is_array( $form ) ) {
-			throw new RuntimeException( 'Form not found' );
+			throw new DataSourceNotFoundException( sprintf( 'Gravity Forms data source (%d) not found', $form_id ) );
 		}
 
 		$this->form = $form;
@@ -191,10 +201,10 @@ final class GravityFormsDataSource extends BaseDataSource {
 	/**
 	 * Returns the top level filters for the Gravity Forms API.
 	 * @since $ver$
-	 * @return string[] The filters.
+	 * @return array[] The filters.
 	 */
 	private function top_level_filters() : array {
-		$filters = [ ];
+		$filters = [];
 
 		foreach ( $this->filters->to_array() as $filter ) {
 			if ( ! in_array( $filter['field'], self::$top_level_filters, true ) ) {
@@ -207,15 +217,62 @@ final class GravityFormsDataSource extends BaseDataSource {
 		return $filters;
 	}
 
+	/**
+	 * Returns the sorting for gravity forms based on the Sort object.
+	 * @since $ver$
+	 * @return array The Gravity Forms sorting.
+	 */
 	private function get_sorting() : array {
 		if ( ! $this->sort ) {
 			return [];
 		}
+
 		$sort = $this->sort->to_array();
 
 		return [
 			'key'       => $sort['field'],
 			'direction' => $sort['direction'],
 		];
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function get_fields() : array {
+		if ( isset( $this->fields ) ) {
+			return $this->fields;
+		}
+
+		$output = [];
+
+		$form   = GFExport::add_default_export_fields( $this->form );
+		$fields = $form['fields'];
+
+		/**
+		 * @var GF_Field[] $fields Gravity Forms fields.
+		 */
+		foreach ( $fields as $field ) {
+			$label = $field->get_field_label( true, '' );
+
+			$output[ (string) $field->id ] = $label;
+
+			if ( ! is_array( $field->inputs ) ) {
+				continue;
+			}
+
+			foreach ( $field->inputs as $input ) {
+				$key       = $input['id'] ?? null;
+				$sub_label = $input['label'] ?? null;
+
+				if ( ! isset( $key, $sub_label ) ) {
+					continue;
+				}
+
+				$output[ $key ] = $sub_label;
+			}
+		}
+
+		return $this->fields = $output;
 	}
 }

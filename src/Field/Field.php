@@ -100,7 +100,6 @@ abstract class Field {
 	) {
 		$this->header      = $header;
 		$this->id          = $id;
-		$this->is_sortable = false;
 
 		$this->callback = static fn( string $id, array $data ) => $data[ $id ] ?? null;
 		$this->context  = $this->default_context();

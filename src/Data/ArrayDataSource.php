@@ -134,4 +134,20 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 			unset( $this->data[ $id ] );
 		}
 	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function get_fields() : array {
+		$keys = [];
+
+		foreach ( $this->data as $data ) {
+			$keys[] = array_keys( $data );
+		}
+
+		$keys = array_unique( array_merge( ...$keys ) );
+
+		return array_combine( $keys, $keys );
+	}
 }
