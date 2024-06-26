@@ -24,6 +24,7 @@ final class DataView {
 	private string $search = '';
 	private int $page = 1;
 	private int $per_page = 100;
+	private bool $is_search = true;
 
 	/**
 	 * Creates the DataView.
@@ -261,8 +262,17 @@ final class DataView {
 	}
 
 	public function with_search( string $search ): self {
-		$clone         = clone $this;
-		$clone->search = $search;
+		$clone            = clone $this;
+		$clone->is_search = true;
+		$clone->search    = $search;
+
+		return $clone;
+	}
+
+	public function without_search(): self {
+		$clone            = clone $this;
+		$clone->is_search = false;
+		$clone->search    = '';
 
 		return $clone;
 	}
@@ -280,6 +290,7 @@ final class DataView {
 	 */
 	public function to_array(): array {
 		return [
+			'search'           => $this->is_search,
 			'supportedLayouts' => $this->supported_layouts(),
 			'paginationInfo'   => $this->pagination_info(),
 			'view'             => $this->view(),

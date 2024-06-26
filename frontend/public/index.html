@@ -899,7 +899,17 @@
                     "isPrimary": true,
                     "icon": "trash",
                     "isDestructive": true,
-                    "callback": ( data ) => console.log( data ),
+                    "supportsBulk": true,
+                    "callback": ( data ) => datakit_dataviews_actions.url( data, {
+                        'confirm': "You sure?",
+                        url: 'https://reqres.in/api/user',
+                        type: 'ajax',
+                        method: 'POST',
+                        params: {
+                            'name': '{author}',
+                        },
+                        use_single_request: true,
+                    } ),
                 }
             ],
             "fields": [{

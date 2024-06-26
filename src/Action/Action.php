@@ -6,60 +6,90 @@ use JsonException;
 
 final class Action {
 	private const TYPE_URL = 'url';
+	private const TYPE_AJAX = 'ajax';
 	private const TYPE_MODAL = 'modal';
 
 	private string $type;
 	private string $id;
 	private string $label;
 	private string $icon = '';
-	private string $url = '';
 
 	private bool $is_destructive = false;
 	private bool $is_header_hidden = false;
+	private bool $is_bulk = false;
+
+	private array $context = [];
 
 	private function __construct( string $id, string $label ) {
 		$this->id    = $id;
 		$this->label = $label;
 	}
 
-	public static function modal( string $id, string $label, string $url ): self {
-		$action       = new self( $id, $label );
-		$action->type = self::TYPE_MODAL;
-		$action->url  = $url;
+	public static function modal( string $id, string $label, string $url ) : self {
+		$action                 = new self( $id, $label );
+		$action->type           = self::TYPE_MODAL;
+		$action->context['url'] = $url;
 
 		return $action;
 	}
 
-	public static function url( string $id, string $label, string $url ): self {
+	public static function url( string $id, string $label, string $url ) : self {
 		$action       = new self( $id, $label );
 		$action->type = self::TYPE_URL;
-		$action->url  = $url;
+
+		$action->context['url'] = $url;
 
 		return $action;
 	}
 
-	public function primary( string $icon ): self {
+	public static function ajax(
+		string $id,
+		string $label,
+		string $url,
+		string $method = 'GET',
+		array $params = [],
+		bool $use_single_request = false
+	) : self {
+		$action       = new self( $id, $label );
+		$action->type = self::TYPE_AJAX;
+
+		$action->context['url']                = $url;
+		$action->context['method']             = $method;
+		$action->context['params']             = $params;
+		$action->context['use_single_request'] = $use_single_request;
+
+		return $action;
+	}
+
+	public function confirm( ?string $message ) : self {
+		$action                     = clone $this;
+		$action->context['confirm'] = $message;
+
+		return $action;
+	}
+
+	public function primary( string $icon ) : self {
 		$action       = clone $this;
 		$action->icon = $icon;
 
 		return $action;
 	}
 
-	public function secondary(): self {
+	public function secondary() : self {
 		$action       = clone $this;
 		$action->icon = '';
 
 		return $action;
 	}
 
-	public function destructive(): self {
+	public function destructive() : self {
 		$action                 = clone $this;
 		$action->is_destructive = true;
 
 		return $action;
 	}
 
-	public function not_destructive(): self {
+	public function not_destructive() : self {
 		$action                 = clone $this;
 		$action->is_destructive = false;
 
@@ -80,8 +110,14 @@ final class Action {
 		return $action;
 	}
 
+	public function bulk() : self {
+		$action          = clone $this;
+		$action->is_bulk = true;
 
-	public function to_array(): array {
+		return $action;
+	}
+
+	public function to_array() : array {
 		$result = [
 			'id'            => $this->id,
 			'label'         => $this->label,
@@ -89,6 +125,7 @@ final class Action {
 			'isDestructive' => $this->is_destructive,
 			'icon'          => $this->icon,
 			'callback'      => $this->callback(),
+			'supportsBulk'  => $this->is_bulk,
 		];
 
 		if ( $this->type === self::TYPE_MODAL ) {
@@ -104,15 +141,15 @@ final class Action {
 	 * @since $ver$
 	 * @return string|null The callback.
 	 */
-	private function callback(): ?string {
-		if ( $this->type !== self::TYPE_URL ) {
+	private function callback() : ?string {
+		if ( $this->type === self::TYPE_MODAL ) {
 			return null;
 		}
 
 		try {
 			$callback = sprintf(
-				'( data ) => %s(data, %s)',
-				'datakit_dataviews_actions.url',
+				'( data ) => datakit_dataviews_actions.%s(data, %s)',
+				'url',
 				json_encode( $this->context(), JSON_THROW_ON_ERROR ),
 			);
 		} catch ( JsonException $e ) {
@@ -122,7 +159,7 @@ final class Action {
 		return '__RAW__' . $callback . '__ENDRAW__';
 	}
 
-	private function render_modal(): ?string {
+	private function render_modal() : ?string {
 		if ( $this->type !== self::TYPE_MODAL ) {
 			return null;
 		}
@@ -140,10 +177,13 @@ final class Action {
 		return '__RAW__' . $modal . '__ENDRAW__';
 	}
 
-	private function context(): array {
-		return [
-			'id'  => $this->id,
-			'url' => $this->url,
-		];
+	private function context() : array {
+		return array_merge(
+			$this->context,
+			[
+				'id'   => $this->id,
+				'type' => $this->type,
+			]
+		);
 	}
 }
