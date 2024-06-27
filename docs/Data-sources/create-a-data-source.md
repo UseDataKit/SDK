@@ -22,11 +22,11 @@ value `csv`. In addition to this, the data source has a `name` method that retur
 type. This label is used for the (future) dataview builder UI.
 
 ```php
-public function id(): string {
+public function id() : string {
     return 'custom';
 }
 
-public function name(): string {
+public function name() : string {
     return 'My custom data source';
 }
 ```
@@ -73,7 +73,7 @@ class that returns `Filter` objects, which in turn can be turned into an array. 
 also be turned into a usable array. In both cases you call the `to_array` method on the object.
 
 ```php
-private function data(): array {
+private function data() : array {
     $filters = $this->filters->to_array();
     //or
     foreach( $filters as $filter) {
@@ -109,7 +109,7 @@ array contains the following keys:
 - `direction` either `ASC` (ascending) or `DESC` (descending)
 
 ```php
-private function data(): array {
+private function data() : array {
     // ...
     $sorting = $this->sort->to_array(); 
 }
@@ -132,4 +132,93 @@ public function get_fields() : array {
 
 ## Mutable data source
 
-TODO
+As DataKit matures, more features will be added. One of the first features we did want to address right away, is the
+ability to delete a result. For this we introduced the `MutableDataSource`. As the name suggests, this data source can
+apply changes on its data; it is [mutable](https://en.wiktionary.org/wiki/mutable).
+
+### Deleting a result
+
+After implementing the `MutableDataSource` on the data source class, you need to implement the
+`public function delete_data_by_id( string ...$ids ) : void;` method. As you can see it allows you to provide multiple
+id's to be removed, via the spread operator (`...`). This means the method is able to delete a single result, as well as
+multiple results at once (depending on the backing implementation).
+
+Notice that the return type is `void`. This means DataKit will assume the deletion was successful, unless it encounters
+a `DataNotFoundException`.
+
+```php
+use DataKit\DataViews\Data\Exception\DataNotFoundException;
+
+public function delete_data_by_id( string ...$ids ) : void {
+    try {
+        DataSourceApi::delete_by_ids( $ids );
+    } catch ( NotFoundException $e ){
+        throw new DataNotFoundException( $this, $e->getMessage(), 404, $e );
+    }
+    
+    // or
+    foreach ( $ids as $id ) {
+        if (! DataSourceApi::has( $id )) {
+            throw new DataNotFoundException( $this, $e->getMessage(), 404, $e );
+        }
+        
+        DataSourceApi::delete_by_id($id);
+    }
+}
+```
+
+Notice how in this example we provide a reference to the current data source (`$this`) on the `DataNotFoundException`.
+This is useful for logging purposes, for example.
+
+## Composing a data source
+
+By default, DataKit only provides either `final` or `abstract` classes. This makes it easier for us to add new features,
+and change implementation details; without introducing breaking changes to the end user. We believe in composition over
+inheritance, which is why we provide interfaces and a `DataSourceDecorator` to aid in that process.
+
+We understand that you might have a data source that only has a fixed set of data, and does not support pagination
+out-of-the-box. This means you could use the `ArrayDataSource` to add most of the functionality, except for the data.
+
+Here is an example of how you could create such a data source with composition.
+
+```php
+use DataKit\DataViews\Data\DataSource;
+use DataKit\DataViews\Data\ArrayDataSource;
+use DataKit\DataViews\Data\DataSourceDecorator;
+
+// Extend the abstract datasource decorator to proxy most methods. 
+final class CustomDataSource extends DataSourceDecorator {
+	/**
+	 * Property to memoize the inner data source.
+	 * @var ArrayDataSource
+	 */
+	private ArrayDataSource $inner;
+
+	public function __construct( ...$arguments ) {
+		// Create an instance with the necessary arguments and dependencies, but don't retrieve the results yet!
+		// This instance might only be used to show the name on the UI, or not even used on the current page,
+		// so retrieving results can be premature here.
+	}
+
+	public function id() : string {
+		return 'custom';
+	}
+
+	public function name() : string {
+		return 'My Custom Data Source';
+	}
+
+	protected function decorated_datasource() : DataSource {
+		// We already instantiated the
+		if ( isset( $this->inner ) ) {
+			return $this->inner;
+		}
+
+		// Retrieve the results
+		$results = get_results_from_api_call();
+
+		// Instantiate and memoize the inner data source for future calls.
+		return $this->inner = new ArrayDataSource( $this->id(), $this->name(), $results );
+	}
+}
+```
