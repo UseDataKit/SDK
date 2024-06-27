@@ -1,0 +1,236 @@
+<?php
+
+namespace DataKit\DataViews\Data;
+
+use DataKit\DataViews\Cache\CacheProvider;
+use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Sort;
+use InvalidArgumentException;
+use JsonException;
+
+/**
+ * A data sources that wraps a different data source in a cache layer.
+ *
+ * NOTE: This class is used internally. When registering your data source you do not need to wrap
+ * the instance yourself. This will be done by DataKit.
+ *
+ * @since $ver$
+ * @internal This class is subject to change.
+ */
+final class CachedDataSource extends BaseDataSource implements MutableDataSource {
+	/**
+	 * The data source to cache.
+	 * @since $ver$
+	 * @var DataSource
+	 */
+	private DataSource $inner;
+
+	/**
+	 * The caching provider.
+	 * @since $ver$
+	 * @var CacheProvider
+	 */
+	private CacheProvider $cache;
+
+	/**
+	 * Creates a cached data source decorator.
+	 * @since $ver$
+	 *
+	 * @param DataSource $inner The wrapped data source.
+	 * @param CacheProvider $cache The cache provider .
+	 */
+	public function __construct( DataSource $inner, CacheProvider $cache ) {
+		$this->inner = $inner;
+		$this->cache = $cache;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function id() : string {
+		return $this->inner->id();
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function name() : string {
+		return $this->inner->name();
+	}
+
+	/**
+	 * Returns a calculated key based on a set of arguments.
+	 * @since $ver$
+	 *
+	 * @param mixed ...$arguments any scalar arguments used calculate a unique cache key.
+	 *
+	 * @return string @return string The cache key.
+	 */
+	private function get_cache_key( ...$arguments ) : string {
+		$arguments[] = $this->inner->id();
+
+		try {
+			return md5( json_encode( $arguments, JSON_THROW_ON_ERROR ) );
+		} catch ( JsonException $e ) {
+			throw new InvalidArgumentException(
+				'The cache key could not be generated based on the provide arguments',
+				$e->getCode(),
+				$e
+			);
+		}
+	}
+
+	/**
+	 * Returns a calculated key based on a set of arguments and the inner data source and filters.
+	 * @since $ver$
+	 *
+	 * @param mixed ...$arguments any scalar arguments used calculate a unique cache key.
+	 *
+	 * @return string The cache key.
+	 */
+	private function get_filter_aware_cache_key( ...$arguments ) : string {
+		$arguments[] = $this->filters ? $this->filters->to_array() : null;
+		$arguments[] = $this->sort ? $this->sort->to_array() : null;
+		$arguments[] = $this->search;
+
+		return $this->get_cache_key( ...$arguments );
+	}
+
+	/**
+	 * Retrieves the result from the cache, or stores if it does not exist.
+	 * @since $ver$
+	 *
+	 * @param string $cache_key The cache key.
+	 * @param callable $retrieve_result The callback that provides the result to cache.
+	 *
+	 * @return mixed The cached result.
+	 */
+	private function fetch( string $cache_key, callable $retrieve_result ) {
+		$result = $this->cache->get( $cache_key );
+
+		if ( $result !== null ) {
+			return $result;
+		}
+
+		$result = $retrieve_result();
+
+		// Todo: cache this key on a group cache, so we can invalidate all cached keys in one swoop.
+		$this->cache->set( $cache_key, $result );
+
+		return $result;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function get_data_ids( int $limit = 20, int $offset = 0 ) : array {
+		$key = $this->get_filter_aware_cache_key( __FUNCTION__, $limit, $offset );
+
+		return $this->fetch( $key, function () use ( $limit, $offset ) {
+			return $this->inner->get_data_ids( $limit, $offset );
+		} );
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function get_data_by_id( string $id ) : array {
+		$key = $this->get_cache_key( __FUNCTION__, $id );
+
+		return $this->fetch( $key, function () use ( $id ) {
+			return $this->inner->get_data_by_id( $id );
+		} );
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * Note: This method is not cached, as it should always show the actual fields.
+	 *
+	 * @since $ver$
+	 */
+	public function get_fields() : array {
+		return $this->inner->get_fields();
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function count() : int {
+		$key = $this->get_filter_aware_cache_key( __FUNCTION__ );
+
+		return $this->fetch( $key, fn() => $this->inner->count() );
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function filter_by( ?Filters $filters ) : self {
+		$cached        = parent::filter_by( $filters );
+		$cached->inner = $this->inner->filter_by( $filters );
+
+		return $cached;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function search_by( string $search ) : self {
+		$cached        = parent::search_by( $search );
+		$cached->inner = $this->inner->search_by( $search );
+
+		return $cached;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function sort_by( ?Sort $sort ) : self {
+		$cached        = parent::sort_by( $sort );
+		$cached->inner = $this->inner->sort_by( $sort );
+
+		return $cached;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function can_delete() : bool {
+		if ( ! $this->inner instanceof MutableDataSource ) {
+			return false;
+		}
+
+		return $this->inner->can_delete();
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function delete_data_by_id( string ...$ids ) : void {
+		if ( ! $this->inner instanceof MutableDataSource ) {
+			return;
+		}
+
+		$this->inner->delete_data_by_id( ...$ids );
+	}
+
+	/**
+	 * Clears the underlying cache for this data source.
+	 * @since $ver$
+	 * @return bool Whether the cache was cleared.
+	 */
+	public function clear_cache() : bool {
+		// Todo: only clear the cache for the keys for this data source.
+		return $this->cache->clear();
+	}
+}

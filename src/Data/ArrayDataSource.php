@@ -125,6 +125,14 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * @inheritDoc
 	 * @since $ver$
 	 */
+	public function can_delete() : bool {
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
 	public function delete_data_by_id( string ...$ids ) : void {
 		foreach ( $ids as $id ) {
 			if ( ! isset( $this->data[ $id ] ) ) {

@@ -9,7 +9,7 @@ use DataKit\DataViews\DataView\Sort;
  * A base class for easier decorator or proxy creation.
  * @since $ver$
  */
-abstract class DataSourceDecorator implements DataSource {
+abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 	/**
 	 * Should return the decorated (or proxy) data source.
 	 *
@@ -78,5 +78,31 @@ abstract class DataSourceDecorator implements DataSource {
 	 */
 	public function sort_by( ?Sort $sort ) {
 		return $this->decorated_datasource()->sort_by( $sort );
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function can_delete() : bool {
+		$inner = $this->decorated_datasource();
+
+		if ( ! $inner instanceof MutableDataSource ) {
+			return false;
+		}
+
+		return $inner->can_delete();
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function delete_data_by_id( string ...$ids ) : void {
+		$inner = $this->decorated_datasource();
+
+		if ( $inner instanceof MutableDataSource ) {
+			$inner->delete_data_by_id( ...$ids );
+		}
 	}
 }
