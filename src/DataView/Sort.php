@@ -15,7 +15,19 @@ final class Sort {
 	 */
 	public const ASC = 'ASC';
 	public const DESC = 'DESC';
+
+	/**
+	 * The field to sort.
+	 * @since $ver$
+	 * @var string
+	 */
 	private string $field;
+
+	/**
+	 * The direction to sort in.
+	 * @since $ver$
+	 * @var string
+	 */
 	private string $direction;
 
 	/**

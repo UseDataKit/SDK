@@ -8,11 +8,13 @@ use JsonException;
 
 /**
  * Represents an (immutable) field on the view.
+ *
  * @since $ver$
  */
 abstract class Field {
 	/**
 	 * The field id.
+	 *
 	 * @since $ver$
 	 * @var string
 	 */
@@ -20,6 +22,7 @@ abstract class Field {
 
 	/**
 	 * The label on the header.
+	 *
 	 * @since $ver$
 	 * @var string
 	 */
@@ -27,6 +30,7 @@ abstract class Field {
 
 	/**
 	 * The render function.
+	 *
 	 * @since $ver$
 	 * @var string
 	 */
@@ -34,6 +38,7 @@ abstract class Field {
 
 	/**
 	 * Whether the field is hidden by default.
+	 *
 	 * @since $ver$
 	 * @var bool
 	 */
@@ -41,6 +46,7 @@ abstract class Field {
 
 	/**
 	 * Whether the field is sortable.
+	 *
 	 * @since $ver$
 	 * @var bool
 	 */
@@ -48,6 +54,7 @@ abstract class Field {
 
 	/**
 	 * Whether the field is hideable.
+	 *
 	 * @since $ver$
 	 * @var bool
 	 */
@@ -55,6 +62,7 @@ abstract class Field {
 
 	/**
 	 * Whether the fields filter is a primary filter.
+	 *
 	 * @since $ver$
 	 * @var bool
 	 */
@@ -62,6 +70,7 @@ abstract class Field {
 
 	/**
 	 * The default value to use if the value is empty.
+	 *
 	 * @since $ver$
 	 * @var string|null
 	 */
@@ -69,12 +78,15 @@ abstract class Field {
 
 	/**
 	 * The filter operators.
+	 *
 	 * @since $ver$
 	 * @var array
 	 */
 	protected array $operators = [];
+
 	/**
 	 * The callback to return the value.
+	 *
 	 * @since $ver$
 	 * @var callable
 	 */
@@ -82,6 +94,7 @@ abstract class Field {
 
 	/**
 	 * The context object for the javascript renderer.
+	 *
 	 * @since $ver$
 	 * @var array
 	 */
@@ -89,17 +102,18 @@ abstract class Field {
 
 	/**
 	 * Creates the field.
+	 *
 	 * @since $ver$
 	 *
-	 * @param string $id The field id.
+	 * @param string $id     The field id.
 	 * @param string $header The field label.
 	 */
 	protected function __construct(
 		string $id,
 		string $header
 	) {
-		$this->header      = $header;
-		$this->id          = $id;
+		$this->header = $header;
+		$this->id     = $id;
 
 		$this->callback = static fn( string $id, array $data ) => $data[ $id ] ?? null;
 		$this->context  = $this->default_context();
@@ -107,6 +121,7 @@ abstract class Field {
 
 	/**
 	 * Returns a unique string for this field instance.
+	 *
 	 * @since $ver$
 	 * @return string
 	 */
@@ -119,6 +134,7 @@ abstract class Field {
 
 	/**
 	 * Named constructor for easy creation.
+	 *
 	 * @since $ver$
 	 * @return static The field instance.
 	 */
@@ -134,6 +150,7 @@ abstract class Field {
 
 	/**
 	 * Unique identifier for the field.
+	 *
 	 * @since $ver$
 	 * @return string
 	 */
@@ -143,6 +160,7 @@ abstract class Field {
 
 	/**
 	 * The field’s name to be shown in the UI
+	 *
 	 * @since $ver$
 	 * @return string
 	 */
@@ -152,6 +170,7 @@ abstract class Field {
 
 	/**
 	 * Function that renders the field. Should be any of the field type renderers; e.g. `fields.html`.
+	 *
 	 * @since $ver$
 	 * @return string
 	 */
@@ -207,9 +226,10 @@ abstract class Field {
 	/**
 	 * @return static
 	 */
-	public function not_hideable() {
+	public function always_visible() {
 		$clone              = clone $this;
 		$clone->is_hideable = false;
+		$clone->is_hidden   = false;
 
 		return $clone;
 	}
@@ -248,8 +268,9 @@ abstract class Field {
 	 * @return static
 	 */
 	public function hidden() {
-		$clone            = clone $this;
-		$clone->is_hidden = true;
+		$clone              = clone $this;
+		$clone->is_hidden   = true;
+		$clone->is_hideable = true;
 
 		return $clone;
 	}
@@ -272,7 +293,7 @@ abstract class Field {
 		return [
 			'operators' => array_map(
 				static fn( Operator $operator ) : string => (string) $operator,
-				$this->operators
+				$this->operators,
 			),
 			'isPrimary' => $this->is_primary,
 		];
@@ -294,6 +315,7 @@ abstract class Field {
 
 	/**
 	 * Set the callback for the field to alter the value.
+	 *
 	 * @since $ver$
 	 *
 	 * @param callable $callback The callback.
@@ -309,6 +331,7 @@ abstract class Field {
 
 	/**
 	 * Returns the value of the field on the provided data set.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $data The data set.
@@ -316,11 +339,12 @@ abstract class Field {
 	 * @return mixed The value.
 	 */
 	public function value( array $data ) {
-		return ( $this->callback )( $this->id(), $data ) ?? $this->default_value ?: $this->default_value;
+		return ( $this->callback )( $this->id(), $data ) ?? $this->default_value;
 	}
 
 	/**
 	 * Returns the field as an array object.
+	 *
 	 * @since $ver$
 	 * @return array[] The field configuration.
 	 */
@@ -337,6 +361,7 @@ abstract class Field {
 
 	/**
 	 * Returns the context needed for the javascript part of the field.
+	 *
 	 * @since $ver$
 	 * @return array[] The context.
 	 */
@@ -346,6 +371,7 @@ abstract class Field {
 
 	/**
 	 * Returns the default context of the field.
+	 *
 	 * @since $ver$
 	 * @return array
 	 */

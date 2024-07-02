@@ -13,8 +13,8 @@
         let datakit_dataviews = {};
         const datakit_dataviews_rest_endpoint = 'https://gravity-export.test/wp-json/dataviews/v1';
 
-        datakit_dataviews[ "dataview-1" ] = {
-            "supportedLayouts": ["table"],
+        datakit_dataviews["dataview-1"] = {
+            "supportedLayouts": [ "table" ],
             "paginationInfo": { "totalItems": 344, "totalPages": 23 },
             "view": {
                 "search": "",
@@ -26,7 +26,7 @@
                 "hiddenFields": [],
                 "layout": []
             },
-            "fields": [{
+            "fields": [ {
                 "id": "status",
                 "header": "Status",
                 "enableHiding": true,
@@ -36,7 +36,7 @@
                     { "label": "Trash", "value": "trash" },
                     { "label": "Spam", "value": "spam" }
                 ],
-                "filterBy": { "operators": ["is"], "isPrimary": true },
+                "filterBy": { "operators": [ "is" ], "isPrimary": true },
                 "render": ( data ) => datakit_fields.enum( 'status', data, {
                     elements: [
                         { "label": "Active", "value": "active" },
@@ -56,9 +56,9 @@
                 "enableHiding": true,
                 "enableSorting": true,
                 "elements": [],
-                "filterBy": { "operators": ["is", "isNot"], "isPrimary": false }
-            }],
-            "data": [{
+                "filterBy": { "operators": [ "is", "isNot" ], "isPrimary": false }
+            } ],
+            "data": [ {
                 "id": "28",
                 "form_id": "1",
                 "post_id": null,
@@ -868,11 +868,11 @@
                 "gravityview_ratings_vote_up": false,
                 "gravityview_ratings_votes": false,
                 "gravityview_ratings_total": false
-            }]
+            } ]
         };
 
-        datakit_dataviews[ 'test' ] = {
-            "supportedLayouts": ["table"],
+        datakit_dataviews['test'] = {
+            "supportedLayouts": [ "table" ],
             "paginationInfo": { "totalItems": 3, "totalPages": 1 },
             "view": {
                 "search": "",
@@ -881,7 +881,7 @@
                 "perPage": 100,
                 "page": 1,
                 "sort": { "field": "author", "direction": "ASC" },
-                "hiddenFields": ["author_url"],
+                "hiddenFields": [ "author_url" ],
                 "layout": []
             },
             "actions": [
@@ -900,7 +900,7 @@
                     "icon": "trash",
                     "isDestructive": true,
                     "supportsBulk": true,
-                    "callback": ( data ) => datakit_dataviews_actions.url( data, {
+                    "callback": ( data, { registry } ) => datakit_dataviews_actions.url( data, {
                         'confirm': "You sure?",
                         url: 'https://reqres.in/api/user',
                         type: 'ajax',
@@ -909,10 +909,11 @@
                             'name': '{author}',
                         },
                         use_single_request: true,
+                        registry
                     } ),
                 }
             ],
-            "fields": [{
+            "fields": [ {
                 "id": "featured_image",
                 "header": "Image",
                 "render": ( data ) => datakit_fields.image( 'featured_image', data, { width: 40, class: 'rounded' } ),
@@ -945,8 +946,8 @@
                 "render": ( data ) => datakit_fields.link( 'author_url', data, {
                     type: 'none',
                 } ),
-            }],
-            "data": [{
+            } ],
+            "data": [ {
                 "id": 1,
                 "title": "<strong>Third</strong> result",
                 "author": "Aaron Applesteen",
@@ -968,7 +969,7 @@
                 "author_url": "https:\/\/gravitykit.com",
                 "description": "Second description",
                 "featured_image": "https://picsum.photos/100?q=3",
-            }]
+            } ]
         }
     </script>
 </head>

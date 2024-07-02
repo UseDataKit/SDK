@@ -2,8 +2,11 @@
 
 namespace DataKit\DataViews\Rest;
 
+use DataKit\DataViews\Data\MutableDataSource;
+use DataKit\DataViews\DataView\DataViewRenderer;
 use DataKit\DataViews\DataView\DataViewRepository;
 use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Pagination;
 use DataKit\DataViews\DataView\Sort;
 use WP_Error;
 use WP_REST_Request;
@@ -11,11 +14,13 @@ use WP_REST_Server;
 
 /**
  * Router responsible for registering and routing the REST routes.
+ *
  * @since $ver$
  */
 final class Router {
 	/**
 	 * The API namespace.
+	 *
 	 * @since $ver$
 	 * @var string
 	 */
@@ -23,6 +28,7 @@ final class Router {
 
 	/**
 	 * The singleton router instance.
+	 *
 	 * @since $ver$
 	 * @var Router
 	 */
@@ -30,6 +36,7 @@ final class Router {
 
 	/**
 	 * The DataViews repository.
+	 *
 	 * @since $ver$
 	 * @var DataViewRepository
 	 */
@@ -37,6 +44,7 @@ final class Router {
 
 	/**
 	 * Creates the router.
+	 *
 	 * @since $ver$
 	 */
 	private function __construct( DataViewRepository $data_view_repository ) {
@@ -45,13 +53,19 @@ final class Router {
 		add_filter( 'rest_api_init', [ $this, 'register_routes' ] );
 	}
 
+
+	public static function get_url( string $url ): string {
+		return rest_url( self::NAMESPACE . '/' . trim( $url, '/' ) );
+	}
+
 	/**
 	 * Registers the REST endpoints.
+	 *
 	 * @since $ver$
 	 * @return void
 	 */
 	public function register_routes(): void {
-		register_rest_route( self::NAMESPACE, '/' . 'view/(?<id>[^/]+)', [
+		register_rest_route( self::NAMESPACE, '/' . 'views/(?<id>[^/]+)$', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_view' ],
@@ -80,20 +94,58 @@ final class Router {
 				],
 			],
 		] );
+
+		register_rest_route( self::NAMESPACE, '/' . 'views/(?<view_id>[^/]+)/data/(?<data_id>[^/]+)', [
+			[
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => [ $this, 'delete_view_data' ],
+				'permission_callback' => [ $this, 'delete_view_data_permissions_check' ],
+			],
+		] );
 	}
 
 	/**
 	 * Returns whether the current user can retrieve the view content.
+	 *
 	 * @since $ver$
 	 * @return bool
 	 */
 	public function get_view_permissions_check(): bool {
-		//todo
+		// todo
 		return true;
 	}
 
 	/**
+	 * Returns whether the current user can delete view data the view content.
+	 *
+	 * @since $ver$
+	 *
+	 * @param WP_REST_Request $request The request object.
+	 *
+	 * @return bool
+	 */
+	public function delete_view_data_permissions_check( WP_REST_Request $request ): bool {
+		try {
+			$data_view   = $this->data_view_repository->get( $request->get_param( 'view_id' ) ?? '' );
+			$data_source = $data_view->data_source();
+
+			if (
+				! $data_source instanceof MutableDataSource
+				|| ! $data_source->can_delete()
+			) {
+				return false;
+			}
+
+			// todo: add test for user permissions.
+			return true;
+		} catch ( \Exception $e ) {
+			return false;
+		}
+	}
+
+	/**
 	 * Returns the data for a DataView.
+	 *
 	 * @since $ver$
 	 *
 	 * @param WP_REST_Request $request The request object.
@@ -106,22 +158,50 @@ final class Router {
 			$params    = $request->get_params();
 
 			// Update view with provided params.
-			$data_view = $data_view
-				->with_filters( Filters::from_array( $params['filters'] ?? [] ) )
-				->with_search( $params['search'] ?? '' );
+			$data_source = $data_view->data_source()
+				->filter_by( Filters::from_array( $params['filters'] ?? [] ) )
+				->search_by( $params['search'] ?? '' );
 
-			if ( $params['page'] ?? 0 ) {
-				$data_view = $data_view->with_pagination( $params['page'], $params['per_page'] ?? null );
-			}
+			$pagination = ( $params['page'] ?? null ) ? Pagination::from_array( $params ) : Pagination::default();
 
 			if ( $params['sort'] ?? [] ) {
-				$data_view = $data_view->with_sort( Sort::from_array( $params['sort'] ) );
+				$data_source = $data_source->sort_by( Sort::from_array( $params['sort'] ) );
 			}
 
-			return array_intersect_key(
-				$data_view->to_array(),
-				array_flip( [ 'paginationInfo', 'data' ] ),
-			);
+			return [
+				'data'           => $data_view->get_data( $data_source, $pagination ),
+				'paginationInfo' => $pagination->info( $data_source ),
+			];
+		} catch ( \Exception $e ) {
+			return new WP_Error( $e->getCode(), $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Deletes a dataset on a dataview.
+	 * @since $ver$
+	 *
+	 * @param WP_REST_Request $request The request object.
+	 *
+	 * @return array|WP_Error
+	 */
+	public function delete_view_data( WP_REST_Request $request ) {
+		try {
+			$data_view   = $this->data_view_repository->get( $request->get_param( 'view_id' ) ?? '' );
+			$data_source = $data_view->data_source();
+
+			if (
+				! $data_source instanceof MutableDataSource
+				|| ! $data_source->can_delete()
+			) {
+				return [];
+			}
+
+			$data_id = $request->get_param( 'data_id' ) ?? '';
+			$data_source->delete_data_by_id( $data_id );
+
+			return [ 'id' => $data_id ];
+
 		} catch ( \Exception $e ) {
 			return new WP_Error( $e->getCode(), $e->getMessage() );
 		}
@@ -129,6 +209,7 @@ final class Router {
 
 	/**
 	 * Return and maybe initialize the singleton router.
+	 *
 	 * @since $ver$
 	 * @return self The router.
 	 */

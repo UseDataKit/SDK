@@ -2,8 +2,6 @@
 
 namespace DataKit\DataViews\DataView;
 
-use InvalidArgumentException;
-
 /**
  * Represents a valid filter operator.
  * @since $ver$

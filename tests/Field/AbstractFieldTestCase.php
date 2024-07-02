@@ -64,7 +64,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 
 	public function testModifier() : void {
 		$field        = $this->createField( 'field_id', 'Field header' );
-		$not_hideable = $field->not_hideable();
+		$not_hideable = $field->always_visible();
 		$hideable     = $not_hideable->hideable();
 		$not_sortable = $hideable->not_sortable();
 		$sortable     = $not_sortable->sortable();

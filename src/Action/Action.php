@@ -25,7 +25,7 @@ final class Action {
 		$this->label = $label;
 	}
 
-	public static function modal( string $id, string $label, string $url ) : self {
+	public static function modal( string $id, string $label, string $url ): self {
 		$action                 = new self( $id, $label );
 		$action->type           = self::TYPE_MODAL;
 		$action->context['url'] = $url;
@@ -33,7 +33,7 @@ final class Action {
 		return $action;
 	}
 
-	public static function url( string $id, string $label, string $url ) : self {
+	public static function url( string $id, string $label, string $url ): self {
 		$action       = new self( $id, $label );
 		$action->type = self::TYPE_URL;
 
@@ -49,7 +49,7 @@ final class Action {
 		string $method = 'GET',
 		array $params = [],
 		bool $use_single_request = false
-	) : self {
+	): self {
 		$action       = new self( $id, $label );
 		$action->type = self::TYPE_AJAX;
 
@@ -61,35 +61,40 @@ final class Action {
 		return $action;
 	}
 
-	public function confirm( ?string $message ) : self {
+	/**
+	 * @param string|null $message
+	 *
+	 * @return $this
+	 */
+	public function confirm( ?string $message ): self {
 		$action                     = clone $this;
 		$action->context['confirm'] = $message;
 
 		return $action;
 	}
 
-	public function primary( string $icon ) : self {
+	public function primary( string $icon ): self {
 		$action       = clone $this;
 		$action->icon = $icon;
 
 		return $action;
 	}
 
-	public function secondary() : self {
+	public function secondary(): self {
 		$action       = clone $this;
 		$action->icon = '';
 
 		return $action;
 	}
 
-	public function destructive() : self {
+	public function destructive(): self {
 		$action                 = clone $this;
 		$action->is_destructive = true;
 
 		return $action;
 	}
 
-	public function not_destructive() : self {
+	public function not_destructive(): self {
 		$action                 = clone $this;
 		$action->is_destructive = false;
 
@@ -110,14 +115,21 @@ final class Action {
 		return $action;
 	}
 
-	public function bulk() : self {
+	public function bulk(): self {
 		$action          = clone $this;
 		$action->is_bulk = true;
 
 		return $action;
 	}
 
-	public function to_array() : array {
+	public function single(): self {
+		$action          = clone $this;
+		$action->is_bulk = false;
+
+		return $action;
+	}
+
+	public function to_array(): array {
 		$result = [
 			'id'            => $this->id,
 			'label'         => $this->label,
@@ -141,14 +153,14 @@ final class Action {
 	 * @since $ver$
 	 * @return string|null The callback.
 	 */
-	private function callback() : ?string {
+	private function callback(): ?string {
 		if ( $this->type === self::TYPE_MODAL ) {
 			return null;
 		}
 
 		try {
 			$callback = sprintf(
-				'( data ) => datakit_dataviews_actions.%s(data, %s)',
+				'( data, { registry } ) => datakit_dataviews_actions.%s(data, {registry, ... %s})',
 				'url',
 				json_encode( $this->context(), JSON_THROW_ON_ERROR ),
 			);
@@ -159,7 +171,7 @@ final class Action {
 		return '__RAW__' . $callback . '__ENDRAW__';
 	}
 
-	private function render_modal() : ?string {
+	private function render_modal(): ?string {
 		if ( $this->type !== self::TYPE_MODAL ) {
 			return null;
 		}
@@ -177,7 +189,7 @@ final class Action {
 		return '__RAW__' . $modal . '__ENDRAW__';
 	}
 
-	private function context() : array {
+	private function context(): array {
 		return array_merge(
 			$this->context,
 			[

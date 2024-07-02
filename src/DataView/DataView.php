@@ -2,29 +2,98 @@
 
 namespace DataKit\DataViews\DataView;
 
+use DataKit\DataViews\Action\Action;
 use DataKit\DataViews\Data\DataSource;
+use DataKit\DataViews\Data\MutableDataSource;
 use DataKit\DataViews\Field\Field;
+use DataKit\DataViews\Rest\Router;
 use JsonException;
 
 /**
- * Todo:
- * - Add support for 'search'.
- * - Add `Actions`
- * - Make a `Fields` collection.
+ * Represents a single DataView entity.
+ *
+ * @since $ver$
  */
 final class DataView {
+	/**
+	 * The dataview ID.
+	 *
+	 * @since $ver$
+	 * @var string
+	 */
 	private string $id;
+
+	/**
+	 * The primary view type.
+	 *
+	 * @since $ver$
+	 * @var View
+	 */
 	private View $view;
-	/** @var Field[] */
+
+	/**
+	 * The fields on the dataview.
+	 *
+	 * @since $ver$
+	 * @var Field[]
+	 */
 	private array $fields = [];
+
+	/**
+	 * The data source that feeds the view.
+	 *
+	 * @since $ver$
+	 * @var DataSource
+	 */
 	private DataSource $data_source;
+
+	/**
+	 * The sorting order.
+	 *
+	 * @since $ver$
+	 * @var Sort|null
+	 */
 	private ?Sort $sort;
+
+	/**
+	 * The provided filters.
+	 *
+	 * @since $ver$
+	 * @var Filters|null
+	 */
 	private ?Filters $filters;
+
+	/**
+	 * The provided actions.
+	 *
+	 * @since $ver$
+	 * @var Actions|null
+	 */
 	private ?Actions $actions;
+
+	/**
+	 * The applied search query.
+	 *
+	 * @since $ver$
+	 * @var string
+	 */
 	private string $search = '';
-	private int $page = 1;
-	private int $per_page = 100;
-	private bool $is_search = true;
+
+	/**
+	 * The pagination info.
+	 *
+	 * @since $ver$
+	 * @var Pagination
+	 */
+	private Pagination $pagination;
+
+	/**
+	 * Whether the dataview supports searching.
+	 *
+	 * @since $ver$
+	 * @var bool
+	 */
+	private bool $has_search = true;
 
 	/**
 	 * Creates the DataView.
@@ -37,6 +106,7 @@ final class DataView {
 	 * @param DataSource   $data_source The data source.
 	 * @param Sort|null    $sort        The sorting.
 	 * @param Filters|null $filters     The filters.
+	 * @param Actions|null $actions     The actions.
 	 */
 	private function __construct(
 		View $view,
@@ -54,6 +124,7 @@ final class DataView {
 		$this->actions     = $actions;
 		$this->sort        = $sort;
 		$this->data_source = $data_source;
+		$this->pagination  = Pagination::default();
 
 		$this->ensure_valid_fields( ...$fields );
 	}
@@ -68,14 +139,16 @@ final class DataView {
 	 * @param DataSource   $data_source The data source.
 	 * @param Sort|null    $sort        The sorting.
 	 * @param Filters|null $filters     The filters.
+	 * @param Actions|null $actions     The actions.
 	 */
 	public static function table(
 		string $id,
 		array $fields,
 		DataSource $data_source,
 		?Sort $sort = null,
-		?Filters $filters = null
-	): self {
+		?Filters $filters = null,
+		?Actions $actions = null
+	) : self {
 		return new self(
 			View::Table(),
 			$id,
@@ -83,40 +156,44 @@ final class DataView {
 			$data_source,
 			$sort,
 			$filters,
+			$actions,
 		);
 	}
 
 	/**
 	 * Makes sure the fields are of the correct type.
+	 *
 	 * @since $ver$
 	 *
 	 * @param Field ...$fields The fields.
 	 **/
-	private function ensure_valid_fields( Field ...$fields ): void {
+	private function ensure_valid_fields( Field ...$fields ) : void {
 		$this->fields = array_merge( $this->fields, $fields );
 	}
 
 	/**
 	 * Returns the ID of the DataView.
+	 *
 	 * @since $ver$
 	 * @return string The ID.
 	 */
-	public function id(): string {
+	public function id() : string {
 		return $this->id;
 	}
 
 	/**
 	 * Returns the view data object.
+	 *
 	 * @since $ver$
 	 * @return array The view data object.
 	 */
-	private function view(): array {
+	private function view() : array {
 		return [
 			'search'       => $this->search,
 			'type'         => (string) $this->view,
 			'filters'      => $this->filters ? $this->filters->to_array() : [],
-			'perPage'      => $this->per_page,
-			'page'         => $this->page,
+			'perPage'      => $this->pagination->limit(),
+			'page'         => $this->pagination->page(),
 			'sort'         => $this->sort ? $this->sort->to_array() : [],
 			'hiddenFields' => $this->hidden_fields(),
 			'layout'       => [],
@@ -125,10 +202,11 @@ final class DataView {
 
 	/**
 	 * Returns a data source with sorting and filters applied.
+	 *
 	 * @since $ver$
 	 * @return DataSource The data source.
 	 */
-	private function data_source(): DataSource {
+	public function data_source() : DataSource {
 		return $this->data_source
 			->sort_by( $this->sort )
 			->filter_by( $this->filters )
@@ -136,26 +214,22 @@ final class DataView {
 	}
 
 	/**
-	 * Returns the calculated offset based on the current page.
-	 * @since $ver$
-	 * @return int The offset.
-	 */
-	private function offset(): int {
-		return ( $this->page - 1 ) * $this->per_page;
-	}
-
-	/**
 	 * Returns the data object for Data View.
+	 *
 	 * @since $ver$
+	 *
+	 * @param DataSource|null $data_source Data source to use.
+	 * @param Pagination|null $pagination  Pagination settings.
 	 *
 	 * @return array The data object.
 	 */
-	private function data(): array {
-		$data_source = $this->data_source();
+	public function get_data( ?DataSource $data_source = null, ?Pagination $pagination = null ) : array {
+		$data_source ??= $this->data_source();
+		$pagination  ??= $this->pagination;
 
 		$object = [];
 
-		foreach ( $data_source->get_data_ids( $this->per_page, $this->offset() ) as $data_id ) {
+		foreach ( $data_source->get_data_ids( $pagination->limit(), $pagination->offset() ) as $data_id ) {
 			$data = $data_source->get_data_by_id( $data_id );
 			foreach ( $this->fields as $field ) {
 				$data[ $field->uuid() ] = $field->value( $data );
@@ -169,10 +243,11 @@ final class DataView {
 
 	/**
 	 * Returns all the field objects.
+	 *
 	 * @since $ver$
 	 * @return array[] The fields as arrays.
 	 */
-	private function fields(): array {
+	private function fields() : array {
 		$fields = [];
 
 		foreach ( $this->fields as $field ) {
@@ -186,46 +261,23 @@ final class DataView {
 	}
 
 	/**
-	 * Returns all the action objects.
-	 * @since $ver$
-	 * @return array[] The fields as arrays.
-	 */
-	private function actions(): array {
-		if ( ! $this->actions ) {
-			return [];
-		}
-
-		return $this->actions->to_array();
-	}
-
-	/**
-	 * Returns the paginationInfo object.
-	 * @since $ver$
-	 * @return array The pagination information.
-	 */
-	private function pagination_info(): array {
-		$total = $this->data_source()->count();
-
-		return [
-			'totalItems' => $total,
-			'totalPages' => ceil( $total / $this->per_page ),
-		];
-	}
-
-	/**
 	 * Returns the supportedLayouts object.
+	 *
 	 * @since $ver$
 	 * @return string[] The supported layouts.
 	 * @todo  provide option to add more.
 	 */
-	private function supported_layouts(): array {
+	private function supported_layouts() : array {
 		return [ (string) $this->view ];
 	}
 
 	/**
+	 * Returns the field keys that should be hidden.
+	 *
+	 * @since $ver$
 	 * @return string[] The field ID's.
 	 */
-	private function hidden_fields(): array {
+	private function hidden_fields() : array {
 		$hidden_fields = [];
 		foreach ( $this->fields as $field ) {
 			if ( ! $field->is_hidden() ) {
@@ -237,75 +289,56 @@ final class DataView {
 		return $hidden_fields;
 	}
 
-	public function with_filters( ?Filters $filters ): self {
-		$clone          = clone $this;
-		$clone->filters = $filters;
+	public function paginate( int $per_page, ?int $page = null ) : self {
+		$this->pagination = new Pagination( $page ?? 1, $per_page );
 
-		return $clone;
+		return $this;
 	}
 
-	public function with_actions( ?Actions $actions ): self {
-		$clone          = clone $this;
-		$clone->actions = $actions;
+	public function search( string $search ) : self {
+		$this->has_search = true;
+		$this->search     = $search;
 
-		return $clone;
+		return $this;
 	}
 
-	public function with_pagination( int $page, int $per_page = null ): self {
-		$clone       = clone $this;
-		$clone->page = max( 1, $page );
-		if ( $per_page > 0 ) {
-			$clone->per_page = $per_page;
-		}
+	public function disable_search() : self {
+		$this->has_search = false;
+		$this->search     = '';
 
-		return $clone;
+		return $this;
 	}
 
-	public function with_search( string $search ): self {
-		$clone            = clone $this;
-		$clone->is_search = true;
-		$clone->search    = $search;
+	public function sort( ?Sort $sort ) : self {
+		$this->sort = $sort;
 
-		return $clone;
-	}
-
-	public function without_search(): self {
-		$clone            = clone $this;
-		$clone->is_search = false;
-		$clone->search    = '';
-
-		return $clone;
-	}
-
-	public function with_sort( ?Sort $sort ): self {
-		$clone       = clone $this;
-		$clone->sort = $sort;
-
-		return $clone;
+		return $this;
 	}
 
 	/**
 	 * Returns the data needed to set up a
+	 *
 	 * @return array
 	 */
-	public function to_array(): array {
+	public function to_array() : array {
 		return [
-			'search'           => $this->is_search,
+			'search'           => $this->has_search,
 			'supportedLayouts' => $this->supported_layouts(),
-			'paginationInfo'   => $this->pagination_info(),
+			'paginationInfo'   => $this->pagination->info( $this->data_source() ),
 			'view'             => $this->view(),
 			'fields'           => $this->fields(),
-			'data'             => $this->data(),
-			'actions'          => $this->actions(),
+			'data'             => $this->get_data(),
+			'actions'          => $this->actions ? $this->actions->to_array() : [],
 		];
 	}
 
 	/**
 	 * Returns the javascript object for a dataview.
+	 *
 	 * @since $ver$
 	 * @return string The javascript object.
 	 */
-	public function to_js( bool $is_pretty = false ): string {
+	public function to_js( bool $is_pretty = false ) : string {
 		$flags = JSON_THROW_ON_ERROR;
 		if ( $is_pretty ) {
 			$flags |= JSON_PRETTY_PRINT;
@@ -314,11 +347,53 @@ final class DataView {
 		try {
 			return preg_replace_callback(
 				'/\"__RAW__(.*?)__ENDRAW__\"/s',
-				static fn( array $matches ): string => stripcslashes( $matches[1] ),
-				json_encode( $this->to_array(), $flags )
+				static fn( array $matches ) : string => stripslashes( $matches[1] ),
+				json_encode( $this->to_array(), $flags ),
 			);
 		} catch ( JsonException $e ) {
 			return '';
 		}
+	}
+
+	/**
+	 * Returns an instance of the data view which includes a delete action.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string        $label The label to use on the button.
+	 * @param callable|null $callback
+	 *
+	 * @return self
+	 */
+	public function deletable( string $label = 'Delete', ?callable $callback = null ) : self {
+		$dataview = clone $this;
+
+		if (
+			! $this->data_source instanceof MutableDataSource
+			|| ! $this->data_source->can_delete()
+		) {
+			return $dataview;
+		}
+
+		$actions         = $this->actions ? iterator_to_array( $this->actions ) : [];
+		$delete_rest_url = Router::get_url( sprintf( 'views/%s/data/{id}', $this->id() ) );
+
+		$delete_action = Action::ajax( 'delete', $label, $delete_rest_url, 'DELETE' )
+			->destructive()
+			->primary( 'trash' )
+			->confirm( 'Are you sure you want to delete this item?' ) ;
+
+		if ( $callback ) {
+			$delete_action = $callback( $delete_action );
+			if ( ! $delete_action instanceof Action ) {
+				throw new \InvalidArgumentException( 'The provided callback should return an Action object.' );
+			}
+		}
+
+		$actions[] = $delete_action;
+
+		$dataview->actions = Actions::of( ...$actions );
+
+		return $dataview;
 	}
 }

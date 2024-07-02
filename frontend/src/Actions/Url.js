@@ -18,7 +18,7 @@ import { get, replace_tags } from '@src/helpers';
  * @constructor
  */
 export default function Url( items, context ) {
-    if ( (context.confirm ?? null) && !window.confirm( context.confirm ) ) {
+    if ( ( context.confirm ?? null ) && !window.confirm( context.confirm ) ) {
         return;
     }
 
@@ -49,12 +49,12 @@ function handleAjax( items, context ) {
     const grouped = {};
 
     for ( const i in items ) {
-        const data = items[ i ];
+        const data = items[i];
         const url = replace_tags( context.url, data );
 
         const params = Object.fromEntries(
             Object.entries( context?.params ?? {} )
-                .map( ( [key, value] ) => [key, replace_tags( value, data )] )
+                .map( ( [ key, value ] ) => [ key, replace_tags( value, data ) ] )
         );
 
         if ( !use_single_request ) {
@@ -70,13 +70,14 @@ function handleAjax( items, context ) {
 
         for ( const key in params ) {
             if ( !grouped.hasOwnProperty( key ) ) {
-                grouped[ key ] = [];
+                grouped[key] = [];
             }
-            grouped[ key ].push( params[ key ] );
+            grouped[key].push( params[key] );
         }
     }
 
     if ( !use_single_request ) {
+        context?.registry?.refreshData();
         return;
     }
 
@@ -84,7 +85,7 @@ function handleAjax( items, context ) {
         ...options,
         body: JSON.stringify( grouped ),
     } )
-        .then( r => null )
+        .then( r => context?.registry?.refreshData() )
         .catch( r => console.error( r ) );
 }
 
@@ -97,7 +98,7 @@ function handleAjax( items, context ) {
 function handleUrl( items, context ) {
     for ( const i in items ) {
 
-        const data = items[ i ];
+        const data = items[i];
         const url = replace_tags( context.url ?? '', data );
         const use_new_window = get( context, 'use_new_window', true );
 

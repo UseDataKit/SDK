@@ -7,6 +7,7 @@ use InvalidArgumentException;
 
 /**
  * Represents a filter on Data Views and Data sources.
+ *
  * @since $ver$
  *
  * @method static self is( string $field, int|string|float|bool $value )
@@ -17,18 +18,38 @@ use InvalidArgumentException;
  * @method static self isNotAll( string $field, array $value )
  */
 final class Filter {
+	/**
+	 * The field to filter on.
+	 *
+	 * @since $ve$
+	 * @var string
+	 */
 	private string $field;
+
+	/**
+	 * The filter operation.
+	 *
+	 * @since $ver$
+	 * @var Operator
+	 */
 	private Operator $operator;
 
+	/**
+	 * The filter value.
+	 *
+	 * @since $ver$
+	 * @var array|string
+	 */
 	private $value;
 
 	/**
 	 * Creates the filter.
+	 *
 	 * @since $ver$
 	 *
-	 * @param string $field The field name.
-	 * @param Operator $operator The operator.
-	 * @param string|array $value The filter value.
+	 * @param string       $field    The field name.
+	 * @param Operator     $operator The operator.
+	 * @param string|array $value    The filter value.
 	 */
 	private function __construct(
 		string $field,
@@ -60,6 +81,7 @@ final class Filter {
 
 	/**
 	 * Recursively flattens the value.
+	 *
 	 * @since $ver$
 	 *
 	 * @param mixed $value The original value.
@@ -84,6 +106,7 @@ final class Filter {
 
 	/**
 	 * Returns whether the value is a string, or able to cast to a string.
+	 *
 	 * @since $ver$
 	 *
 	 * @param mixed $value The value to check.
@@ -104,6 +127,7 @@ final class Filter {
 
 	/**
 	 * Serializes a Filter to an array.
+	 *
 	 * @since $ver$
 	 * @return array{field: string, operator: string, value: string} The filter array.
 	 */
@@ -139,10 +163,11 @@ final class Filter {
 
 	/**
 	 * Creates special static constructors based on the available operators.
+	 *
 	 * @since $ver$
 	 *
-	 * @param string $method The method name.
-	 * @param array $arguments The arguments for the method.
+	 * @param string $method    The method name.
+	 * @param array  $arguments The arguments for the method.
 	 *
 	 * @return self The filter.
 	 */
@@ -155,7 +180,7 @@ final class Filter {
 
 		if ( count( $arguments ) !== 2 ) {
 			throw new BadMethodCallException(
-				sprintf( 'Method "%s" expects exactly 2 arguments, %d given.', $method, count( $arguments ) )
+				sprintf( 'Method "%s" expects exactly 2 arguments, %d given.', $method, count( $arguments ) ),
 			);
 		}
 
@@ -164,12 +189,13 @@ final class Filter {
 
 	/**
 	 * Whether the given value matches the filter.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $data The dataset to match against.
 	 *
 	 * @return bool Whether the value matches the filter.
-	 * @todo this may need to be moved to a separate class.
+	 * @todo  this may need to be moved to a separate class.
 	 */
 	public function matches( array $data ) : bool {
 		$value = $data[ $this->field ] ?? null;
