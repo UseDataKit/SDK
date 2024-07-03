@@ -41,7 +41,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 	public function get( string $id ) : DataView {
 		$data_view = $this->data_views[ $id ] ?? null;
 		if ( ! $data_view ) {
-			throw new DataViewsNotFoundException();
+			throw new DataViewNotFoundException();
 		}
 
 		return $data_view;

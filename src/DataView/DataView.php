@@ -32,12 +32,20 @@ final class DataView {
 	private View $view;
 
 	/**
-	 * The fields on the dataview.
+	 * The fields to show on the DataView.
 	 *
 	 * @since $ver$
 	 * @var Field[]
 	 */
-	private array $fields = [];
+	private array $directory_fields = [];
+
+	/**
+	 * The fields to show on a single result.
+	 *
+	 * @since $ver$
+	 * @var Field[]
+	 */
+	public array $view_fields = [];
 
 	/**
 	 * The data source that feeds the view.
@@ -168,7 +176,7 @@ final class DataView {
 	 * @param Field ...$fields The fields.
 	 **/
 	private function ensure_valid_fields( Field ...$fields ) : void {
-		$this->fields = array_merge( $this->fields, $fields );
+		$this->directory_fields = array_merge( $this->directory_fields, $fields );
 	}
 
 	/**
@@ -230,9 +238,14 @@ final class DataView {
 		$object = [];
 
 		foreach ( $data_source->get_data_ids( $pagination->limit(), $pagination->offset() ) as $data_id ) {
+			/**
+			 * Todo: this is a possible breach of security as all data is passed along in the JS.
+			 * But the merge tags need access to the raw data, so the field needs to tell us which field is need,
+			 * and only disclose those values.
+			 */
 			$data = $data_source->get_data_by_id( $data_id );
-			foreach ( $this->fields as $field ) {
-				$data[ $field->uuid() ] = $field->value( $data );
+			foreach ( $this->directory_fields as $field ) {
+				$data[ $field->uuid() ] = $field->get_value( $data );
 			}
 
 			$object[] = $data;
@@ -250,7 +263,7 @@ final class DataView {
 	private function fields() : array {
 		$fields = [];
 
-		foreach ( $this->fields as $field ) {
+		foreach ( $this->directory_fields as $field ) {
 			$fields[] = array_filter(
 				$field->toArray(),
 				static fn( $value ) => ! is_null( $value ),
@@ -279,7 +292,7 @@ final class DataView {
 	 */
 	private function hidden_fields() : array {
 		$hidden_fields = [];
-		foreach ( $this->fields as $field ) {
+		foreach ( $this->directory_fields as $field ) {
 			if ( ! $field->is_hidden() ) {
 				continue;
 			}
@@ -356,6 +369,34 @@ final class DataView {
 	}
 
 	/**
+	 * Makes a single result of a dataview visible within a modal.
+	 *
+	 * @since $ver$
+	 *
+	 * @param array  $fields The fields.
+	 * @param string $label  The label.
+	 *
+	 * @return self The dataview.
+	 */
+	public function viewable( array $fields, string $label = 'View' ) {
+		$dataview              = clone $this;
+		$dataview->view_fields = $fields;
+
+		$actions       = $this->actions ? iterator_to_array( $this->actions ) : [];
+		$view_rest_url = Router::get_url( sprintf( 'views/%s/data/{id}', $this->id() ) );
+
+		$view_action = Action::modal( 'view', $label, $view_rest_url )
+			->primary( 'info' )
+			->hide_header();
+
+		$actions[] = $view_action;
+
+		$dataview->actions = Actions::of( ...$actions );
+
+		return $dataview;
+	}
+
+	/**
 	 * Returns an instance of the data view which includes a delete action.
 	 *
 	 * @since $ver$
@@ -381,7 +422,7 @@ final class DataView {
 		$delete_action = Action::ajax( 'delete', $label, $delete_rest_url, 'DELETE' )
 			->destructive()
 			->primary( 'trash' )
-			->confirm( 'Are you sure you want to delete this item?' ) ;
+			->confirm( 'Are you sure you want to delete this item?' );
 
 		if ( $callback ) {
 			$delete_action = $callback( $delete_action );

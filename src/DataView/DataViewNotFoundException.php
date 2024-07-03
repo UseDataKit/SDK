@@ -9,7 +9,7 @@ use Exception;
  * Exception thrown when a DataView was not found.
  * @since $ver$
  */
-final class DataViewsNotFoundException extends DataViewsException {
+final class DataViewNotFoundException extends DataViewsException {
 	/**
 	 * @inheritDoc
 	 * @since $ver$

@@ -338,7 +338,7 @@ abstract class Field {
 	 *
 	 * @return mixed The value.
 	 */
-	public function value( array $data ) {
+	public function get_value( array $data ) {
 		return ( $this->callback )( $this->id(), $data ) ?? $this->default_value;
 	}
 

@@ -1,10 +1,8 @@
 <?php
 
-namespace DataKit\DataViews\Components;
+namespace DataKit\DataViews\Component;
 
-use DataKit\DataViews\DataView\DataView;
 use DataKit\DataViews\DataView\DataViewRepository;
-use JsonException;
 
 /**
  * Responsible for registering and rendering shortcodes.
@@ -102,16 +100,5 @@ final class Shortcode {
 		}
 
 		return self::$instance;
-	}
-
-	/**
-	 * Get a valid javascript object representation of a data view.
-	 * @since $ver$
-	 *
-	 * @param DataView $dataview The data view to parse.
-	 *
-	 * @return string A javascript object representation of the data view.
-	 */
-	private function get_js( DataView $dataview ) : string {
 	}
 }

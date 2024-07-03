@@ -20,7 +20,7 @@ interface DataViewRepository {
 	 * @param string $id The DataView ID.
 	 *
 	 * @return DataView The DataView.
-	 * @throws DataViewsNotFoundException When the DataView could not be found.
+	 * @throws DataViewNotFoundException When the DataView could not be found.
 	 */
 	public function get( string $id ) : DataView;
 

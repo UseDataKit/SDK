@@ -18,14 +18,14 @@ final class LinkField extends Field {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected string $render = 'datakit_fields.link';
+	protected string $render = 'datakit_fields.html';
 
 
 	/**
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected function default_context() : array {
+	protected function default_context(): array {
 		return [
 			'link'           => null,
 			'type'           => self::TYPE_NONE,
@@ -41,7 +41,7 @@ final class LinkField extends Field {
 	 *
 	 * @return self
 	 */
-	public function linkToField( string $field_id ) : self {
+	public function linkToField( string $field_id ): self {
 		$clone                  = clone $this;
 		$clone->context['type'] = self::TYPE_FIELD;
 		$clone->context['link'] = $field_id;
@@ -54,7 +54,7 @@ final class LinkField extends Field {
 	 * @since $ver$
 	 * @return self
 	 */
-	public function on_new_window() : self {
+	public function on_new_window(): self {
 		$clone                            = clone $this;
 		$clone->context['use_new_window'] = true;
 
@@ -66,10 +66,45 @@ final class LinkField extends Field {
 	 * @since $ver$
 	 * @return self
 	 */
-	public function on_same_window() : self {
+	public function on_same_window(): self {
 		$clone                            = clone $this;
 		$clone->context['use_new_window'] = false;
 
 		return $clone;
+	}
+
+
+	/**
+	 * Returns a link based on the context settings.
+	 * @since $ver$
+	 *
+	 * @param array $data The item data.
+	 *
+	 * @return int|string|float The value.
+	 */
+	public function get_value( array $data ) {
+		return sprintf(
+			'<a href="%s" target="%s">%s</a>',
+			esc_attr( $this->href( $data ) ),
+			esc_attr( $this->target() ),
+			$this->label( $data ),
+		);
+	}
+
+	private function href( array $data ): string {
+		if ( self::TYPE_FIELD === ( $this->context['type'] ?? self::TYPE_NONE ) ) {
+
+			return $data[ $this->context['link'] ?? '' ] ?? '';
+		}
+
+		return parent::get_value( $data ) ?? '';
+	}
+
+	private function target(): string {
+		return $this->context['use_new_window'] ?? false ? '_blank' : '_self';
+	}
+
+	private function label( array $data ): string {
+		return parent::get_value( $data ) ?? '';
 	}
 }

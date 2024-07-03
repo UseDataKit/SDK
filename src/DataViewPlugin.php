@@ -2,7 +2,7 @@
 
 namespace DataKit\DataViews;
 
-use DataKit\DataViews\Components\Shortcode;
+use DataKit\DataViews\Component\Shortcode;
 use DataKit\DataViews\DataView\DataView;
 use DataKit\DataViews\DataView\DataViewRepository;
 use DataKit\DataViews\Rest\Router;

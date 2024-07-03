@@ -890,7 +890,7 @@
                     "label": "View entry",
                     "isPrimary": true,
                     "icon": "info",
-                    "RenderModal": ( props ) => datakit_modal( { ...props, context: { url: 'test-url' } } ),
+                    "RenderModal": ( props ) => datakit_modal( { ...props, context: { url: 'https://gravity-export.test/wp-json/dataviews/v1/views/test/data/{id}' } } ),
                     "hideModalHeader": true,
                 },
                 {
@@ -948,22 +948,21 @@
                 } ),
             } ],
             "data": [ {
-                "id": 1,
+                "id": "uuid-1",
                 "title": "<strong>Third</strong> result",
                 "author": "Aaron Applesteen",
                 "description": "Third description",
                 "author_url": null,
                 "featured_image": "https://picsum.photos/100",
             }, {
-                "id": 2,
+                "id": "uuid-2",
                 "title": "First result",
                 "author": "Doeke Norg",
                 "author_url": "https:\/\/doeken.org",
                 "description": "First description",
                 "featured_image": "https://picsum.photos/100?q=2",
-
             }, {
-                "id": 3,
+                "id": "uuid-3",
                 "title": "Second result",
                 "author": "GravityKit",
                 "author_url": "https:\/\/gravitykit.com",

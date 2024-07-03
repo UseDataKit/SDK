@@ -2,6 +2,7 @@
 
 namespace DataKit\DataViews\Rest;
 
+use DataKit\DataViews\Controller\Rest\ViewController;
 use DataKit\DataViews\Data\MutableDataSource;
 use DataKit\DataViews\DataView\DataViewRenderer;
 use DataKit\DataViews\DataView\DataViewRepository;
@@ -43,18 +44,36 @@ final class Router {
 	private DataViewRepository $data_view_repository;
 
 	/**
+	 * The view controller.
+	 *
+	 * @since $ver$
+	 * @var ViewController
+	 */
+	private ViewController $view_controller;
+
+	/**
 	 * Creates the router.
 	 *
 	 * @since $ver$
 	 */
 	private function __construct( DataViewRepository $data_view_repository ) {
 		$this->data_view_repository = $data_view_repository;
+		$this->view_controller      = new ViewController( $data_view_repository );
 
 		add_filter( 'rest_api_init', [ $this, 'register_routes' ] );
 	}
 
 
-	public static function get_url( string $url ): string {
+	/**
+	 * Returns a prefixed url.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string $url The url to prefix.
+	 *
+	 * @return string The full url.
+	 */
+	public static function get_url( string $url ) : string {
 		return rest_url( self::NAMESPACE . '/' . trim( $url, '/' ) );
 	}
 
@@ -64,7 +83,7 @@ final class Router {
 	 * @since $ver$
 	 * @return void
 	 */
-	public function register_routes(): void {
+	public function register_routes() : void {
 		register_rest_route( self::NAMESPACE, '/' . 'views/(?<id>[^/]+)$', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -73,7 +92,7 @@ final class Router {
 				'args'                => [
 					'search'  => [
 						'default'           => '',
-						'sanitize_callback' => fn( $value ): string => (string) $value,
+						'sanitize_callback' => fn( $value ) : string => (string) $value,
 					],
 					'filters' => [
 						'default'           => [],
@@ -97,6 +116,14 @@ final class Router {
 
 		register_rest_route( self::NAMESPACE, '/' . 'views/(?<view_id>[^/]+)/data/(?<data_id>[^/]+)', [
 			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this->view_controller, 'get_item' ],
+				'permission_callback' => [ $this->view_controller, 'can_view' ],
+			],
+		] );
+
+		register_rest_route( self::NAMESPACE, '/' . 'views/(?<view_id>[^/]+)/data/(?<data_id>[^/]+)', [
+			[
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'delete_view_data' ],
 				'permission_callback' => [ $this, 'delete_view_data_permissions_check' ],
@@ -110,7 +137,7 @@ final class Router {
 	 * @since $ver$
 	 * @return bool
 	 */
-	public function get_view_permissions_check(): bool {
+	public function get_view_permissions_check() : bool {
 		// todo
 		return true;
 	}
@@ -124,7 +151,7 @@ final class Router {
 	 *
 	 * @return bool
 	 */
-	public function delete_view_data_permissions_check( WP_REST_Request $request ): bool {
+	public function delete_view_data_permissions_check( WP_REST_Request $request ) : bool {
 		try {
 			$data_view   = $this->data_view_repository->get( $request->get_param( 'view_id' ) ?? '' );
 			$data_source = $data_view->data_source();
@@ -179,6 +206,7 @@ final class Router {
 
 	/**
 	 * Deletes a dataset on a dataview.
+	 *
 	 * @since $ver$
 	 *
 	 * @param WP_REST_Request $request The request object.
@@ -201,7 +229,6 @@ final class Router {
 			$data_source->delete_data_by_id( $data_id );
 
 			return [ 'id' => $data_id ];
-
 		} catch ( \Exception $e ) {
 			return new WP_Error( $e->getCode(), $e->getMessage() );
 		}
@@ -213,7 +240,7 @@ final class Router {
 	 * @since $ver$
 	 * @return self The router.
 	 */
-	public static function get_instance( DataViewRepository $repository ): self {
+	public static function get_instance( DataViewRepository $repository ) : self {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self( $repository );
 		}
