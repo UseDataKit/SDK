@@ -34,7 +34,7 @@ final class DataViewTest extends TestCase {
 
 		$uuid     = $field->uuid();
 		$expected = <<<TEXT
-"render":( data ) => datakit_fields.enum("$uuid", data, {"elements":[{"label":"Tes\"'t","value":"test"}]}),
+"render":( data ) => datakit_fields.html("$uuid", data, []),
 TEXT;
 
 		self::assertStringContainsString( $expected, $view->to_js() );
