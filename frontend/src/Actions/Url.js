@@ -12,6 +12,7 @@ import { get, replace_tags } from '@src/helpers';
  * @property {string|null} confirm A confirm message.
  * @property {boolean} use_new_window Whether to open the url in a new window.
  * @property {boolean} use_single_request Whether to open the url in a new window.
+ * @property {object|null} registry The provided registry which contains a public API for the component.
  *
  * @param {Object.<string, string>[]} items The data object.
  * @param {Context} context The context object.
@@ -49,7 +50,7 @@ function handleAjax( items, context ) {
     const grouped = {};
 
     for ( const i in items ) {
-        const data = items[i];
+        const data = items[ i ];
         const url = replace_tags( context.url, data );
 
         const params = Object.fromEntries(
@@ -70,9 +71,9 @@ function handleAjax( items, context ) {
 
         for ( const key in params ) {
             if ( !grouped.hasOwnProperty( key ) ) {
-                grouped[key] = [];
+                grouped[ key ] = [];
             }
-            grouped[key].push( params[key] );
+            grouped[ key ].push( params[ key ] );
         }
     }
 
@@ -98,7 +99,7 @@ function handleAjax( items, context ) {
 function handleUrl( items, context ) {
     for ( const i in items ) {
 
-        const data = items[i];
+        const data = items[ i ];
         const url = replace_tags( context.url ?? '', data );
         const use_new_window = get( context, 'use_new_window', true );
 

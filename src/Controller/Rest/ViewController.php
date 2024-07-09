@@ -52,11 +52,7 @@ final class ViewController {
 		$data_id = (string) ( $request->get_param( 'data_id' ) ?? '' );
 
 		$dataview = $this->dataview_repository->get( $view_id );
-		$data     = $dataview->data_source()->get_data_by_id( $data_id );
-
-		foreach ( $dataview->view_fields as $field ) {
-			$data[ $field->uuid() ] = $field->get_value( $data );
-		}
+		$data_item = $dataview->get_view_data( $data_id );
 
 		ob_start();
 
@@ -64,7 +60,7 @@ final class ViewController {
 
 		( static function ( array $fields, array $data ) use ( $template ) {
 			require $template;
-		} )( $dataview->view_fields, $data );
+		} )( $data_item->fields(), $data_item->data() );
 
 		$html = ob_get_clean();
 

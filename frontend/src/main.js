@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { createElement } from 'react';
-import DataView from '@src/Components/DataView';
+import DataView from '@src/DataView/DataView.jsx';
 import Modal from '@src/Components/Modal';
 
 import Text from '@src/Fields/Text';
@@ -44,7 +44,7 @@ const views = document.querySelectorAll( '[data-dataview]' );
 
     const dataViewData = datakit_dataviews[ dataViewID ];
     const wrapper = createRoot( dataview );
-    const dataView = createElement( DataView, { id: dataViewID, ...dataViewData } );
+    const dataView = createElement( DataView, { id: dataViewID, apiUrl: datakit_dataviews_rest_endpoint, ...dataViewData } );
 
     wrapper.render( dataView );
 } );
