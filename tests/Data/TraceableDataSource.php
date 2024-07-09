@@ -26,9 +26,6 @@ final class TraceableDataSource implements DataSource {
 		return $this->inner->id();
 	}
 
-	public function name() : string {
-		return $this->inner->name();
-	}
 
 	/**
 	 * @inheritDoc

@@ -29,7 +29,6 @@ final class ArrayDataSourceTest extends TestCase {
 	protected function setUp() : void {
 		$this->source = new ArrayDataSource(
 			'test',
-			'Test data set',
 			[
 				'user::1' => [
 					'name'  => 'Zack',
@@ -54,7 +53,6 @@ final class ArrayDataSourceTest extends TestCase {
 	 */
 	public function test_data_source() : void {
 		self::assertSame( 'test', $this->source->id() );
-		self::assertSame( 'Test data set', $this->source->name() );
 
 		self::assertCount( 3, $this->source );
 		self::assertSame( [ 'user::1', 'user::2', 'user::3' ], $this->source->get_data_ids() );

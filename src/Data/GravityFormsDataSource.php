@@ -7,7 +7,6 @@ use DataKit\DataViews\DataView\Operator;
 use GF_Field;
 use GFAPI;
 use GFExport;
-use RuntimeException;
 use WP_Error;
 
 /**
@@ -55,7 +54,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 			throw new DataSourceNotFoundException( sprintf( 'Gravity Forms data source (%d) not found', $form_id ) );
 		}
 
-		$this->form = $form;
+		$this->form = GFExport::add_default_export_fields( $form );
 	}
 
 	/**
@@ -107,6 +106,15 @@ final class GravityFormsDataSource extends BaseDataSource {
 		$entry = $this->entries[ $id ] ?? GFAPI::get_entry( $id );
 		if ( ! is_array( $entry ) ) {
 			return [];
+		}
+
+
+		foreach ( $this->get_form_fields() as $field ) {
+			$inputs = [ $field->id, ...array_column( $field->inputs ?? [], 'id' ) ];
+
+			foreach ( $inputs as $input_id ) {
+				$entry[ $input_id ] = $field->get_value_export( $entry, $input_id );
+			}
 		}
 
 		return $entry;
@@ -183,7 +191,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @param string $operator The field operator.
 	 *
 	 * @return string The Gravity Forms search operator.
-	 * @todo this needs to be fixed for all cases.
+	 * @todo  this needs to be fixed for all cases.
 	 */
 	private function map_operator( string $operator ) : string {
 		$case = Operator::tryFrom( $operator );
@@ -246,13 +254,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 		$output = [];
 
-		$form   = GFExport::add_default_export_fields( $this->form );
-		$fields = $form['fields'];
-
-		/**
-		 * @var GF_Field[] $fields Gravity Forms fields.
-		 */
-		foreach ( $fields as $field ) {
+		foreach ( $this->get_form_fields() as $field ) {
 			$label = $field->get_field_label( true, '' );
 
 			$output[ (string) $field->id ] = $label;
@@ -274,5 +276,32 @@ final class GravityFormsDataSource extends BaseDataSource {
 		}
 
 		return $this->fields = $output;
+	}
+
+	/**
+	 * Returns the form fields.
+	 * @since $ver$
+	 * @return GF_Field[] The form fields.
+	 */
+	private function get_form_fields() : array {
+		return array_filter(
+			$this->form['fields'],
+			static fn( $value ) => $value instanceof GF_Field
+		);
+	}
+
+
+	private function get_form_field( $field_id ) : ?GF_Field {
+		foreach ( $this->get_form_fields() as $field ) {
+			if ( ! is_numeric( $field_id ) && $field->id === $field_id ) {
+				return $field;
+			}
+
+			if ( (int) $field->id === (int) $field_id ) {
+				return $field;
+			}
+		}
+
+		return null;
 	}
 }

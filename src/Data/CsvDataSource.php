@@ -56,15 +56,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function id() : string {
-		return 'csv';
-	}
-
-	/**
-	 * @inheritDoc
-	 * @since $ver$
-	 */
-	public function name() : string {
-		return sprintf( '%s-%s', $this->id(), $this->file->getBasename() );
+		return sprintf('csv-%s',$this->file->getBasename()) ;
 	}
 
 	/**

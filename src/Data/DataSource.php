@@ -20,16 +20,9 @@ interface DataSource extends Countable {
 	public function id() : string;
 
 	/**
-	 * The name of the data source visible in the UI.
-	 * @since $ver$
-	 * @return string
-	 */
-	public function name() : string;
-
-	/**
 	 * Returns the id's for the data source.
 	 *
-	 * @param int $limit The limit.
+	 * @param int $limit  The limit.
 	 * @param int $offset The offset.
 	 *
 	 * @return string[] The id's.

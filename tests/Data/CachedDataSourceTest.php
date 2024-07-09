@@ -29,7 +29,6 @@ final class CachedDataSourceTest extends TestCase {
 		$this->trace = new TraceableDataSource(
 			new ArrayDataSource(
 				'test-source',
-				'Test source',
 				[
 					'one' => [ 'name' => 'Person one', 'email' => 'person-one@company.test' ],
 					'two' => [ 'name' => 'Person two', 'email' => 'person-two@company.test' ],
@@ -47,7 +46,6 @@ final class CachedDataSourceTest extends TestCase {
 		$ds    = new CachedDataSource( $this->trace, $cache );
 
 		self::assertSame( 'test-source', $ds->id() );
-		self::assertSame( 'Test source', $ds->name() );
 
 		self::assertSame( [ 'one', 'two' ], $ds->get_data_ids() );
 		self::assertSame( [ 'one', 'two' ], $ds->get_data_ids() );

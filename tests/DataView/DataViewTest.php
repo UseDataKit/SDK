@@ -9,11 +9,13 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for {@see DataView}
+ *
  * @since $ver$
  */
 final class DataViewTest extends TestCase {
 	/**
 	 * Test case for {@see DataView::to_js()}.
+	 *
 	 * @since $ver$
 	 */
 	public function test_to_js() : void {
@@ -22,9 +24,12 @@ final class DataViewTest extends TestCase {
 			[
 				$field = EnumField::create( 'test', 'Test', [ 'test' => 'Tes"\'t' ] ),
 			],
-			new ArrayDataSource( 'test', 'Test', [
-				'test' => [ 'test' => 'Test' ]
-			] )
+			new ArrayDataSource(
+				'test',
+				[
+					'test' => [ 'test' => 'Test' ],
+				],
+			),
 		);
 
 		$uuid     = $field->uuid();

@@ -9,28 +9,38 @@ use DataKit\DataViews\DataView\Sort;
 
 /**
  * A data source backed by a kay/value array.
+ *
  * @since $ver$
  */
 final class ArrayDataSource extends BaseDataSource implements MutableDataSource {
+	/**
+	 * The unique ID for the data source.
+	 *
+	 * @since $ver$
+	 * @var string
+	 */
 	private string $id;
-	private string $name;
+
+	/**
+	 * The backing array.
+	 *
+	 * @since $ver$
+	 * @var array<string, array<string,string>> Key is ID, value is array of key=>value pairs.
+	 */
 	private array $data;
 
 	/**
 	 * Creates the data source.
+	 *
 	 * @since $ver$
 	 *
-	 * @param string $id The ID.
-	 * @param string $name The name.
 	 * @param array $data The data.
 	 */
 	public function __construct(
 		string $id,
-		string $name,
 		array $data = []
 	) {
 		$this->data = $data;
-		$this->name = $name;
 		$this->id   = $id;
 	}
 
@@ -40,14 +50,6 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 */
 	public function id() : string {
 		return $this->id;
-	}
-
-	/**
-	 * @inheritDoc
-	 * @since $ver$
-	 */
-	public function name() : string {
-		return $this->name;
 	}
 
 	/**
@@ -83,6 +85,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 
 	/**
 	 * Returns the data, filtered by the {@see Filters}.
+	 *
 	 * @since $ver$
 	 * @return array The filtered data.
 	 */

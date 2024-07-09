@@ -54,7 +54,7 @@ final class CsvDataSourceTest extends TestCase {
 	 * @since $ver$
 	 */
 	public function test_id() : void {
-		self::assertSame( 'csv', $this->data_source->id() );
+		self::assertSame( 'csv-oscar-example-data.csv', $this->data_source->id() );
 	}
 
 	/**
@@ -69,14 +69,6 @@ final class CsvDataSourceTest extends TestCase {
 		$search_by_robert = $this->data_source->search_by( 'Robert' );
 		self::assertSame( [ '13', '42', '54', '57', '72' ], $search_by_robert->get_data_ids() );
 		self::assertCount( 5, $search_by_robert );
-	}
-
-	/**
-	 * Test case for {@see CsvDataSource::name()}.
-	 * @since $ver$
-	 */
-	public function test_name() : void {
-		self::assertSame( 'csv-oscar-example-data.csv', $this->data_source->name() );
 	}
 
 	/**

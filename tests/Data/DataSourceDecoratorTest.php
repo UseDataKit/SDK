@@ -42,7 +42,7 @@ final class DataSourceDecoratorTest extends TestCase {
 				$results = [ 'one' => [ 'name' => 'Doeke' ], 'two' => [ 'name' => 'Zack' ] ];
 
 				// Instantiate and memoize the inner data source for future calls.
-				return $this->inner = new ArrayDataSource( $this->id(), $this->name(), $results );
+				return $this->inner = new ArrayDataSource( $this->id(), $results );
 			}
 		};
 	}
