@@ -6,6 +6,7 @@ use InvalidArgumentException;
 
 /**
  * Represents a field with elements that renders the label of the corresponding element.
+ *
  * @since $ver$
  */
 final class EnumField extends Field {
@@ -13,10 +14,11 @@ final class EnumField extends Field {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected string $render = 'datakit_fields.enum';
+	protected string $render = 'datakit_fields.html';
 
 	/**
 	 * Contains the list of elements.
+	 *
 	 * @since $ver$
 	 * @var array{value:string, label:string}[].
 	 */
@@ -42,12 +44,13 @@ final class EnumField extends Field {
 	 */
 	public function toArray() : array {
 		return array_merge( parent::toArray(), [
-			'elements' => $this->elements,
+			'elements' => array_values( $this->elements ),
 		] );
 	}
 
 	/**
 	 * Sets and validates the elements.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $elements The elements.
@@ -69,19 +72,16 @@ final class EnumField extends Field {
 			}
 		}
 
-		$this->elements = array_values( $elements );
+		$this->elements = $elements;
 	}
 
 	/**
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected function context() : array {
-		return array_merge(
-			parent::context(),
-			[
-				'elements' => $this->elements,
-			]
-		);
+	public function get_value( array $data ) {
+		$value = parent::get_value( $data );
+
+		return $this->elements[ $value ]['label'] ?? $value;
 	}
 }
