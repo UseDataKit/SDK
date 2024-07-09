@@ -8,6 +8,7 @@ import { useRequestCallback } from '@src/DataView/useRequestCallback';
 
 import '@wordpress/dataviews/build-style/style.css';
 import '@wordpress/components/build-style/style.css';
+import '@src/scss/fields.css';
 
 /**
  * Creates the Dataview.

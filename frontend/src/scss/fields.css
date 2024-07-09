@@ -1,4 +1,4 @@
-[data-dataview] {
+[class^='dataviews-view-'] {
     img.round {
         border-radius: 50%;
     }

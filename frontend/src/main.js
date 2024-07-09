@@ -5,20 +5,11 @@ import Modal from '@src/Components/Modal';
 
 import Text from '@src/Fields/Text';
 import Html from '@src/Fields/Html';
-import Link from '@src/Fields/Link';
-import Image from '@src/Fields/Image';
-import Enum from '@src/Fields/Enum';
-import DateTime from '@src/Fields/DateTime';
-
 import Url from '@src/Actions/Url';
 
 window.datakit_fields = new Proxy( {
-    datetime: DateTime,
-    enum: Enum,
     html: Html,
-    image: Image,
     text: Text,
-    link: Link,
 }, {
     get: ( fields, type ) => {
         // Force the same function signature for every object.
