@@ -4,11 +4,13 @@ namespace DataKit\DataViews\Field;
 
 /**
  * Represents a field that renders an `<a href` link.
+ *
  * @since $ver$
  */
 final class LinkField extends Field {
 	/**
 	 * The available link types.
+	 *
 	 * @since $ver$
 	 */
 	private const TYPE_NONE = 'none';
@@ -25,7 +27,7 @@ final class LinkField extends Field {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected function default_context(): array {
+	protected function default_context() : array {
 		return [
 			'link'           => null,
 			'type'           => self::TYPE_NONE,
@@ -35,13 +37,14 @@ final class LinkField extends Field {
 
 	/**
 	 * Creates a link that uses the current field as the label, and a different field_id as the target link.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $field_id
 	 *
 	 * @return self
 	 */
-	public function linkToField( string $field_id ): self {
+	public function linkToField( string $field_id ) : self {
 		$clone                  = clone $this;
 		$clone->context['type'] = self::TYPE_FIELD;
 		$clone->context['link'] = $field_id;
@@ -51,10 +54,11 @@ final class LinkField extends Field {
 
 	/**
 	 * Whether to have the link open on a new window.
+	 *
 	 * @since $ver$
 	 * @return self
 	 */
-	public function on_new_window(): self {
+	public function on_new_window() : self {
 		$clone                            = clone $this;
 		$clone->context['use_new_window'] = true;
 
@@ -63,10 +67,11 @@ final class LinkField extends Field {
 
 	/**
 	 * Whether to have the link open on the same window.
+	 *
 	 * @since $ver$
 	 * @return self
 	 */
-	public function on_same_window(): self {
+	public function on_same_window() : self {
 		$clone                            = clone $this;
 		$clone->context['use_new_window'] = false;
 
@@ -76,11 +81,12 @@ final class LinkField extends Field {
 
 	/**
 	 * Returns a link based on the context settings.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $data The item data.
 	 *
-	 * @return int|string|float The value.
+	 * @return string The value.
 	 */
 	public function get_value( array $data ) {
 		return sprintf(
@@ -91,20 +97,43 @@ final class LinkField extends Field {
 		);
 	}
 
-	private function href( array $data ): string {
+	/**
+	 * Return the href for the link.
+	 *
+	 * @since $ver$
+	 *
+	 * @param array $data The data object.
+	 *
+	 * @return string The href.
+	 */
+	private function href( array $data ) : string {
 		if ( self::TYPE_FIELD === ( $this->context['type'] ?? self::TYPE_NONE ) ) {
-
 			return $data[ $this->context['link'] ?? '' ] ?? '';
 		}
 
 		return parent::get_value( $data ) ?? '';
 	}
 
-	private function target(): string {
+	/**
+	 * Returns the target for the link.
+	 *
+	 * @since $ver$
+	 * @return string
+	 */
+	private function target() : string {
 		return $this->context['use_new_window'] ?? false ? '_blank' : '_self';
 	}
 
-	private function label( array $data ): string {
+	/**
+	 * Returns the label of the link.
+	 *
+	 * @since $ver$
+	 *
+	 * @param array $data THe data object.
+	 *
+	 * @return string The label.
+	 */
+	private function label( array $data ) : string {
 		return parent::get_value( $data ) ?? '';
 	}
 }
