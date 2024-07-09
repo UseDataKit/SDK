@@ -37,8 +37,8 @@ window.datakit_modal = Modal;
 const views = document.querySelectorAll( '[data-dataview]' );
 [...views].forEach( dataview => {
 
-    const dataViewID = dataview.dataset[ 'dataview' ] || null;
-    if ( !datakit_dataviews[ dataViewID ] || null ) {
+    const dataViewID = dataview.dataset[ 'dataview' ] ?? null;
+    if ( !datakit_dataviews[ dataViewID ] ?? null ) {
         return;
     }
 

@@ -4,6 +4,7 @@ namespace DataKit\DataViews\Field;
 
 /**
  * Represents a field that is rendered as an image.
+ *
  * @since $ver$
  */
 final class ImageField extends Field {
@@ -11,7 +12,7 @@ final class ImageField extends Field {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected string $render = 'datakit_fields.image';
+	protected string $render = 'datakit_fields.html';
 
 	/**
 	 * @inheritDoc
@@ -27,9 +28,10 @@ final class ImageField extends Field {
 
 	/**
 	 * Returns an instance with a set width and height.
+	 *
 	 * @since $ver$
 	 *
-	 * @param int $width The width.
+	 * @param int      $width  The width.
 	 * @param int|null $height The (optional) height.
 	 *
 	 * @return self The field.
@@ -45,8 +47,8 @@ final class ImageField extends Field {
 
 	/**
 	 * Returns an instance with a set class.
-	 * @since $ver$
 	 *
+	 * @since $ver$
 	 *
 	 * @param string $class The class to set on the image.
 	 *
@@ -57,5 +59,38 @@ final class ImageField extends Field {
 		$clone->context['class'] = $class;
 
 		return $clone;
+	}
+
+	/**
+	 * Returns an instance with a set alt text.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string $alt The alt text.
+	 *
+	 * @return self the field.
+	 */
+	public function alt( string $alt ) : self {
+		$clone                 = clone $this;
+		$clone->context['alt'] = $alt;
+
+		return $clone;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function get_value( array $data ) : string {
+		$attributes = array_merge( $this->context(), [
+			'src' => parent::get_value( $data ),
+		] );
+
+		$params = [];
+		foreach ( array_filter( $attributes ) as $key => $value ) {
+			$params[] = sprintf( '%s="%s"', esc_attr( $key ), esc_attr( $value ) );
+		}
+
+		return sprintf( '<img %s />', implode( ' ', $params ) );
 	}
 }
