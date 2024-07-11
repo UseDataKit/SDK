@@ -194,6 +194,8 @@ abstract class Field {
 	/**
 	 * Create a new instance with the provided filter operators.
 	 *
+	 * @since $ver$
+	 *
 	 * @param Operator ...$operators The operators.
 	 *
 	 * @return static A new instance with the filters applied.
@@ -206,7 +208,11 @@ abstract class Field {
 	}
 
 	/**
-	 * @return static
+	 * Returns a new instance of the field that is not sortable.
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The field which is *not* sortable.
 	 */
 	public function not_sortable() {
 		$clone              = clone $this;
@@ -216,7 +222,11 @@ abstract class Field {
 	}
 
 	/**
-	 * @return static
+	 * Returns a new instance of the field that is sortable.
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The field which is sortable.
 	 */
 	public function sortable() {
 		$clone              = clone $this;
@@ -226,7 +236,11 @@ abstract class Field {
 	}
 
 	/**
-	 * @return static
+	 * Returns a new instance of the field that cannot be hidden.
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The field which is always visible.
 	 */
 	public function always_visible() {
 		$clone              = clone $this;
@@ -237,7 +251,11 @@ abstract class Field {
 	}
 
 	/**
-	 * @return static
+	 * Returns a new instance of the field that can be hidden.
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The field which can be hidden.
 	 */
 	public function hideable() {
 		$clone              = clone $this;
@@ -247,27 +265,11 @@ abstract class Field {
 	}
 
 	/**
-	 * @return static
-	 */
-	public function primary() {
-		$clone             = clone $this;
-		$clone->is_primary = true;
-
-		return $clone;
-	}
-
-	/**
-	 * @return static
-	 */
-	public function secondary() {
-		$clone             = clone $this;
-		$clone->is_primary = false;
-
-		return $clone;
-	}
-
-	/**
-	 * @return static
+	 * Returns a new instance of the field that is hidden by default.
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The field which is hidden.
 	 */
 	public function hidden() {
 		$clone              = clone $this;
@@ -278,7 +280,11 @@ abstract class Field {
 	}
 
 	/**
-	 * @return static
+	 * Returns a new instance of the field that is visible.
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The field which is visible.
 	 */
 	public function visible() {
 		$clone            = clone $this;
@@ -287,30 +293,34 @@ abstract class Field {
 		return $clone;
 	}
 
-	private function get_filter_by() : ?array {
-		if ( ! $this->operators ) {
-			return null;
-		}
+	/**
+	 * Returns a new instance of the field that is primary.
+	 *
+	 * Note: Filters for primary fields are always shown.
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The field which is primary.
+	 */
+	public function primary() {
+		$clone             = clone $this;
+		$clone->is_primary = true;
 
-		return [
-			'operators' => array_map(
-				static fn( Operator $operator ) : string => (string) $operator,
-				$this->operators,
-			),
-			'isPrimary' => $this->is_primary,
-		];
-	}
-
-	public function is_hidden() : bool {
-		return $this->is_hidden;
+		return $clone;
 	}
 
 	/**
-	 * @return static
+	 * Returns a new instance of the field that is secondary.
+	 *
+	 * Note: Filters for secondary fields are hidden behind a dropdown.
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The field which is primary.
 	 */
-	public function default_value( ?string $default_value ) {
-		$clone                = clone $this;
-		$clone->default_value = $default_value;
+	public function secondary() {
+		$clone             = clone $this;
+		$clone->is_primary = false;
 
 		return $clone;
 	}
@@ -330,6 +340,52 @@ abstract class Field {
 
 		return $clone;
 	}
+
+	/**
+	 * Returns a new instance with a default value if the value is empty.
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The field with a default value.
+	 */
+	public function default_value( ?string $default_value ) {
+		$clone                = clone $this;
+		$clone->default_value = $default_value;
+
+		return $clone;
+	}
+
+	/**
+	 * Returns the `filterBy` options for the javascript object.
+	 *
+	 * @since $ver$
+	 * @return array|null The filter options.
+	 */
+	private function get_filter_by() : ?array {
+		if ( ! $this->operators ) {
+			return null;
+		}
+
+		return [
+			'operators' => array_map(
+				static fn( Operator $operator ) : string => (string) $operator,
+				$this->operators,
+			),
+			'isPrimary' => $this->is_primary,
+		];
+	}
+
+
+	/**
+	 * Whether the field is hidden.
+	 *
+	 * @since $ver$
+	 * @return bool Whether the field is hidden.
+	 */
+	public function is_hidden() : bool {
+		return $this->is_hidden;
+	}
+
 
 	/**
 	 * Returns the value of the field on the provided data set.
@@ -374,8 +430,10 @@ abstract class Field {
 	/**
 	 * Returns the default context of the field.
 	 *
+	 * Note: this should be overwritten on extending field.
+	 *
 	 * @since $ver$
-	 * @return array
+	 * @return array The default context values.
 	 */
 	protected function default_context() : array {
 		return [];
