@@ -75,17 +75,15 @@ export default function DataView(
      */
     useRequestCallback( () => updateData( requestState ), requestState );
 
-    return <StrictMode>
-        <RegistryProvider value={public_api}>
-            <DataViews
-                id={id}
-                view={viewState}
-                data={dataState}
-                paginationInfo={paginationState}
-                onChangeView={setView}
-                isLoading={isLoading}
-                {...{ fields, actions, supportedLayouts, search, searchLabel }}
-            />
-        </RegistryProvider>
-    </StrictMode>;
+    return <RegistryProvider value={public_api}>
+        <DataViews
+            id={id}
+            view={viewState}
+            data={dataState}
+            paginationInfo={paginationState}
+            onChangeView={setView}
+            isLoading={isLoading}
+            {...{ fields, actions, supportedLayouts, search, searchLabel }}
+        />
+    </RegistryProvider>;
 }

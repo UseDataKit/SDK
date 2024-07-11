@@ -2,7 +2,7 @@
 
 namespace DataKit\DataViews\DataView;
 
-use DataKit\assets\DataViewsException;
+use DataKit\DataViews\DataViewsException;
 use Exception;
 
 /**

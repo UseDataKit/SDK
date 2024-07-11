@@ -21,15 +21,15 @@ final class DataViewTest extends TestCase {
 	public function test_to_js() : void {
 		$view = DataView::table(
 			'test',
-			[
-				$field = EnumField::create( 'test', 'Test', [ 'test' => 'Tes"\'t' ] ),
-			],
 			new ArrayDataSource(
 				'test',
 				[
 					'test' => [ 'test' => 'Test' ],
 				],
 			),
+			[
+				$field = EnumField::create( 'test', 'Test', [ 'test' => 'Tes"\'t' ] ),
+			],
 		);
 
 		$uuid     = $field->uuid();

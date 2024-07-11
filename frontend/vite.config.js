@@ -30,13 +30,16 @@ export default defineConfig( {
         },
     },
     build: {
+        assetsDir: '',
         outDir: '../assets',
+        emptyOutDir: false,
+        sourcemap: isProduction ? false : 'inline',
         rollupOptions: {
             input: {
                 main: 'src/main.js'
             },
             output: {
-                sourcemap: isProduction ? false : 'inline',
+                format: 'iife',
                 entryFileNames: `js/${assetName}.js`,
                 assetFileNames: `css/${assetName}.css`,
             }

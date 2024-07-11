@@ -1,6 +1,6 @@
 <?php
 
-namespace DataKit\assets;
+namespace DataKit\DataViews;
 
 use RuntimeException;
 

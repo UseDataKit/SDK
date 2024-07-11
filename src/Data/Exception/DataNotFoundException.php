@@ -2,7 +2,7 @@
 
 namespace DataKit\DataViews\Data\Exception;
 
-use DataKit\assets\DataViewsException;
+use DataKit\DataViews\DataViewsException;
 use DataKit\DataViews\Data\DataSource;
 use Throwable;
 
