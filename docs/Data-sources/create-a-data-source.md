@@ -17,17 +17,12 @@ values on the class to be used by the other methods later on.
 ### Identify the data source type
 
 A data source needs to be able to be differentiated from other sources types. For this purpose we implement the `id`
-method, which returns a unique name (string) for your data source. The `CsvDataSource` for example returns the
-value `csv`. In addition to this, the data source has a `name` method that returns a nice label for the data source
-type. This label is used for the (future) dataview builder UI.
+method, which returns a unique and consistent identifier (string) for your data source. The `CsvDataSource` for example
+returns the value `csv-{filename}`, where the `filename` differentiates between CsvDataSource instances.
 
 ```php
 public function id() : string {
     return 'custom';
-}
-
-public function name() : string {
-    return 'My custom data source';
 }
 ```
 
@@ -204,10 +199,6 @@ final class CustomDataSource extends DataSourceDecorator {
 		return 'custom';
 	}
 
-	public function name() : string {
-		return 'My Custom Data Source';
-	}
-
 	protected function decorated_datasource() : DataSource {
 		// We already instantiated the
 		if ( isset( $this->inner ) ) {
@@ -218,7 +209,7 @@ final class CustomDataSource extends DataSourceDecorator {
 		$results = get_results_from_api_call();
 
 		// Instantiate and memoize the inner data source for future calls.
-		return $this->inner = new ArrayDataSource( $this->id(), $this->name(), $results );
+		return $this->inner = new ArrayDataSource( $this->id(), $results );
 	}
 }
 ```
