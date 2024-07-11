@@ -37,11 +37,18 @@ final class Pagination {
 	 * @param int|null $per_page The amount of results per page.
 	 */
 	public function __construct( int $page, ?int $per_page = null ) {
-		$default_per_page = 25;
-		// Todo: add hook to overwrite the default.
+		/**
+		 * Overwrites the default amount of results per page.
+		 *
+		 * @filter `dk/dataview/pagination/per-page-default`
+		 * @since  $ver$
+		 *
+		 * @param int $per_page The amount of results per page, default 25.
+		 */
+		$per_page ??= (int) add_filter( 'dk/dataview/pagination/per-page-default', 25 );
 
 		$this->page     = max( 1, $page );
-		$this->per_page = max( 1, $per_page ?? $default_per_page );
+		$this->per_page = max( 1, $per_page );
 	}
 
 	/**

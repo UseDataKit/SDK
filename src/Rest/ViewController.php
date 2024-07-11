@@ -3,6 +3,7 @@
 namespace DataKit\DataViews\Rest;
 
 use DataKit\DataViews\DataView\DataItem;
+use DataKit\DataViews\DataView\DataView;
 use DataKit\DataViews\DataView\DataViewRepository;
 use WP_REST_Request;
 
@@ -63,13 +64,27 @@ final class ViewController {
 
 		ob_start();
 
-		// Todo: add filter to replace template.
-		$template = dirname( DATAVIEW_PLUGIN_PATH ) . '/templates/view/table.php';
+		/**
+		 * Overwrites the default template used for a single date item view.
+		 *
+		 * @filter `dk/dataview/view/template`
+		 * @since  $ver$
+		 *
+		 * @param string   $template  The absolute path of the template to render.
+		 * @param DataView $dataview  The dataview.
+		 * @param DataItem $data_item The data item to render.
+		 */
+		$template = (string) apply_filters(
+			'dk/dataview/view/template',
+			dirname( DATAVIEW_PLUGIN_PATH ) . '/templates/view/table.php',
+			$dataview,
+			$data_item,
+		);
 
 		// Scope rendering of template to avoid class leaking.
-		( static function ( DataItem $data_item ) use ( $template ) {
+		( static function () use ( $template, $data_item ) {
 			require $template;
-		} )( $data_item );
+		} )();
 
 		$html = ob_get_clean();
 
