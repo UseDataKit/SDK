@@ -1,11 +1,4 @@
 [class^='dataviews-view-'] {
+    @import 'field/image';
     @import 'field/status-indicator';
-
-    img.round {
-        border-radius: 50%;
-    }
-
-    img.rounded {
-        border-radius: 8px;
-    }
 }

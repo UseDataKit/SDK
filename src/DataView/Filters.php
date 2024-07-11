@@ -9,17 +9,20 @@ use IteratorAggregate;
 
 /**
  * Represents a collection of fields.
+ *
  * @since $ver$
  */
 final class Filters implements IteratorAggregate {
 	/**
 	 * The Filters.
+	 *
 	 * @var Filter[]
 	 */
 	private array $filters;
 
 	/**
 	 * Creates the collection.
+	 *
 	 * @since $ver$
 	 *
 	 * @param Filter ...$filters The filters.
@@ -30,6 +33,7 @@ final class Filters implements IteratorAggregate {
 
 	/**
 	 * Creates collection of filters.
+	 *
 	 * @since $ver$
 	 *
 	 * @param Filter ...$filters The filters.
@@ -46,6 +50,7 @@ final class Filters implements IteratorAggregate {
 
 	/**
 	 * Creates collection of filters from an array.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $array The array of filters.
@@ -63,13 +68,14 @@ final class Filters implements IteratorAggregate {
 
 	/**
 	 * Serializes the collection to an array.
+	 *
 	 * @since $ver$
 	 * @return array[array{field: string, operator: string, value: string}] The fields as an array.
 	 */
 	public function to_array() : array {
 		return array_map(
 			static fn( Filter $filter ) : array => $filter->to_array(),
-			$this->filters
+			$this->filters,
 		);
 	}
 
@@ -84,6 +90,7 @@ final class Filters implements IteratorAggregate {
 
 	/**
 	 * Returns whether the entry matches the filters.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $data The data to match against.

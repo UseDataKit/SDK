@@ -2,14 +2,23 @@
 
 namespace DataKit\DataViews\Data\DataMatcher;
 
+use DataKit\DataViews\DataView\Filter;
+
+/**
+ * Helper class that can perform basic pattern matching on a data item.
+ *
+ * @since $ver$
+ * @todo  Add support for search operators like +, - and "exact phrases".
+ */
 final class ArrayDataMatcher {
 	/**
 	 * Returns whether the provided data array matches a search query string.
+	 *
 	 * @since $ver$
 	 *
-	 * @param array $data The data.
-	 * @param string $query The query string.
-	 * @param bool $is_exact_search Whether to treat the query as an exact term.
+	 * @param array  $data            The data.
+	 * @param string $query           The query string.
+	 * @param bool   $is_exact_search Whether to treat the query as an exact term.
 	 *
 	 * @return bool Whether the query is found in the data.
 	 */
@@ -41,6 +50,7 @@ final class ArrayDataMatcher {
 
 	/**
 	 * Parse a full query string into multiple possible parts.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $query The query to parse.

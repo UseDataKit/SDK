@@ -7,11 +7,13 @@ use ReflectionClass;
 
 /**
  * An enum object backed by a string.
+ *
  * @since $ver$
  */
 abstract class EnumObject {
 	/**
 	 * The backing value of the enum.
+	 *
 	 * @since $ver$
 	 * @var string
 	 */
@@ -19,6 +21,7 @@ abstract class EnumObject {
 
 	/**
 	 * Returns the available enum cases.
+	 *
 	 * @since $ver$
 	 * @return array<string, string> Cases as key => value.
 	 */
@@ -28,6 +31,7 @@ abstract class EnumObject {
 
 	/**
 	 * Create the enum object.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $case The enum case.
@@ -42,6 +46,7 @@ abstract class EnumObject {
 
 	/**
 	 * Constructor to create an enum by its backing value.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $case The case.
@@ -58,10 +63,11 @@ abstract class EnumObject {
 
 	/**
 	 * Dynamically create enums from their constant name, as a method.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $method The case name.
-	 * @param array $_ Unused arguments.
+	 * @param array  $_      Unused arguments.
 	 *
 	 * @return static The enum object.
 	 */
@@ -77,6 +83,7 @@ abstract class EnumObject {
 
 	/**
 	 * Returns the backing value of the enum.
+	 *
 	 * @since $ver$
 	 */
 	public function __toString() : string {
@@ -85,6 +92,7 @@ abstract class EnumObject {
 
 	/**
 	 * Returns the backing value of the enum.
+	 *
 	 * @since $ver$
 	 */
 	public function as_string() : string {

@@ -14,12 +14,13 @@ use JsonException;
  * NOTE: This class is used internally. When registering your data source you do not need to wrap
  * the instance yourself. This will be done by DataKit.
  *
- * @since $ver$
+ * @since    $ver$
  * @internal This class is subject to change.
  */
 final class CachedDataSource extends BaseDataSource implements MutableDataSource {
 	/**
 	 * The data source to cache.
+	 *
 	 * @since $ver$
 	 * @var DataSource
 	 */
@@ -27,6 +28,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * The caching provider.
+	 *
 	 * @since $ver$
 	 * @var CacheProvider
 	 */
@@ -34,9 +36,10 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * Creates a cached data source decorator.
+	 *
 	 * @since $ver$
 	 *
-	 * @param DataSource $inner The wrapped data source.
+	 * @param DataSource    $inner The wrapped data source.
 	 * @param CacheProvider $cache The cache provider .
 	 */
 	public function __construct( DataSource $inner, CacheProvider $cache ) {
@@ -53,15 +56,8 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	}
 
 	/**
-	 * @inheritDoc
-	 * @since $ver$
-	 */
-	public function name() : string {
-		return $this->inner->name();
-	}
-
-	/**
 	 * Returns a calculated key based on a set of arguments.
+	 *
 	 * @since $ver$
 	 *
 	 * @param mixed ...$arguments any scalar arguments used calculate a unique cache key.
@@ -77,13 +73,14 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 			throw new InvalidArgumentException(
 				'The cache key could not be generated based on the provide arguments',
 				$e->getCode(),
-				$e
+				$e,
 			);
 		}
 	}
 
 	/**
 	 * Returns a calculated key based on a set of arguments and the inner data source and filters.
+	 *
 	 * @since $ver$
 	 *
 	 * @param mixed ...$arguments any scalar arguments used calculate a unique cache key.
@@ -100,9 +97,10 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * Retrieves the result from the cache, or stores if it does not exist.
+	 *
 	 * @since $ver$
 	 *
-	 * @param string $cache_key The cache key.
+	 * @param string   $cache_key       The cache key.
 	 * @param callable $retrieve_result The callback that provides the result to cache.
 	 *
 	 * @return mixed The cached result.
@@ -116,7 +114,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 		$result = $retrieve_result();
 
-		// Todo: cache this key on a group cache, so we can invalidate all cached keys in one swoop.
+		// Todo: record this key on a group cache, so we can invalidate all cached keys in one swoop.
 		$this->cache->set( $cache_key, $result );
 
 		return $result;
@@ -226,6 +224,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * Clears the underlying cache for this data source.
+	 *
 	 * @since $ver$
 	 * @return bool Whether the cache was cleared.
 	 */

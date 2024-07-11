@@ -9,6 +9,8 @@ use JsonException;
 /**
  * Represents an (immutable) field on the view.
  *
+ * @link  https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/#fields-object
+ *
  * @since $ver$
  */
 abstract class Field {

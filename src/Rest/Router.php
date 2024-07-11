@@ -2,7 +2,6 @@
 
 namespace DataKit\DataViews\Rest;
 
-use DataKit\DataViews\Controller\Rest\ViewController;
 use DataKit\DataViews\Data\MutableDataSource;
 use DataKit\DataViews\DataView\DataViewRenderer;
 use DataKit\DataViews\DataView\DataViewRepository;

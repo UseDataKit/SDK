@@ -4,16 +4,23 @@ namespace DataKit\DataViews\Data;
 
 use Countable;
 use DataKit\DataViews\Data\Exception\DataNotFoundException;
+use DataKit\DataViews\Data\Exception\DataSourceNotFoundException;
 use DataKit\DataViews\DataView\Filters;
 use DataKit\DataViews\DataView\Sort;
 
 /**
  * Represents a read-only data source.
+ *
+ * Developer notes:
+ * - Data source should throw a {@see DataSourceNotFoundException} when creation of the data source fails.
+ * - The data source should preferably be immutable, as {@see BaseDataSource} helper methods do.
+ *
  * @since $ver$
  */
 interface DataSource extends Countable {
 	/**
 	 * The unique ID of the data source.
+	 *
 	 * @since $ver$
 	 * @return string
 	 */
@@ -31,6 +38,7 @@ interface DataSource extends Countable {
 
 	/**
 	 * Returns the data for the provided id.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $id The id.
@@ -42,6 +50,7 @@ interface DataSource extends Countable {
 
 	/**
 	 * Returns a value => label array of the available fields for the data source.
+	 *
 	 * @since $ver$
 	 * @return array<string, string> The fields.
 	 */
@@ -59,31 +68,34 @@ interface DataSource extends Countable {
 
 	/**
 	 * Sets the filters for the data source.
+	 *
 	 * @since $ver$
 	 *
 	 * @param null|Filters $filters The filter.
 	 *
-	 * @return static The (possibly immutable) data source.
+	 * @return static The data source.
 	 */
 	public function filter_by( ?Filters $filters );
 
 	/**
 	 * Filters entries based on a search string.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $search The search query.
 	 *
-	 * @return static The (possibly immutable) data source.
+	 * @return static The data source.
 	 */
 	public function search_by( string $search );
 
 	/**
 	 * Sets the filters for the data source.
+	 *
 	 * @since $ver$
 	 *
 	 * @param Sort|null $sort The sorting.
 	 *
-	 * @return static The (possibly immutable) data source.
+	 * @return static The data source.
 	 */
 	public function sort_by( ?Sort $sort );
 }

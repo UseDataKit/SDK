@@ -6,11 +6,13 @@ use InvalidArgumentException;
 
 /**
  * Represents the sorting applied to a data view.
+ *
  * @since $ver$
  */
 final class Sort {
 	/**
 	 * The sorting options.
+	 *
 	 * @since $ver$
 	 */
 	public const ASC = 'ASC';
@@ -18,6 +20,7 @@ final class Sort {
 
 	/**
 	 * The field to sort.
+	 *
 	 * @since $ver$
 	 * @var string
 	 */
@@ -25,6 +28,7 @@ final class Sort {
 
 	/**
 	 * The direction to sort in.
+	 *
 	 * @since $ver$
 	 * @var string
 	 */
@@ -32,10 +36,11 @@ final class Sort {
 
 	/**
 	 * Creates a sort instance.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $direction The direction.
-	 * @param string $field The field name.
+	 * @param string $field     The field name.
 	 */
 	private function __construct( string $field, string $direction ) {
 		$this->direction = strtoupper( $direction );
@@ -51,6 +56,7 @@ final class Sort {
 
 	/**
 	 * Serialize the sort as an array.
+	 *
 	 * @since $ver$
 	 * @return array<string, string> The serialized sort object.
 	 */
@@ -63,6 +69,7 @@ final class Sort {
 
 	/**
 	 * Create a sort object from an array.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array{field: string, direction: string} $array The array.
@@ -75,6 +82,7 @@ final class Sort {
 
 	/**
 	 * Creates a sort object for the provided field with an ascending direction.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $field The field name.
@@ -87,6 +95,7 @@ final class Sort {
 
 	/**
 	 * Creates a sort object for the provided field with a descending direction.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $field The field name.

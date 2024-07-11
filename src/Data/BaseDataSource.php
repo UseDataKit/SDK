@@ -6,12 +6,16 @@ use DataKit\DataViews\DataView\Filters;
 use DataKit\DataViews\DataView\Sort;
 
 /**
- * Abstract data source that implements default methods.
+ * Abstract data source that provides common filtering and sorting methods.
+ *
+ * Note: Methods are implemented to create an immutable data source.
+ *
  * @since $ver$
  */
 abstract class BaseDataSource implements DataSource {
 	/**
 	 * The filters to use.
+	 *
 	 * @since $ver$
 	 * @var Filters|null
 	 */
@@ -19,12 +23,14 @@ abstract class BaseDataSource implements DataSource {
 
 	/**
 	 * The sorting to use.
+	 *
 	 * @since $ver$
 	 */
 	protected ?Sort $sort = null;
 
 	/**
 	 * The string to search by.
+	 *
 	 * @since $ver$
 	 */
 	protected string $search = '';
@@ -44,7 +50,6 @@ abstract class BaseDataSource implements DataSource {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
-	 * @return static
 	 */
 	public function sort_by( ?Sort $sort ) {
 		$clone       = clone $this;

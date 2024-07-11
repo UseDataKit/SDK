@@ -4,11 +4,13 @@ namespace DataKit\DataViews\DataView;
 
 /**
  * A DataView repository backed by an array.
+ *
  * @since $ver$
  */
 final class ArrayDataViewRepository implements DataViewRepository {
 	/**
 	 * Contains the registered DataViews.
+	 *
 	 * @since $ver$
 	 * @var array<string, DataView>
 	 */
@@ -16,6 +18,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 
 	/**
 	 * Creates the repository.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $data_views

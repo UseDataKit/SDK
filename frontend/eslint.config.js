@@ -1,13 +1,19 @@
-import globals from "globals";
-import pluginJs from "@eslint/js";
-import pluginReactConfig from "eslint-plugin-react/configs/recommended.js";
+import globals from 'globals';
+import pluginJs from '@eslint/js';
+import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js';
 
 export default [
     {
-        languageOptions: { globals: globals.browser },
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+                datakit_dataviews: 'readable',
+                datakit_dataviews_rest_endpoint: 'readable',
+            },
+        },
         settings: {
             react: {
-                "version": "detect",
+                'version': 'detect',
             }
         }
     },

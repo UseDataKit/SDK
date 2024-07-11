@@ -7,6 +7,8 @@ use DataKit\DataViews\Data\DataSource;
 /**
  * Represents the pagination settings of a dataview.
  *
+ * @link  https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/#paginationinfo-object
+ *
  * @since $ver$
  */
 final class Pagination {
@@ -35,8 +37,11 @@ final class Pagination {
 	 * @param int|null $per_page The amount of results per page.
 	 */
 	public function __construct( int $page, ?int $per_page = null ) {
+		$default_per_page = 25;
+		// Todo: add hook to overwrite the default.
+
 		$this->page     = max( 1, $page );
-		$this->per_page = max( 1, $per_page ?? 25 );
+		$this->per_page = max( 1, $per_page ?? $default_per_page );
 	}
 
 	/**

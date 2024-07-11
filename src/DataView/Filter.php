@@ -111,7 +111,7 @@ final class Filter {
 	 *
 	 * @param mixed $value The value to check.
 	 *
-	 * @return bool Whether the value is stringable.
+	 * @return bool Whether the value can be cast to a string.
 	 */
 	private static function is_stringable( $value ) : bool {
 		if ( is_scalar( $value ) || is_null( $value ) ) {
@@ -195,7 +195,6 @@ final class Filter {
 	 * @param array $data The dataset to match against.
 	 *
 	 * @return bool Whether the value matches the filter.
-	 * @todo  this may need to be moved to a separate class.
 	 */
 	public function matches( array $data ) : bool {
 		$value = $data[ $this->field ] ?? null;

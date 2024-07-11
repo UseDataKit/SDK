@@ -1,9 +1,4 @@
 /**
- * Javascript side of the text field.
- * @since $ver$
- */
-
-/**
  * Returns the provided data as text.
  * @since $ver$
  */

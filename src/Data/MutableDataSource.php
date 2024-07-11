@@ -6,11 +6,13 @@ use DataKit\DataViews\Data\Exception\DataNotFoundException;
 
 /**
  * Represents a mutable data source.
+ *
  * @since $ver$
  */
 interface MutableDataSource extends DataSource {
 	/**
 	 * Whether the data source can delete results.
+	 *
 	 * @since $ver$
 	 * @return bool
 	 */

@@ -7,6 +7,7 @@ use DataKit\DataViews\DataView\Sort;
 
 /**
  * A base class for easier decorator or proxy creation.
+ *
  * @since $ver$
  */
 abstract class DataSourceDecorator implements DataSource, MutableDataSource {

@@ -2,7 +2,6 @@
 
 namespace DataKit\DataViews\DataView;
 
-use DataKit\DataViews\Action\Action;
 use DataKit\DataViews\Data\DataSource;
 use DataKit\DataViews\Data\MutableDataSource;
 use DataKit\DataViews\Field\Field;
@@ -151,12 +150,12 @@ final class DataView {
 	 */
 	public static function table(
 		string $id,
-		array $fields,
 		DataSource $data_source,
+		array $fields,
 		?Sort $sort = null,
 		?Filters $filters = null,
 		?Actions $actions = null
-	): self {
+	) : self {
 		return new self(
 			View::Table(),
 			$id,
@@ -175,7 +174,7 @@ final class DataView {
 	 *
 	 * @param Field ...$fields The fields.
 	 **/
-	private function ensure_valid_fields( Field ...$fields ): void {
+	private function ensure_valid_fields( Field ...$fields ) : void {
 		$this->directory_fields = array_merge( $this->directory_fields, $fields );
 	}
 
@@ -185,7 +184,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return string The ID.
 	 */
-	public function id(): string {
+	public function id() : string {
 		return $this->id;
 	}
 
@@ -195,7 +194,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return array The view data object.
 	 */
-	private function view(): array {
+	private function view() : array {
 		return [
 			'search'       => $this->search,
 			'type'         => (string) $this->view,
@@ -214,7 +213,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return DataSource The data source.
 	 */
-	public function data_source(): DataSource {
+	public function data_source() : DataSource {
 		return $this->data_source
 			->sort_by( $this->sort )
 			->filter_by( $this->filters )
@@ -231,7 +230,7 @@ final class DataView {
 	 *
 	 * @return array The data object.
 	 */
-	public function get_data( ?DataSource $data_source = null, ?Pagination $pagination = null ): array {
+	public function get_data( ?DataSource $data_source = null, ?Pagination $pagination = null ) : array {
 		$data_source ??= $this->data_source();
 		$pagination  ??= $this->pagination;
 
@@ -254,7 +253,18 @@ final class DataView {
 		return $object;
 	}
 
-	public function get_view_data( string $data_id ): DataItem {
+	/**
+	 * Returns a data item for a single result.
+	 *
+	 * This value object contains (a reference to) the fields as well as the data. Used by the single entry template.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string $data_id The data item ID.
+	 *
+	 * @return DataItem The data item.
+	 */
+	public function get_view_data_item( string $data_id ) : DataItem {
 		$data = $this->data_source()->get_data_by_id( $data_id );
 
 		foreach ( $this->view_fields as $field ) {
@@ -268,12 +278,12 @@ final class DataView {
 	}
 
 	/**
-	 * Returns all the field objects.
+	 * Returns all the fields for the dictionary view.
 	 *
 	 * @since $ver$
 	 * @return array[] The fields as arrays.
 	 */
-	private function fields(): array {
+	private function dictionary_fields() : array {
 		$fields = [];
 
 		foreach ( $this->directory_fields as $field ) {
@@ -293,7 +303,7 @@ final class DataView {
 	 * @return string[] The supported layouts.
 	 * @todo  provide option to add more.
 	 */
-	private function supported_layouts(): array {
+	private function supported_layouts() : array {
 		return [ (string) $this->view ];
 	}
 
@@ -303,68 +313,108 @@ final class DataView {
 	 * @since $ver$
 	 * @return string[] The field ID's.
 	 */
-	private function hidden_fields(): array {
+	private function hidden_fields() : array {
 		$hidden_fields = [];
 		foreach ( $this->directory_fields as $field ) {
 			if ( ! $field->is_hidden() ) {
 				continue;
 			}
+
 			$hidden_fields[] = $field->id();
 		}
 
 		return $hidden_fields;
 	}
 
-	public function paginate( int $per_page, ?int $page = null ): self {
+	/**
+	 * Returns an instance of the data view with a particular pagination.
+	 *
+	 * @since $ver$
+	 *
+	 * @param int      $per_page The results per page.
+	 * @param int|null $page     The current page.
+	 *
+	 * @return self The dataview.
+	 */
+	public function paginate( int $per_page, ?int $page = null ) : self {
 		$this->pagination = new Pagination( $page ?? 1, $per_page );
 
 		return $this;
 	}
 
-	public function search( string $search ): self {
+	/**
+	 * Returns an instance of the data view with search enabled, and a provided search string.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string $search The query to search.
+	 *
+	 * @return self The dataview.
+	 */
+	public function search( string $search ) : self {
 		$this->has_search = true;
 		$this->search     = $search;
 
 		return $this;
 	}
 
-	public function disable_search(): self {
+	/**
+	 * Returns an instance of the data view with searching disabled.
+	 *
+	 * @since $ver$
+	 *
+	 * @return self The data view instance.
+	 */
+	public function disable_search() : self {
 		$this->has_search = false;
 		$this->search     = '';
 
 		return $this;
 	}
 
-	public function sort( ?Sort $sort ): self {
+	/**
+	 * Returns an instance of the data view with a particular sorting applied.
+	 *
+	 * @since $ver$
+	 *
+	 * @param Sort|null $sort The sort object.
+	 *
+	 * @return self The dataview.
+	 */
+	public function sort( ?Sort $sort ) : self {
 		$this->sort = $sort;
 
 		return $this;
 	}
 
 	/**
-	 * Returns the data needed to set up a
+	 * Returns the data needed to set up a WordPress DataViews component.
 	 *
-	 * @return array
+	 * @since $ver$
+	 *
+	 * @return array The data for a WordPress DataViews component.
 	 */
-	public function to_array(): array {
+	public function to_array() : array {
 		return [
 			'search'           => $this->has_search,
 			'supportedLayouts' => $this->supported_layouts(),
 			'paginationInfo'   => $this->pagination->info( $this->data_source() ),
 			'view'             => $this->view(),
-			'fields'           => $this->fields(),
+			'fields'           => $this->dictionary_fields(),
 			'data'             => $this->get_data(),
 			'actions'          => $this->actions ? $this->actions->to_array() : [],
 		];
 	}
 
 	/**
-	 * Returns the javascript object for a dataview.
+	 * Returns the javascript object for a WordPress DataViews component.
+	 *
+	 * Note: removing "__RAW__ and __ENDRAW__" ensure certain code is provided as javascript, instead of a string.
 	 *
 	 * @since $ver$
 	 * @return string The javascript object.
 	 */
-	public function to_js( bool $is_pretty = false ): string {
+	public function to_js( bool $is_pretty = false ) : string {
 		$flags = JSON_THROW_ON_ERROR;
 		if ( $is_pretty ) {
 			$flags |= JSON_PRETTY_PRINT;
@@ -373,7 +423,7 @@ final class DataView {
 		try {
 			return preg_replace_callback(
 				'/\"__RAW__(.*?)__ENDRAW__\"/s',
-				static fn( array $matches ): string => stripslashes( $matches[1] ),
+				static fn( array $matches ) : string => stripslashes( $matches[1] ),
 				json_encode( $this->to_array(), $flags ),
 			);
 		} catch ( JsonException $e ) {
@@ -384,23 +434,24 @@ final class DataView {
 	/**
 	 * Makes a single result of a dataview visible within a modal.
 	 *
+	 * Note: This method adds a primary action to open a single entry template in a modal.
+	 *
 	 * @since $ver$
 	 *
-	 * @param array  $fields The fields.
-	 * @param string $label  The label.
+	 * @param array  $fields The fields to show.
+	 * @param string $label  The label to call the action.
 	 *
-	 * @return self The dataview.
+	 * @return self The dataview with the view action.
 	 */
-	public function viewable( array $fields, string $label = 'View' ) {
-		$dataview              = clone $this;
-		$dataview->view_fields = $fields;
+	public function viewable( array $fields, string $label = 'View' ) : self {
+		$dataview = clone $this;
+		$dataview->add_view_fields( ...$fields );
 
 		$actions       = $this->actions ? iterator_to_array( $this->actions ) : [];
 		$view_rest_url = Router::get_url( sprintf( 'views/%s/data/{id}', $this->id() ) );
 
-		$view_action = Action::modal( 'view', $label, $view_rest_url )
-			->primary( 'info' )
-			->hide_header();
+		$view_action = Action::modal( 'view', $label, $view_rest_url, true )
+			->primary( 'info' );
 
 		$actions[] = $view_action;
 
@@ -410,16 +461,19 @@ final class DataView {
 	}
 
 	/**
-	 * Returns an instance of the data view which includes a delete action.
+	 * Returns an instance of the dataview which includes a delete action.
+	 *
+	 * Note: The method adds a primary destructive action, with a confirmation. To change anything to the action, you
+	 * can provide a callback which receives (and should return) the action.
 	 *
 	 * @since $ver$
 	 *
-	 * @param string        $label The label to use on the button.
-	 * @param callable|null $callback
+	 * @param string        $label    The label to use on the button.
+	 * @param callable|null $callback Callback that receives the action as the single argument to perform changes on.
 	 *
-	 * @return self
+	 * @return self The dataview with a delete action.
 	 */
-	public function deletable( string $label = 'Delete', ?callable $callback = null ): self {
+	public function deletable( string $label = 'Delete', ?callable $callback = null ) : self {
 		$dataview = clone $this;
 
 		if (
@@ -449,5 +503,16 @@ final class DataView {
 		$dataview->actions = Actions::of( ...$actions );
 
 		return $dataview;
+	}
+
+	/**
+	 * Adds fields for the single entry view.
+	 *
+	 * @since $ver$
+	 *
+	 * @param Field ...$fields The fields.
+	 */
+	private function add_view_fields( Field ...$fields ) : void {
+		$this->view_fields = $fields;
 	}
 }

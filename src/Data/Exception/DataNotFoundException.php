@@ -2,17 +2,19 @@
 
 namespace DataKit\DataViews\Data\Exception;
 
+use DataKit\assets\DataViewsException;
 use DataKit\DataViews\Data\DataSource;
-use DataKit\DataViews\DataViewsException;
 use Throwable;
 
 /**
  * Thrown when the data was not found.
+ *
  * @since $ver$
  */
 final class DataNotFoundException extends DataViewsException {
 	/**
 	 * The data source that triggered the exception.
+	 *
 	 * @since $ver$
 	 * @var DataSource
 	 */
@@ -34,10 +36,11 @@ final class DataNotFoundException extends DataViewsException {
 
 	/**
 	 * Creates instance of the exception for a specific id.
+	 *
 	 * @since $ver$
 	 *
 	 * @param DataSource $data_source The data source that triggered the exception.
-	 * @param string $id The ID of the data set.
+	 * @param string     $id          The ID of the data set.
 	 *
 	 * @return self The exception.
 	 */
@@ -47,6 +50,7 @@ final class DataNotFoundException extends DataViewsException {
 
 	/**
 	 * Returns the data source that triggered the exception.
+	 *
 	 * @since $ver$
 	 * @return DataSource
 	 */

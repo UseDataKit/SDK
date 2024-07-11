@@ -1,17 +1,20 @@
 <?php
 
-namespace DataKit\DataViews\Controller\Rest;
+namespace DataKit\DataViews\Rest;
 
+use DataKit\DataViews\DataView\DataItem;
 use DataKit\DataViews\DataView\DataViewRepository;
 use WP_REST_Request;
 
 /**
  * Controller responsible for a single view result.
+ *
  * @since $ver$
  */
 final class ViewController {
 	/**
 	 * The dataview repository.
+	 *
 	 * @since $ver$
 	 * @var DataViewRepository
 	 */
@@ -19,6 +22,7 @@ final class ViewController {
 
 	/**
 	 * Creates the controller.
+	 *
 	 * @since $ver$
 	 *
 	 * @param DataViewRepository $dataview_repository The dataview repository
@@ -29,45 +33,50 @@ final class ViewController {
 
 	/**
 	 * Whether the current user can view the result.
+	 *
 	 * @since $ver$
 	 *
 	 * @param WP_REST_Request $request The request object.
 	 *
 	 * @return bool Whether the current user can view the result.
+	 * @todo  Add security from DataView.
 	 */
-	public function can_view( WP_REST_Request $request ): bool {
+	public function can_view( WP_REST_Request $request ) : bool {
 		return true;
 	}
 
 	/**
 	 * Returns the result for a single item.
+	 *
 	 * @since $ver$
 	 *
 	 * @param WP_REST_Request $request The request object.
 	 *
 	 * @return array The response..
 	 */
-	public function get_item( WP_REST_Request $request ): array {
+	public function get_item( WP_REST_Request $request ) : array {
 		$view_id = (string) ( $request->get_param( 'view_id' ) ?? '' );
 		$data_id = (string) ( $request->get_param( 'data_id' ) ?? '' );
 
-		$dataview = $this->dataview_repository->get( $view_id );
-		$data_item = $dataview->get_view_data( $data_id );
+		$dataview  = $this->dataview_repository->get( $view_id );
+		$data_item = $dataview->get_view_data_item( $data_id );
 
 		ob_start();
 
+		// Todo: add filter to replace template.
 		$template = dirname( DATAVIEW_PLUGIN_PATH ) . '/templates/view/table.php';
 
-		( static function ( array $fields, array $data ) use ( $template ) {
+		// Scope rendering of template to avoid class leaking.
+		( static function ( DataItem $data_item ) use ( $template ) {
 			require $template;
-		} )( $data_item->fields(), $data_item->data() );
+		} )( $data_item );
 
 		$html = ob_get_clean();
 
 		return [
-			'dataview'  => $dataview->id(),
-			'result_id' => $data_id,
-			'html'      => $html,
+			'dataview_id' => $dataview->id(),
+			'data_id'     => $data_id,
+			'html'        => $html,
 		];
 	}
 }

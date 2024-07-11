@@ -6,11 +6,13 @@ use DataKit\DataViews\DataView\DataViewRepository;
 
 /**
  * Responsible for registering and rendering shortcodes.
+ *
  * @since $ver$
  */
-final class Shortcode {
+final class DataviewShortcode {
 	/**
 	 * The name of the shortcode.
+	 *
 	 * @since $ver$
 	 * @var string
 	 */
@@ -18,12 +20,15 @@ final class Shortcode {
 
 	/**
 	 * The singleton plugin instance.
+	 *
 	 * @since $ver$
 	 * @var self
 	 */
 	private static self $instance;
+
 	/**
 	 * The DataView repository.
+	 *
 	 * @since $ver$
 	 * @var DataViewRepository
 	 */
@@ -31,6 +36,7 @@ final class Shortcode {
 
 	/**
 	 * Runtime cache for which dataviews are rendered.
+	 *
 	 * @since $ver$
 	 * @var array
 	 */
@@ -38,6 +44,7 @@ final class Shortcode {
 
 	/**
 	 * Creates the shortcode instance.
+	 *
 	 * @since $ver$
 	 */
 	private function __construct( DataViewRepository $data_view_repository ) {
@@ -49,6 +56,7 @@ final class Shortcode {
 
 	/**
 	 * Renders the short code.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $attributes The shortcode attributes.
@@ -91,6 +99,7 @@ final class Shortcode {
 
 	/**
 	 * Return and maybe initialize the singleton.
+	 *
 	 * @since $ver$
 	 * @return self The singleton.
 	 */

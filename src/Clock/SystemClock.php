@@ -4,6 +4,7 @@ namespace DataKit\DataViews\Clock;
 
 /**
  * Clock that uses the system time.
+ *
  * @since $ver$
  */
 final class SystemClock implements Clock {

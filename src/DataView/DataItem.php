@@ -79,10 +79,22 @@ final class DataItem {
 		];
 	}
 
+	/**
+	 * Returns the fields for the data item.
+	 *
+	 * @since $ver$
+	 * @return Field[] The fields.
+	 */
 	public function fields() : array {
 		return $this->fields;
 	}
 
+	/**
+	 * Returns the data for the data item.
+	 *
+	 * @since $ver$
+	 * @return array The data.
+	 */
 	public function data() : array {
 		return $this->data;
 	}

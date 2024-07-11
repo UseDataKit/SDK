@@ -7,11 +7,11 @@
  * @since $ver$
  */
 import { get, replace_tags } from '@src/helpers';
-import { useState } from "react";
+import { useState } from 'react';
 
 export default function Modal( { items, closeModal, context } ) {
-    const [body, setBody] = useState( null );
-    const [busy, setBusy] = useState( false );
+    const [ body, setBody ] = useState( null );
+    const [ busy, setBusy ] = useState( false );
 
     // Close modal on any element that has `data-close-modal` as a data-attribute.
     const handleClick = ( e ) => e.target.matches( '[data-close-modal]' ) && closeModal();

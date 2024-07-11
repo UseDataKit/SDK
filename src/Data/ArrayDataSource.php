@@ -10,6 +10,9 @@ use DataKit\DataViews\DataView\Sort;
 /**
  * A data source backed by a kay/value array.
  *
+ * Note: Technically this data source can delete, but it will not be persisted outside the session.
+ * This source is useful for testing and composition.
+ *
  * @since $ver$
  */
 final class ArrayDataSource extends BaseDataSource implements MutableDataSource {
@@ -126,6 +129,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function can_delete() : bool {

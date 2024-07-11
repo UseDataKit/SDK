@@ -2,7 +2,7 @@
 
 namespace DataKit\DataViews;
 
-use DataKit\DataViews\Component\Shortcode;
+use DataKit\DataViews\Component\DataviewShortcode;
 use DataKit\DataViews\DataView\DataView;
 use DataKit\DataViews\DataView\DataViewRepository;
 use DataKit\DataViews\Rest\Router;
@@ -36,7 +36,7 @@ final class DataViewPlugin {
 		$this->data_view_repository = $data_view_repository;
 
 		Router::get_instance( $this->data_view_repository );
-		Shortcode::get_instance( $this->data_view_repository );
+		DataviewShortcode::get_instance( $this->data_view_repository );
 
 		add_action( 'datakit/dataview/register', [ $this, 'register_data_view' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_scripts' ] );

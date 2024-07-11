@@ -57,6 +57,7 @@ export default function DataView(
 
     /**
      * API passed to the callback actions.
+     *
      * @since $ver$
      */
     const public_api = {

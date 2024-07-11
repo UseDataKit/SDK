@@ -11,11 +11,15 @@ use WP_Error;
 
 /**
  * Data source backed by a Gravity Forms form.
+ *
  * @since $ver$
  */
 final class GravityFormsDataSource extends BaseDataSource {
 	/**
 	 * Fields that are top-level search keys.
+	 *
+	 * Note: These filters are handled differently by the Gravity Forms search API.
+	 *
 	 * @since $ver$
 	 * @var string[]
 	 */
@@ -23,6 +27,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * The form object.
+	 *
 	 * @since $ver$
 	 * @var array[]
 	 */
@@ -30,6 +35,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * Microcache for the "current" entries.
+	 *
 	 * @since $ver$
 	 * @var array[]
 	 */
@@ -37,6 +43,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * Microcache for the data source fields.
+	 *
 	 * @since $ver$
 	 * @var array<string, string>
 	 */
@@ -44,6 +51,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * Creates the data source.
+	 *
 	 * @since $ver$
 	 *
 	 * @param int $form_id The form ID.
@@ -63,14 +71,6 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 */
 	public function id() : string {
 		return sprintf( 'gravity-forms-%d', $this->form['id'] );
-	}
-
-	/**
-	 * @inheritDoc
-	 * @since $ver$
-	 */
-	public function name() : string {
-		return sprintf( 'Gravity Forms (#%d) %s', $this->form['id'], $this->form['title'] );
 	}
 
 	/**
@@ -108,8 +108,8 @@ final class GravityFormsDataSource extends BaseDataSource {
 			return [];
 		}
 
-
 		foreach ( $this->get_form_fields() as $field ) {
+			// Returns the values for the entire field, as well as all sub input separately; e.g. 1, 1.1, 1.2, etc.
 			$inputs = [ $field->id, ...array_column( $field->inputs ?? [], 'id' ) ];
 
 			foreach ( $inputs as $input_id ) {
@@ -130,9 +130,10 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * Returns the search criteria based on the filters.
+	 *
 	 * @since $ver$
 	 *
-	 * @return array {field_filters: array} The search criteria.
+	 * @return array The search criteria.
 	 */
 	private function get_search_criteria() : array {
 		if ( ! $this->filters && ! $this->search ) {
@@ -143,19 +144,19 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 		if ( $this->filters ) {
 			$filters                  = $this->top_level_filters();
-			$filters['field_filters'] = array_filter(
+			$filters['field_filters'] = array_merge( ...array_filter(
 				array_map(
-					\Closure::fromCallable( [ $this, 'transform_filter_to_field_filter' ] ),
-					$this->filters->to_array()
-				)
-			);
+					\Closure::fromCallable( [ $this, 'transform_filter_to_field_filters' ] ),
+					$this->filters->to_array(),
+				),
+			) );
 		}
 
 		if ( $this->search ) {
 			$filters['field_filters'] ??= [];
 
 			$filters['field_filters'][] = [
-				'field'    => '0',
+				'field'    => '0', // All fields.
 				'operator' => 'contains',
 				'value'    => $this->search,
 			];
@@ -165,27 +166,33 @@ final class GravityFormsDataSource extends BaseDataSource {
 	}
 
 	/**
-	 * Transforms a filter into a Gravity Forms field filter.
+	 * Transforms a filter into a Gravity Forms field filters.
+	 *
+	 * Note: Returns an array of arrays, as a single DataView Filter can be comprised of multiple Gravity Forms filters.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $filter The filter.
 	 *
-	 * @return null|array{key: string, value:string|int|float|array, operator:string} The field filter criteria.
+	 * @return null|array{array{key: string, value:string|int|float|array, operator:string}} The field filter criteria.
 	 */
-	private function transform_filter_to_field_filter( array $filter ) : ?array {
+	private function transform_filter_to_field_filters( array $filter ) : ?array {
 		if ( in_array( $filter['field'], self::$top_level_filters, true ) ) {
 			return null;
 		}
 
 		return [
-			'key'      => $filter['field'],
-			'value'    => $filter['value'],
-			'operator' => $this->map_operator( $filter['operator'] ),
+			[
+				'key'      => $filter['field'],
+				'value'    => $filter['value'],
+				'operator' => $this->map_operator( $filter['operator'] ),
+			],
 		];
 	}
 
 	/**
 	 * Maps the field operator to a Gravity Forms search operator.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $operator The field operator.
@@ -197,17 +204,20 @@ final class GravityFormsDataSource extends BaseDataSource {
 		$case = Operator::tryFrom( $operator );
 
 		$lookup = [
-			(string) Operator::is()     => 'IS',
-			(string) Operator::isNot()  => 'IS NOT',
-			(string) Operator::isAny()  => 'IN',
-			(string) Operator::isNone() => 'NOT IN',
+			(string) Operator::is()       => 'IS',
+			(string) Operator::isNot()    => 'IS NOT',
+			(string) Operator::isAny()    => 'IN',
+			(string) Operator::isAll()    => 'IS',
+			(string) Operator::isNotAll() => 'IN',
+			(string) Operator::isNone()   => 'NOT IN',
 		];
 
-		return $lookup[ (string) $case ] ?? 'CONTAINS';
+		return $lookup[ (string) $case ] ?? 'IS NOT';
 	}
 
 	/**
 	 * Returns the top level filters for the Gravity Forms API.
+	 *
 	 * @since $ver$
 	 * @return array[] The filters.
 	 */
@@ -227,6 +237,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * Returns the sorting for gravity forms based on the Sort object.
+	 *
 	 * @since $ver$
 	 * @return array The Gravity Forms sorting.
 	 */
@@ -280,28 +291,14 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * Returns the form fields.
+	 *
 	 * @since $ver$
 	 * @return GF_Field[] The form fields.
 	 */
 	private function get_form_fields() : array {
 		return array_filter(
 			$this->form['fields'],
-			static fn( $value ) => $value instanceof GF_Field
+			static fn( $value ) => $value instanceof GF_Field,
 		);
-	}
-
-
-	private function get_form_field( $field_id ) : ?GF_Field {
-		foreach ( $this->get_form_fields() as $field ) {
-			if ( ! is_numeric( $field_id ) && $field->id === $field_id ) {
-				return $field;
-			}
-
-			if ( (int) $field->id === (int) $field_id ) {
-				return $field;
-			}
-		}
-
-		return null;
 	}
 }

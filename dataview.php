@@ -6,7 +6,7 @@
  * Version:             0.1.0
  * Author:              GravityKit
  * Author URI:          https://www.gravitykit.com
- * Text Domain:         gk-dataview
+ * Text Domain:         dk-datakit
  * License:             GPLv2 or later
  * License URI:         http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -24,6 +24,10 @@ require_once 'vendor/autoload.php';
 const DATAVIEW_PLUGIN_PATH = __FILE__;
 
 // Initialize the plugin.
-DataViewPlugin::get_instance(
-	new ArrayDataViewRepository(),
-);
+try {
+	DataViewPlugin::get_instance(
+		new ArrayDataViewRepository(),
+	);
+} catch ( \Throwable $e ) {
+	// Todo: log errors somewhere.
+}

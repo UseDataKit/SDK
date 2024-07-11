@@ -15,12 +15,15 @@ use DataKit\DataViews\Clock\SystemClock;
 final class ArrayCacheProvider implements CacheProvider {
 	/**
 	 * The cached items.
+	 *
 	 * @since $ver$
 	 * @var array
 	 */
 	private array $items;
+
 	/**
 	 * The clock instance.
+	 *
 	 * @since $ver$
 	 * @var Clock
 	 */
@@ -28,10 +31,11 @@ final class ArrayCacheProvider implements CacheProvider {
 
 	/**
 	 * Creates an Array Cache Provider.
+	 *
 	 * @since $ver$
 	 *
 	 * @param Clock|null $clock The clock instance.
-	 * @param array $items The pre-filled cache items.
+	 * @param array      $items The pre-filled cache items.
 	 */
 	public function __construct( ?Clock $clock = null, array $items = [] ) {
 		$this->clock = $clock ?? new SystemClock();
@@ -105,6 +109,7 @@ final class ArrayCacheProvider implements CacheProvider {
 
 	/**
 	 * Whether the provided cache item is expired.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $item The cache item.

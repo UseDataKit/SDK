@@ -63,14 +63,13 @@ function handleAjax( items, context ) {
                 ...options,
                 body: JSON.stringify( params ),
             } )
-                .then( r => null )
                 .catch( r => console.error( r ) );
 
             continue;
         }
 
         for ( const key in params ) {
-            if ( !grouped.hasOwnProperty( key ) ) {
+            if ( !Object.hasOwn( grouped, key ) ) {
                 grouped[ key ] = [];
             }
             grouped[ key ].push( params[ key ] );
@@ -86,7 +85,7 @@ function handleAjax( items, context ) {
         ...options,
         body: JSON.stringify( grouped ),
     } )
-        .then( r => context?.registry?.refreshData() )
+        .then( () => context?.registry?.refreshData() )
         .catch( r => console.error( r ) );
 }
 

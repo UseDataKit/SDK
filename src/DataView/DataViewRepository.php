@@ -4,11 +4,13 @@ namespace DataKit\DataViews\DataView;
 
 /**
  * Represents the storage for all registered DataViews.
+ *
  * @since $ver$
  */
 interface DataViewRepository {
 	/**
 	 * Returns an array of DataViews, keyed by their ID.
+	 *
 	 * @since $ver$
 	 * @return array<string, DataView> The DataViews.
 	 */
@@ -26,6 +28,7 @@ interface DataViewRepository {
 
 	/**
 	 * Returns whether a DataView is registered in the repository by the provided ID.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $id The ID.
@@ -36,6 +39,7 @@ interface DataViewRepository {
 
 	/**
 	 * Saves the DataView on the repository.
+	 *
 	 * @since $ver$
 	 *
 	 * @param DataView $data_view The DataView.
@@ -46,6 +50,7 @@ interface DataViewRepository {
 
 	/**
 	 * Removes the DataView from the repository.
+	 *
 	 * @since $ver$
 	 *
 	 * @param DataView $data_view The DataView.

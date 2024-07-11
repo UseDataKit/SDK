@@ -14,17 +14,20 @@ use SplFileObject;
 
 /**
  * Data source backed by a CSV file.
+ *
  * @since $ver$
  */
 final class CsvDataSource extends BaseDataSource {
 	/**
 	 * The CSV file iterator.
+	 *
 	 * @since $ver$
 	 */
 	private SplFileObject $file;
 
 	/**
 	 * Creates the CSV Data Source.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $file_path The file path to the CSV file.
@@ -46,7 +49,7 @@ final class CsvDataSource extends BaseDataSource {
 			SplFileObject::READ_CSV |
 			SplFileObject::READ_AHEAD |
 			SplFileObject::SKIP_EMPTY |
-			SplFileObject::DROP_NEW_LINE
+			SplFileObject::DROP_NEW_LINE,
 		);
 		$this->file->setCsvControl( $separator, $enclosure, $escape );
 	}
@@ -56,7 +59,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function id() : string {
-		return sprintf('csv-%s',$this->file->getBasename()) ;
+		return sprintf( 'csv-%s', $this->file->getBasename() );
 	}
 
 	/**
@@ -93,6 +96,7 @@ final class CsvDataSource extends BaseDataSource {
 
 	/**
 	 * Clean the values from the CSV.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $data The data for a single result.
@@ -115,6 +119,7 @@ final class CsvDataSource extends BaseDataSource {
 
 	/**
 	 * Lazy instantiate a file object.
+	 *
 	 * @since $ver$
 	 * @return SplFileObject The file object.
 	 */
@@ -126,13 +131,14 @@ final class CsvDataSource extends BaseDataSource {
 
 	/**
 	 * Returns an iterator that skips the first row to remove the fields.
+	 *
 	 * @since $ver$
 	 * @return Iterator The data iterator.
 	 */
 	private function data() : Iterator {
 		$data = new CallbackFilterIterator(
 			new LimitIterator( $this->file(), 1 ),
-			Closure::fromCallable( [ $this, 'filter_data' ] )
+			Closure::fromCallable( [ $this, 'is_matched_data' ] ),
 		);
 
 		if ( $this->sort ) {
@@ -164,13 +170,14 @@ final class CsvDataSource extends BaseDataSource {
 
 	/**
 	 * Returns whether the data matches the provided filters if provided.
+	 *
 	 * @since $ver$
 	 *
 	 * @param array $data The data for a single result.
 	 *
 	 * @return bool Whether the data matches the filters.
 	 */
-	private function filter_data( array $data ) : bool {
+	private function is_matched_data( array $data ) : bool {
 		if ( ! $this->search && ! $this->filters ) {
 			return true;
 		}
@@ -187,5 +194,4 @@ final class CsvDataSource extends BaseDataSource {
 
 		return true;
 	}
-
 }

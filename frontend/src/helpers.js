@@ -6,11 +6,11 @@
  * @param {any} fallback The fallback value if the key was not found.
  */
 export function get( data, key, fallback = null ) {
-    if ( !data.hasOwnProperty( key ) ) {
+    if ( !Object.hasOwn( data, key ) ) {
         return fallback;
     }
 
-    return data[key];
+    return data[ key ];
 }
 
 /**
@@ -22,7 +22,7 @@ export function get( data, key, fallback = null ) {
  */
 export function replace_tags( value, data ) {
     return value.replace( /{([^}]+)}/g, ( _, key ) => {
-        let val = data.hasOwnProperty( key ) ? data[ key ] : null;
+        let val = Object.hasOwn( data, key ) ? data[ key ] : null;
 
         if ( val === null ) {
             val = '';
