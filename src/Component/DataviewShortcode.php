@@ -55,7 +55,7 @@ final class DataviewShortcode {
 
 
 	/**
-	 * Renders the short code.
+	 * Renders the shortcode.
 	 *
 	 * @since $ver$
 	 *
