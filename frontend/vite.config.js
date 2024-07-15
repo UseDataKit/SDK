@@ -31,6 +31,7 @@ export default defineConfig( {
     },
     build: {
         assetsDir: '',
+        cssCodeSplit: false,
         outDir: '../assets',
         emptyOutDir: false,
         sourcemap: isProduction ? false : 'inline',

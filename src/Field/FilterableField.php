@@ -95,6 +95,10 @@ abstract class FilterableField extends Field {
 	}
 
 
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
 	public function toArray() : array {
 		return array_merge( parent::toArray(), [
 			'filterBy' => $this->get_filter_by(),
