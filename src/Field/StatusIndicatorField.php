@@ -98,33 +98,57 @@ final class StatusIndicatorField extends Field {
 	protected string $render = 'datakit_fields.html';
 
 	/**
-	 * Returns an instance with a (possible) dot.
+	 * Returns an instance with a dot.
 	 *
 	 * @since $ver$
 	 *
-	 * @param bool $has_dot Whether the instance has a dot.
-	 *
 	 * @return self The field.
 	 */
-	public function dot( bool $has_dot ) : self {
+	public function has_dot() : self {
 		$clone          = clone $this;
-		$clone->has_dot = $has_dot;
+		$clone->has_dot = true;
 
 		return $clone;
 	}
 
 	/**
-	 * Returns an instance with as a (possible) pill.
+	 * Returns an instance without a dot.
 	 *
 	 * @since $ver$
 	 *
-	 * @param bool $is_pill Whether the instance is a pill.
+	 * @return self The field.
+	 */
+	public function has_no_dot() : self {
+		$clone          = clone $this;
+		$clone->has_dot = false;
+
+		return $clone;
+	}
+
+	/**
+	 * Returns an instance that is displayed as a pill.
+	 *
+	 * @since $ver$
 	 *
 	 * @return self The field.
 	 */
-	public function pill( bool $is_pill ) : self {
+	public function pill() : self {
 		$clone          = clone $this;
-		$clone->is_pill = $is_pill;
+		$clone->is_pill = true;
+
+		return $clone;
+	}
+
+	/**
+	 * Returns an instance that is displayed as a rectangle.
+	 *
+	 * @since $ver$
+	 *
+	 * @return self The field.
+	 */
+	public function rectangle() : self {
+		$clone          = clone $this;
+		$clone->is_pill = false;
 
 		return $clone;
 	}
@@ -212,6 +236,7 @@ final class StatusIndicatorField extends Field {
 		if ( $this->is_pill ) {
 			$classes[] = 'datakit-status-indicator--is-pill';
 		}
+
 		if ( $this->has_dot ) {
 			$classes[] = 'datakit-status-indicator--has-dot';
 			$svg       = '<svg viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="2" r="1" stroke-width="2"></circle></svg>';
@@ -273,5 +298,29 @@ final class StatusIndicatorField extends Field {
 		}
 
 		return $status;
+	}
+
+	/**
+	 * Returns an instance which shows the value as the text.
+	 *
+	 * @since $ver$
+	 */
+	public function show_value() : self {
+		$clone                     = clone $this;
+		$clone->use_value_as_label = true;
+
+		return $clone;
+	}
+
+	/**
+	 * Returns an instance which shows the label as the text.
+	 *
+	 * @since $ver$
+	 */
+	public function show_label() : self {
+		$clone                     = clone $this;
+		$clone->use_value_as_label = false;
+
+		return $clone;
 	}
 }
