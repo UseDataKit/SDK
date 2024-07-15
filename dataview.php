@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die;
 }
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 const DATAVIEW_PLUGIN_PATH = __FILE__;
 
