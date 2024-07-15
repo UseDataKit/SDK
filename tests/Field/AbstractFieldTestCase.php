@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 abstract class AbstractFieldTestCase extends TestCase {
 	/**
 	 * Should return the field class name that is being tested.
+	 *
 	 * @since $ver$
 	 * @return string
 	 */
@@ -22,9 +23,10 @@ abstract class AbstractFieldTestCase extends TestCase {
 
 	/**
 	 * Creates the field using the `::create` method.
+	 *
 	 * @since $ver$
 	 *
-	 * @param string $id The field id.
+	 * @param string $id     The field id.
 	 * @param string $header the field header.
 	 *
 	 * @return Field The field instance.
@@ -37,6 +39,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 
 	/**
 	 * Test case for {@see Field::create()}.
+	 *
 	 * @since $ver$
 	 */
 	public function testCreate() : void {
@@ -48,6 +51,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 
 	/**
 	 * Test case for {@see Field::toArray()}.
+	 *
 	 * @since $ver$
 	 */
 	public function testToArray() : void {
@@ -61,6 +65,11 @@ abstract class AbstractFieldTestCase extends TestCase {
 		self::assertNull( $field_array['filterBy'] );
 	}
 
+	/**
+	 * Testcase for different field modifiers.
+	 *
+	 * @since $ver$
+	 */
 	public function testModifier() : void {
 		$field        = $this->createField( 'field_id', 'Field header' );
 		$not_hideable = $field->always_visible();
@@ -73,5 +82,26 @@ abstract class AbstractFieldTestCase extends TestCase {
 		self::assertTrue( $sortable->toArray()['enableSorting'] );
 		self::assertFalse( $not_hideable->toArray()['enableHiding'] );
 		self::assertFalse( $not_sortable->toArray()['enableSorting'] );
+	}
+
+	/**
+	 * Test case for {@see Field::callback()}.
+	 *
+	 * @since $ver$
+	 */
+	public function testCallback() : void {
+		$field = $this->createField( 'email', 'Email Address' )
+			->callback( function ( string $id, array $data ) : string {
+				$value = $data[ $id ] ?? '';
+				if ( strlen( $value ) <= 15 ) {
+					return $value;
+				}
+
+				// Truncate any value longer than 20 characters.
+				return substr( $value, 0, 15 ) . '...';
+			} );
+
+		$result = $field->get_value( [ 'email' => 'person@gravitykit.com', 'name' => 'Doeke Norg' ] );
+		self::assertStringContainsString( 'person@gravityk...', $result );
 	}
 }

@@ -12,3 +12,9 @@ if ( ! function_exists( 'apply_filters' ) ) {
 		return $args[0];
 	}
 }
+
+if ( ! function_exists( 'esc_attr' ) ) {
+	function esc_attr( ...$args ) {
+		return $args[0];
+	}
+}

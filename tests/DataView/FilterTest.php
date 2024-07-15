@@ -6,7 +6,6 @@ use BadMethodCallException;
 use DataKit\DataViews\DataView\Filter;
 use DataKit\DataViews\DataView\Operator;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
