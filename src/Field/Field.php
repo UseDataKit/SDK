@@ -63,14 +63,6 @@ abstract class Field {
 	protected bool $is_hideable = true;
 
 	/**
-	 * Whether the fields filter is a primary filter.
-	 *
-	 * @since $ver$
-	 * @var bool
-	 */
-	protected bool $is_primary = true;
-
-	/**
 	 * The default value to use if the value is empty.
 	 *
 	 * @since $ver$
@@ -78,13 +70,6 @@ abstract class Field {
 	 */
 	protected ?string $default_value = null;
 
-	/**
-	 * The filter operators.
-	 *
-	 * @since $ver$
-	 * @var array
-	 */
-	protected array $operators = [];
 
 	/**
 	 * The callback to return the value.
@@ -192,22 +177,6 @@ abstract class Field {
 	}
 
 	/**
-	 * Create a new instance with the provided filter operators.
-	 *
-	 * @since $ver$
-	 *
-	 * @param Operator ...$operators The operators.
-	 *
-	 * @return static A new instance with the filters applied.
-	 */
-	public function filterable_by( Operator ...$operators ) {
-		$clone            = clone $this;
-		$clone->operators = $operators;
-
-		return $clone;
-	}
-
-	/**
 	 * Returns a new instance of the field that is not sortable.
 	 *
 	 * @since $ver$
@@ -294,38 +263,6 @@ abstract class Field {
 	}
 
 	/**
-	 * Returns a new instance of the field that is primary.
-	 *
-	 * Note: Filters for primary fields are always shown.
-	 *
-	 * @since $ver$
-	 *
-	 * @return static The field which is primary.
-	 */
-	public function primary() {
-		$clone             = clone $this;
-		$clone->is_primary = true;
-
-		return $clone;
-	}
-
-	/**
-	 * Returns a new instance of the field that is secondary.
-	 *
-	 * Note: Filters for secondary fields are hidden behind a dropdown.
-	 *
-	 * @since $ver$
-	 *
-	 * @return static The field which is primary.
-	 */
-	public function secondary() {
-		$clone             = clone $this;
-		$clone->is_primary = false;
-
-		return $clone;
-	}
-
-	/**
 	 * Set the callback for the field to alter the value.
 	 *
 	 * @since $ver$
@@ -356,27 +293,6 @@ abstract class Field {
 	}
 
 	/**
-	 * Returns the `filterBy` options for the javascript object.
-	 *
-	 * @since $ver$
-	 * @return array|null The filter options.
-	 */
-	private function get_filter_by() : ?array {
-		if ( ! $this->operators ) {
-			return null;
-		}
-
-		return [
-			'operators' => array_map(
-				static fn( Operator $operator ) : string => (string) $operator,
-				$this->operators,
-			),
-			'isPrimary' => $this->is_primary,
-		];
-	}
-
-
-	/**
 	 * Whether the field is hidden.
 	 *
 	 * @since $ver$
@@ -385,7 +301,6 @@ abstract class Field {
 	public function is_hidden() : bool {
 		return $this->is_hidden;
 	}
-
 
 	/**
 	 * Returns the value of the field on the provided data set.
@@ -397,7 +312,7 @@ abstract class Field {
 	 * @return mixed The value.
 	 */
 	public function get_value( array $data ) {
-		return ( $this->callback )( $this->id(), $data ) ?? $this->default_value;
+		return ( $this->callback )( $this->id(), $data ) ?? '' ?: $this->default_value;
 	}
 
 	/**
@@ -413,7 +328,6 @@ abstract class Field {
 			'render'        => $this->render(),
 			'enableHiding'  => $this->is_hideable,
 			'enableSorting' => $this->is_sortable,
-			'filterBy'      => $this->get_filter_by(),
 		];
 	}
 

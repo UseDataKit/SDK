@@ -54,7 +54,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function testToArray() : void {
+	public function testToArray() : Field {
 		$field       = $this->createField( 'field_id', 'Field header' );
 		$field_array = $field->toArray();
 
@@ -62,7 +62,8 @@ abstract class AbstractFieldTestCase extends TestCase {
 		self::assertSame( 'Field header', $field_array['header'] );
 		self::assertTrue( $field_array['enableHiding'] );
 		self::assertTrue( $field_array['enableSorting'] );
-		self::assertNull( $field_array['filterBy'] );
+
+		return $field;
 	}
 
 	/**
