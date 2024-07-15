@@ -9,7 +9,7 @@ use InvalidArgumentException;
  *
  * @since $ver$
  */
-final class EnumField extends Field {
+final class EnumField extends FilterableField {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
