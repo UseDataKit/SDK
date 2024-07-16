@@ -60,7 +60,7 @@ final class DataviewShortcode {
 	 * @since $ver$
 	 *
 	 * @param array $attributes The shortcode attributes.
-	 *
+	 * @todo Add search & sorting attributes.
 	 * @return string The shortcode output.
 	 */
 	public function render_shortcode( array $attributes ) : string {

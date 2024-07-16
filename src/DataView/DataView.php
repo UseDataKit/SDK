@@ -336,8 +336,8 @@ final class DataView {
 	 *
 	 * @return self The dataview.
 	 */
-	public function paginate( int $per_page, ?int $page = null ) : self {
-		$this->pagination = new Pagination( $page ?? 1, $per_page );
+	public function paginate( int $per_page, int $page = 1 ) : self {
+		$this->pagination = new Pagination( $page, $per_page );
 
 		return $this;
 	}
@@ -351,7 +351,7 @@ final class DataView {
 	 *
 	 * @return self The dataview.
 	 */
-	public function search( string $search ) : self {
+	public function search( string $search = '' ) : self {
 		$this->has_search = true;
 		$this->search     = $search;
 
@@ -481,12 +481,13 @@ final class DataView {
 		}
 
 		$actions         = $this->actions ? iterator_to_array( $this->actions ) : [];
-		$delete_rest_url = Router::get_url( sprintf( 'views/%s/data/{id}', $this->id() ) );
+		$delete_rest_url = Router::get_url( sprintf( 'views/%s/data', $this->id() ) );
 
-		$delete_action = Action::ajax( 'delete', $label, $delete_rest_url, 'DELETE' )
+		$delete_action = Action::ajax( 'delete', $label, $delete_rest_url, 'DELETE', [ 'id' => '{id}' ], true )
 			->destructive()
+			->bulk()
 			->primary( 'trash' )
-			->confirm( 'Are you sure you want to delete this item?' );
+			->confirm( 'Are you sure you want to delete these items?' );
 
 		if ( $callback ) {
 			$delete_action = $callback( $delete_action );

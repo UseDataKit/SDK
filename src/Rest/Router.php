@@ -121,7 +121,7 @@ final class Router {
 			],
 		] );
 
-		register_rest_route( self::NAMESPACE, '/' . 'views/(?<view_id>[^/]+)/data/(?<data_id>[^/]+)', [
+		register_rest_route( self::NAMESPACE, '/' . 'views/(?<view_id>[^/]+)/data', [
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'delete_view_data' ],
@@ -224,10 +224,10 @@ final class Router {
 				return [];
 			}
 
-			$data_id = $request->get_param( 'data_id' ) ?? '';
-			$data_source->delete_data_by_id( $data_id );
+			$data_ids = $request->get_param( 'id' ) ?? [];
+			$data_source->delete_data_by_id( ... $data_ids );
 
-			return [ 'id' => $data_id ];
+			return [ 'id' => $data_ids ];
 		} catch ( \Exception $e ) {
 			return new WP_Error( $e->getCode(), $e->getMessage() );
 		}
