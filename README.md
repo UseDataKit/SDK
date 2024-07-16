@@ -72,7 +72,7 @@ DataKit provides a fluent PHP API for creating `DataView` objects. A `DataView` 
     ```php
     do_action( 'datakit/dataview/register', $dataview );
     ```
-4. Show off your DataView! You can use the `[datakit id="my-dataview"]` shortcode to display your DataView anywhere.
+4. Show off your DataView! You can use the `[dataview id="my-dataview"]` shortcode to display your DataView anywhere.
 
 ## Learn More
 
