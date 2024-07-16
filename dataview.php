@@ -3,10 +3,10 @@
 /**
  * Plugin Name:         DataKit
  * Description:         Easily create your own DataViews components with just PHP.
- * Plugin URI:          https://www.gravitykit.com
+ * Plugin URI:          https://www.datakit.org
  * Version:             0.1.0
- * Author:              GravityKit
- * Author URI:          https://www.gravitykit.com
+ * Author:              DataKit
+ * Author URI:          https://www.datakit.org
  * Text Domain:         dk-datakit
  * License:             GPLv2 or later
  * License URI:         http://www.gnu.org/licenses/gpl-2.0.html
