@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Plugin Name:         DataView
+ * Plugin Name:         DataKit
+ * Description:         Easily create your own DataViews components with just PHP.
  * Plugin URI:          https://www.gravitykit.com
  * Version:             0.1.0
  * Author:              GravityKit
