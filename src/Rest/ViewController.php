@@ -67,7 +67,7 @@ final class ViewController {
 		/**
 		 * Overwrites the default template used for a single date item view.
 		 *
-		 * @filter `dk/dataview/view/template`
+		 * @filter `datakit/dataview/view/template`
 		 * @since  $ver$
 		 *
 		 * @param string   $template  The absolute path of the template to render.
@@ -75,7 +75,7 @@ final class ViewController {
 		 * @param DataItem $data_item The data item to render.
 		 */
 		$template = (string) apply_filters(
-			'dk/dataview/view/template',
+			'datakit/dataview/view/template',
 			dirname( DATAVIEW_PLUGIN_PATH ) . '/templates/view/table.php',
 			$dataview,
 			$data_item,
