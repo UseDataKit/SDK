@@ -13,10 +13,10 @@ Currently, DataKit provides the following field types:
 - `TextField`: Renders the value as plain text. Tags are stripped, and no HTML is parsed.
 - `HtmlField`: Renders the value as HTML.
 - `DateTimeField`: Renders the value as a date according to a provided format.
-- [`EnumField`](./enum-field.md): Renders the output based on a fixed set op possible values.
+- [`EnumField`](./20-enum-field.md): Renders the output based on a fixed set op possible values.
 - `ImageField`: Renders the value as a `<img />` tag.
 - `LinkField`: Renders the value as a link.
-- `StatusIndicator`: Renders the value as a status indicator (active/inactive, or with different states).
+- [`StatusIndicator`](./30-status-indicator-field.md): Renders the value as a status indicator (active/inactive, or with different states).
 
 Every field is (and should be) extended from the abstract `Field` class. This class provides an API that is valid
 for every field type.
@@ -117,4 +117,4 @@ like `Person (person@gravitykit.com)` on the view.
 
 Fields can be made filterable. These filters are applied by the datasource. Filtering is based around a search query or
 a finite set of values. These values and thus the filters are currently only available on
-an [`EnumField`](./enum-field.md).
+an [`EnumField`](./20-enum-field.md).
