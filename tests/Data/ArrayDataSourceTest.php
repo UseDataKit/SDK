@@ -12,11 +12,13 @@ use Throwable;
 
 /**
  * Unit tests for {@see ArrayDataSource}
+ *
  * @since $ver$
  */
 final class ArrayDataSourceTest extends TestCase {
 	/**
 	 * The data source under test.
+	 *
 	 * @since $ver$
 	 * @var ArrayDataSource
 	 */
@@ -49,6 +51,7 @@ final class ArrayDataSourceTest extends TestCase {
 
 	/**
 	 * Test case for
+	 *
 	 * @since $ver$
 	 */
 	public function test_data_source() : void {
@@ -72,7 +75,7 @@ final class ArrayDataSourceTest extends TestCase {
 		$not_doeke = $this->source->filter_by(
 			Filters::of(
 				Filter::isNot( 'name', 'Doeke' ),
-			)
+			),
 		);
 
 		self::assertSame( [ 'user::1', 'user::2' ], $not_doeke->get_data_ids() );
@@ -87,6 +90,7 @@ final class ArrayDataSourceTest extends TestCase {
 
 	/**
 	 * Test case for
+	 *
 	 * @since $ver$
 	 */
 	public function test_not_found() : void {
@@ -96,11 +100,13 @@ final class ArrayDataSourceTest extends TestCase {
 
 	/**
 	 * Test case for
+	 *
 	 * @since $ver$
 	 */
 	public function test_delete_by_id() : void {
 		$data = $this->source->get_data_by_id( 'user::1' );
 		self::assertSame( 'Zack', $data['name'] );
+		self::assertTrue( $this->source->can_delete() );
 
 		$this->source->delete_data_by_id( 'user::1', 'user::2' );
 		self::assertSame( [ 'user::3' ], $this->source->get_data_ids() );
@@ -115,12 +121,13 @@ final class ArrayDataSourceTest extends TestCase {
 
 	/**
 	 * Test case for
+	 *
 	 * @since $ver$
 	 */
 	public function test_get_fields() : void {
 		self::assertSame(
 			[ 'name' => 'name', 'email' => 'email', 'extra_key' => 'extra_key' ],
-			$this->source->get_fields()
+			$this->source->get_fields(),
 		);
 	}
 }

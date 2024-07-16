@@ -82,7 +82,7 @@ final class DateTimeField extends Field {
 	public function from_format( ?string $format, ?DateTimeZone $time_zone = null ) : self {
 		$clone                = clone $this;
 		$clone->from_format   = $format;
-		$clone->from_timezone = $format;
+		$clone->from_timezone = $time_zone;
 
 		return $clone;
 	}

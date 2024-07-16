@@ -2,7 +2,6 @@
 
 namespace DataKit\DataViews\Field;
 
-use DataKit\DataViews\DataView\Operator;
 use InvalidArgumentException;
 use JsonException;
 

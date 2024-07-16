@@ -61,6 +61,8 @@ final class EnumFieldTest extends AbstractFieldTestCase {
 
 		$primary = $with_operators->primary();
 		self::assertTrue( $primary->toArray()['filterBy']['isPrimary'] );
+		$secondary = $primary->secondary();
+		self::assertFalse( $secondary->toArray()['filterBy']['isPrimary'] );
 
 		return $field;
 	}

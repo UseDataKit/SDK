@@ -22,7 +22,6 @@ final class LinkField extends Field {
 	 */
 	protected string $render = 'datakit_fields.html';
 
-
 	/**
 	 * @inheritDoc
 	 * @since $ver$

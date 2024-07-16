@@ -2,8 +2,6 @@
 
 namespace DataKit\DataViews\Data\DataMatcher;
 
-use DataKit\DataViews\DataView\Filter;
-
 /**
  * Helper class that can perform basic pattern matching on a data item.
  *

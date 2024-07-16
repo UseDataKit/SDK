@@ -18,6 +18,7 @@
         <whitelist processUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">.</directory>
             <exclude>
+                <directory>templates</directory>
                 <directory>tests</directory>
                 <directory>vendor</directory>
             </exclude>

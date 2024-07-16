@@ -6,6 +6,7 @@ use ArrayIterator;
 use CallbackFilterIterator;
 use Closure;
 use DataKit\DataViews\Data\DataMatcher\ArrayDataMatcher;
+use DataKit\DataViews\Data\Exception\DataNotFoundException;
 use DataKit\DataViews\DataView\Sort;
 use InvalidArgumentException;
 use Iterator;
@@ -67,7 +68,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function get_data_ids( int $limit = 100, int $offset = 0 ) : array {
-		$lines = new LimitIterator( $this->data(), $offset, $limit );
+		$lines = new LimitIterator( $this->data( true ), $offset, $limit );
 
 		$ids = [];
 		foreach ( $lines as $key => $_ ) {
@@ -82,7 +83,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ) : array {
-		foreach ( $this->data() as $key => $data ) {
+		foreach ( $this->data( false ) as $key => $data ) {
 			if ( (string) $key !== $id ) {
 				continue;
 			}
@@ -90,7 +91,7 @@ final class CsvDataSource extends BaseDataSource {
 			return $this->cleanup( $data );
 		}
 
-		return [];
+		throw DataNotFoundException::with_id( $this, $id );
 	}
 
 
@@ -112,7 +113,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function count() : int {
-		$count = iterator_count( $this->data() );
+		$count = iterator_count( $this->data( true ) );
 
 		return $count < 1 ? 0 : $count;
 	}
@@ -133,13 +134,19 @@ final class CsvDataSource extends BaseDataSource {
 	 * Returns an iterator that skips the first row to remove the fields.
 	 *
 	 * @since $ver$
+	 *
+	 * @param bool $is_filtered Whether the data should be filtered.
+	 *
 	 * @return Iterator The data iterator.
 	 */
-	private function data() : Iterator {
-		$data = new CallbackFilterIterator(
-			new LimitIterator( $this->file(), 1 ),
-			Closure::fromCallable( [ $this, 'is_matched_data' ] ),
-		);
+	private function data( bool $is_filtered ) : Iterator {
+		$data = new LimitIterator( $this->file(), 1 );
+		if ( $is_filtered ) {
+			$data = new CallbackFilterIterator(
+				$data,
+				Closure::fromCallable( [ $this, 'is_matched_data' ] ),
+			);
+		}
 
 		if ( $this->sort ) {
 			$sort    = $this->sort->to_array();

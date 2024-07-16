@@ -3,18 +3,22 @@
 namespace DataKit\DataViews\Tests\Data;
 
 use DataKit\DataViews\Data\CsvDataSource;
+use DataKit\DataViews\Data\Exception\DataNotFoundException;
 use DataKit\DataViews\DataView\Filter;
 use DataKit\DataViews\DataView\Filters;
 use DataKit\DataViews\DataView\Sort;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for {@see CsvDataSource}
+ *
  * @since $ver$
  */
 final class CsvDataSourceTest extends TestCase {
 	/**
 	 * The data source to be tested.
+	 *
 	 * @since $ver$
 	 * @var CsvDataSource
 	 */
@@ -22,25 +26,42 @@ final class CsvDataSourceTest extends TestCase {
 
 	/**
 	 * Set up the data source for every test.
+	 *
 	 * @since $ver$
 	 */
 	protected function setUp() : void {
 		$this->data_source = new CsvDataSource( __DIR__ . '/../assets/oscar-example-data.csv' );
 	}
 
+
+	/**
+	 * Test case for missing or unreadable path.
+	 *
+	 * @since $ver$
+	 */
+	public function test_invalid_path() : void {
+		$this->expectException( InvalidArgumentException::class );
+		new CsvDataSource( 'invalid-path' );
+	}
+
 	/**
 	 * Test case for {@see CsvDataSource::get_data_by_id()}.
+	 *
 	 * @since $ver$
 	 */
 	public function test_get_data_by_id() : void {
 		self::assertSame(
 			[ '82', '2009', '48', 'Sean Penn', 'Milk' ],
-			$this->data_source->get_data_by_id( '82' )
+			$this->data_source->get_data_by_id( '82' ),
 		);
+
+		$this->expectException( DataNotFoundException::class );
+		$this->data_source->get_data_by_id( 'invalid' );
 	}
 
 	/**
 	 * Test case for {@see CsvDataSource::sort_by()}.
+	 *
 	 * @since $ver$
 	 */
 	public function test_sort_by() : void {
@@ -51,6 +72,7 @@ final class CsvDataSourceTest extends TestCase {
 
 	/**
 	 * Test case for {@see CsvDataSource::id()}.
+	 *
 	 * @since $ver$
 	 */
 	public function test_id() : void {
@@ -59,6 +81,7 @@ final class CsvDataSourceTest extends TestCase {
 
 	/**
 	 * Test case for {@see CsvDataSource::search_by()}.
+	 *
 	 * @since $ver$
 	 */
 	public function test_search_by() : void {
@@ -73,6 +96,7 @@ final class CsvDataSourceTest extends TestCase {
 
 	/**
 	 * Test case for {@see CsvDataSource::count()}.
+	 *
 	 * @since $ver$
 	 */
 	public function test_count() : void {
@@ -81,6 +105,7 @@ final class CsvDataSourceTest extends TestCase {
 
 	/**
 	 * Test case for {@see CsvDataSource::get_data_ids()}.
+	 *
 	 * @since $ver$
 	 */
 	public function test_get_data_ids() : void {
@@ -89,16 +114,29 @@ final class CsvDataSourceTest extends TestCase {
 
 	/**
 	 * Test case for {@see CsvDataSource::filter_by()}.
+	 *
 	 * @since $ver$
 	 */
 	public function test_filter_by() : void {
 		$data_source = $this->data_source->filter_by(
 			Filters::of(
-				Filter::is( '3', 'Sean Penn' )
-			)
+				Filter::is( '3', 'Sean Penn' ),
+			),
 		);
 
 		self::assertCount( 2, $data_source );
 		self::assertSame( [ '77', '82' ], $data_source->get_data_ids() );
+	}
+
+	/**
+	 * Test case for
+	 *
+	 * @since $ver$
+	 */
+	public function testGetFields() : void {
+		self::assertSame(
+			[ 'Index', 'Year', 'Age', 'Name', 'Movie' ],
+			$this->data_source->get_fields(),
+		);
 	}
 }

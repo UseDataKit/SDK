@@ -220,6 +220,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 		}
 
 		$this->inner->delete_data_by_id( ...$ids );
+		$this->clear_cache();
 	}
 
 	/**
