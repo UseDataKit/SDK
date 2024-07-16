@@ -3,7 +3,6 @@
 namespace DataKit\DataViews\Rest;
 
 use DataKit\DataViews\Data\MutableDataSource;
-use DataKit\DataViews\DataView\DataViewRenderer;
 use DataKit\DataViews\DataView\DataViewRepository;
 use DataKit\DataViews\DataView\Filters;
 use DataKit\DataViews\DataView\Pagination;

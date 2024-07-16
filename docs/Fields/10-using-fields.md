@@ -1,6 +1,6 @@
 # Using fields
 
-A DataView consists of fields and data. The data is provided by a [DataSource](../Data-sources/create-a-data-source.md),
+A DataView consists of fields and data. The data is provided by a [DataSource](../Data-sources/10-create-a-data-source.md),
 and the fields are provided by you. In this chapter we'll explore what a field is, and how you can create your own.
 
 ## What are fields?
