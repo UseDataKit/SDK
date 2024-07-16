@@ -444,8 +444,7 @@ final class DataView {
 	 * @return self The dataview with the view action.
 	 */
 	public function viewable( array $fields, string $label = 'View' ) : self {
-		$dataview = clone $this;
-		$dataview->add_view_fields( ...$fields );
+		$this->add_view_fields( ...$fields );
 
 		$actions       = $this->actions ? iterator_to_array( $this->actions ) : [];
 		$view_rest_url = Router::get_url( sprintf( 'views/%s/data/{id}', $this->id() ) );
@@ -455,9 +454,9 @@ final class DataView {
 
 		$actions[] = $view_action;
 
-		$dataview->actions = Actions::of( ...$actions );
+		$this->actions = Actions::of( ...$actions );
 
-		return $dataview;
+		return $this;
 	}
 
 	/**
@@ -474,13 +473,11 @@ final class DataView {
 	 * @return self The dataview with a delete action.
 	 */
 	public function deletable( string $label = 'Delete', ?callable $callback = null ) : self {
-		$dataview = clone $this;
-
 		if (
 			! $this->data_source instanceof MutableDataSource
 			|| ! $this->data_source->can_delete()
 		) {
-			return $dataview;
+			return $this;
 		}
 
 		$actions         = $this->actions ? iterator_to_array( $this->actions ) : [];
@@ -500,9 +497,9 @@ final class DataView {
 
 		$actions[] = $delete_action;
 
-		$dataview->actions = Actions::of( ...$actions );
+		$this->actions = Actions::of( ...$actions );
 
-		return $dataview;
+		return $this;
 	}
 
 	/**
