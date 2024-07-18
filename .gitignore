@@ -4,5 +4,6 @@ composer.lock
 node_modules
 phpunit.xml
 phpstan.neon
+phpcs.xml
 .phpunit.cache
 .phpunit.result.cache

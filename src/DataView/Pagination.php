@@ -45,7 +45,7 @@ final class Pagination {
 		 *
 		 * @param int $per_page The amount of results per page, default 25.
 		 */
-		$per_page ??= apply_filters( 'datakit/dataview/pagination/per-page-default', 25 );
+		$per_page ??= (int) apply_filters( 'datakit/dataview/pagination/per-page-default', 25 );
 
 		$this->page     = max( 1, $page );
 		$this->per_page = max( 1, $per_page );
