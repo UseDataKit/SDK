@@ -23,11 +23,11 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @since $ver$
 	 */
-	public const STATUS_ACTIVE = 'active';
+	public const STATUS_ACTIVE   = 'active';
 	public const STATUS_INACTIVE = 'inactive';
-	public const STATUS_INFO = 'info';
-	public const STATUS_WARNING = 'warning';
-	public const STATUS_ERROR = 'error';
+	public const STATUS_INFO     = 'info';
+	public const STATUS_WARNING  = 'warning';
+	public const STATUS_ERROR    = 'error';
 
 	/**
 	 * The default labels per status.
@@ -81,7 +81,10 @@ final class StatusIndicatorField extends Field {
 	 * @since $ver$
 	 * @var array|string[]
 	 */
-	private array $boolean_statuses = [ 0 => self::STATUS_INACTIVE, 1 => self::STATUS_ACTIVE ];
+	private array $boolean_statuses = [
+		0 => self::STATUS_INACTIVE,
+		1 => self::STATUS_ACTIVE,
+	];
 
 	/**
 	 * The mapping from value to a status type.
@@ -94,6 +97,7 @@ final class StatusIndicatorField extends Field {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
+	 * @var string
 	 */
 	protected string $render = 'datakit_fields.html';
 
@@ -104,7 +108,7 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @return self The field.
 	 */
-	public function has_dot() : self {
+	public function has_dot(): self {
 		$clone          = clone $this;
 		$clone->has_dot = true;
 
@@ -118,7 +122,7 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @return self The field.
 	 */
-	public function has_no_dot() : self {
+	public function has_no_dot(): self {
 		$clone          = clone $this;
 		$clone->has_dot = false;
 
@@ -132,7 +136,7 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @return self The field.
 	 */
-	public function pill() : self {
+	public function pill(): self {
 		$clone          = clone $this;
 		$clone->is_pill = true;
 
@@ -146,7 +150,7 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @return self The field.
 	 */
-	public function rectangle() : self {
+	public function rectangle(): self {
 		$clone          = clone $this;
 		$clone->is_pill = false;
 
@@ -172,7 +176,7 @@ final class StatusIndicatorField extends Field {
 		?string $error = null,
 		?string $warning = null,
 		?string $info = null
-	) : self {
+	): self {
 		$clone          = clone $this;
 		$clone->type    = self::TYPE_MAPPING;
 		$clone->mapping = array_flip( array_filter( compact( 'active', 'inactive', 'error', 'warning', 'info' ) ) );
@@ -185,17 +189,17 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $true  The status used for a truthy value.
-	 * @param string $false The status used for a false value.
+	 * @param string $truthy  The status used for a truthy value.
+	 * @param string $falsely The status used for a false value.
 	 *
 	 * @return self The field.
 	 */
-	public function boolean( string $true = self::STATUS_ACTIVE, string $false = self::STATUS_INACTIVE ) : self {
+	public function boolean( string $truthy = self::STATUS_ACTIVE, string $falsely = self::STATUS_INACTIVE ): self {
 		$clone       = clone $this;
 		$clone->type = self::TYPE_BOOLEAN;
 
-		$clone->boolean_statuses[1] = $this->validate_status( $true );
-		$clone->boolean_statuses[0] = $this->validate_status( $false );
+		$clone->boolean_statuses[1] = $this->validate_status( $truthy );
+		$clone->boolean_statuses[0] = $this->validate_status( $falsely );
 
 		return $clone;
 	}
@@ -209,7 +213,7 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @return string The status type.
 	 */
-	private function status( $value ) : string {
+	private function status( $value ): string {
 		if ( self::TYPE_BOOLEAN === $this->type ) {
 			return $this->boolean_statuses[ (bool) $value ];
 		}
@@ -261,7 +265,7 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @return string The value.
 	 */
-	private function get_label( string $value ) : string {
+	private function get_label( string $value ): string {
 		if ( $this->use_value_as_label ) {
 			return $value ?: '&nbsp;';
 		}
@@ -278,23 +282,23 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @return string The status text.
 	 */
-	private function validate_status( string $status ) : string {
-		if ( ! in_array(
-			$status,
-			$statuses = [
-				self::STATUS_INACTIVE,
-				self::STATUS_ACTIVE,
-				self::STATUS_ERROR,
-				self::STATUS_WARNING,
-				self::STATUS_INFO,
-			],
-			true,
-		) ) {
-			throw new InvalidArgumentException( sprintf(
-				'A status can only be one of: "%s"; "%s" given. ',
-				implode( '", "', $statuses ),
-				$status,
-			) );
+	private function validate_status( string $status ): string {
+		$statuses = [
+			self::STATUS_INACTIVE,
+			self::STATUS_ACTIVE,
+			self::STATUS_ERROR,
+			self::STATUS_WARNING,
+			self::STATUS_INFO,
+		];
+
+		if ( ! in_array( $status, $statuses, true, ) ) {
+			throw new InvalidArgumentException(
+				sprintf(
+					'A status can only be one of: "%s"; "%s" given. ',
+					implode( '", "', $statuses ),
+					$status,
+				),
+			);
 		}
 
 		return $status;
@@ -305,7 +309,7 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @since $ver$
 	 */
-	public function show_value() : self {
+	public function show_value(): self {
 		$clone                     = clone $this;
 		$clone->use_value_as_label = true;
 
@@ -317,7 +321,7 @@ final class StatusIndicatorField extends Field {
 	 *
 	 * @since $ver$
 	 */
-	public function show_label() : self {
+	public function show_label(): self {
 		$clone                     = clone $this;
 		$clone->use_value_as_label = false;
 

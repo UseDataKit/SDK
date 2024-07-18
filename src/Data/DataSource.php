@@ -24,7 +24,7 @@ interface DataSource extends Countable {
 	 * @since $ver$
 	 * @return string
 	 */
-	public function id() : string;
+	public function id(): string;
 
 	/**
 	 * Returns the id's for the data source.
@@ -34,7 +34,7 @@ interface DataSource extends Countable {
 	 *
 	 * @return string[] The id's.
 	 */
-	public function get_data_ids( int $limit = 20, int $offset = 0 ) : array;
+	public function get_data_ids( int $limit = 20, int $offset = 0 ): array;
 
 	/**
 	 * Returns the data for the provided id.
@@ -46,7 +46,7 @@ interface DataSource extends Countable {
 	 * @return array The provided data.
 	 * @throws DataNotFoundException When the data was not found.
 	 */
-	public function get_data_by_id( string $id ) : array;
+	public function get_data_by_id( string $id ): array;
 
 	/**
 	 * Returns a value => label array of the available fields for the data source.
@@ -54,7 +54,7 @@ interface DataSource extends Countable {
 	 * @since $ver$
 	 * @return array<string, string> The fields.
 	 */
-	public function get_fields() : array;
+	public function get_fields(): array;
 
 	/**
 	 * Returns the total amount of results for this data source.
@@ -64,7 +64,7 @@ interface DataSource extends Countable {
 	 * @since $ver$
 	 * @return int The total amount of results.
 	 */
-	public function count() : int;
+	public function count(): int;
 
 	/**
 	 * Sets the filters for the data source.

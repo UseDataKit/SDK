@@ -16,7 +16,7 @@ interface MutableDataSource extends DataSource {
 	 * @since $ver$
 	 * @return bool
 	 */
-	public function can_delete() : bool;
+	public function can_delete(): bool;
 
 	/**
 	 * Deletes all data by their ID.
@@ -25,5 +25,5 @@ interface MutableDataSource extends DataSource {
 	 *
 	 * @throws DataNotFoundException When the data was not found.
 	 */
-	public function delete_data_by_id( string ...$ids ) : void;
+	public function delete_data_by_id( string ...$ids ): void;
 }

@@ -23,6 +23,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * The CSV file iterator.
 	 *
 	 * @since $ver$
+	 * @var SplFileObject $file;
 	 */
 	private SplFileObject $file;
 
@@ -59,7 +60,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function id() : string {
+	public function id(): string {
 		return sprintf( 'csv-%s', $this->file->getBasename() );
 	}
 
@@ -67,7 +68,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_ids( int $limit = 100, int $offset = 0 ) : array {
+	public function get_data_ids( int $limit = 100, int $offset = 0 ): array {
 		$lines = new LimitIterator( $this->data( true ), $offset, $limit );
 
 		$ids = [];
@@ -82,7 +83,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_by_id( string $id ) : array {
+	public function get_data_by_id( string $id ): array {
 		foreach ( $this->data( false ) as $key => $data ) {
 			if ( (string) $key !== $id ) {
 				continue;
@@ -104,7 +105,7 @@ final class CsvDataSource extends BaseDataSource {
 	 *
 	 * @return array The cleaned data.
 	 */
-	private function cleanup( array $data ) : array {
+	private function cleanup( array $data ): array {
 		return array_map( 'trim', $data );
 	}
 
@@ -112,7 +113,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function count() : int {
+	public function count(): int {
 		$count = iterator_count( $this->data( true ) );
 
 		return $count < 1 ? 0 : $count;
@@ -124,7 +125,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @since $ver$
 	 * @return SplFileObject The file object.
 	 */
-	private function file() : SplFileObject {
+	private function file(): SplFileObject {
 		$this->file->rewind();
 
 		return $this->file;
@@ -139,7 +140,7 @@ final class CsvDataSource extends BaseDataSource {
 	 *
 	 * @return Iterator The data iterator.
 	 */
-	private function data( bool $is_filtered ) : Iterator {
+	private function data( bool $is_filtered ): Iterator {
 		$data = new LimitIterator( $this->file(), 1 );
 		if ( $is_filtered ) {
 			$data = new CallbackFilterIterator(
@@ -155,13 +156,15 @@ final class CsvDataSource extends BaseDataSource {
 
 			$data = new ArrayIterator( iterator_to_array( $data ) );
 
-			$data->uasort( static function ( array $a, array $b ) use ( $is_desc, $field ) : int {
-				if ( $is_desc ) {
-					[ $b, $a ] = [ $a, $b ];
-				}
+			$data->uasort(
+                static function ( array $a, array $b ) use ( $is_desc, $field ): int {
+					if ( $is_desc ) {
+						[ $b, $a ] = [ $a, $b ];
+					}
 
-				return strnatcmp( $a[ $field ] ?? '', $b[ $field ] ?? '' );
-			} );
+					return strnatcmp( $a[ $field ] ?? '', $b[ $field ] ?? '' );
+				}
+            );
 		}
 
 		return $data;
@@ -171,7 +174,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_fields() : array {
+	public function get_fields(): array {
 		return $this->file()->current() ?: [];
 	}
 
@@ -184,7 +187,7 @@ final class CsvDataSource extends BaseDataSource {
 	 *
 	 * @return bool Whether the data matches the filters.
 	 */
-	private function is_matched_data( array $data ) : bool {
+	private function is_matched_data( array $data ): bool {
 		if ( ! $this->search && ! $this->filters ) {
 			return true;
 		}

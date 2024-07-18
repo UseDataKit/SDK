@@ -69,7 +69,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function id() : string {
+	public function id(): string {
 		return sprintf( 'gravity-forms-%d', $this->form['id'] );
 	}
 
@@ -77,7 +77,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_ids( int $limit = 100, int $offset = 0 ) : array {
+	public function get_data_ids( int $limit = 100, int $offset = 0 ): array {
 		$entries = GFAPI::get_entries(
 			$this->form['id'],
 			$this->get_search_criteria(),
@@ -85,7 +85,8 @@ final class GravityFormsDataSource extends BaseDataSource {
 			[
 				'offset'    => $offset,
 				'page_size' => $limit,
-			] );
+			],
+		);
 
 		if ( $entries instanceof WP_Error ) {
 			return [];
@@ -102,7 +103,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_by_id( string $id ) : array {
+	public function get_data_by_id( string $id ): array {
 		$entry = $this->entries[ $id ] ?? GFAPI::get_entry( (int) $id );
 		if ( ! is_array( $entry ) ) {
 			return [];
@@ -124,7 +125,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function count() : int {
+	public function count(): int {
 		return GFAPI::count_entries( $this->form['id'], $this->get_search_criteria() );
 	}
 
@@ -135,7 +136,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 *
 	 * @return array The search criteria.
 	 */
-	private function get_search_criteria() : array {
+	private function get_search_criteria(): array {
 		if ( ! $this->filters && ! $this->search ) {
 			return [];
 		}
@@ -144,12 +145,14 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 		if ( $this->filters ) {
 			$filters                  = $this->top_level_filters();
-			$filters['field_filters'] = array_merge( ...array_filter(
-				array_map(
-					\Closure::fromCallable( [ $this, 'transform_filter_to_field_filters' ] ),
-					$this->filters->to_array(),
+			$filters['field_filters'] = array_merge(
+				...array_filter(
+					array_map(
+						\Closure::fromCallable( [ $this, 'transform_filter_to_field_filters' ] ),
+						$this->filters->to_array(),
+					),
 				),
-			) );
+			);
 		}
 
 		if ( $this->search ) {
@@ -176,7 +179,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 *
 	 * @return null|array{array{key: string, value:string|int|float|array, operator:string}} The field filter criteria.
 	 */
-	private function transform_filter_to_field_filters( array $filter ) : ?array {
+	private function transform_filter_to_field_filters( array $filter ): ?array {
 		if ( in_array( $filter['field'], self::$top_level_filters, true ) ) {
 			return null;
 		}
@@ -200,8 +203,8 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @return string The Gravity Forms search operator.
 	 * @todo  this needs to be fixed for all cases.
 	 */
-	private function map_operator( string $operator ) : string {
-		$case = Operator::tryFrom( $operator );
+	private function map_operator( string $operator ): string {
+		$case = Operator::try_from( $operator );
 
 		$lookup = [
 			(string) Operator::is()       => 'IS',
@@ -221,7 +224,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @since $ver$
 	 * @return array<string, string> The filters.
 	 */
-	private function top_level_filters() : array {
+	private function top_level_filters(): array {
 		$filters = [];
 
 		foreach ( $this->filters->to_array() as $filter ) {
@@ -241,7 +244,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @since $ver$
 	 * @return array The Gravity Forms sorting.
 	 */
-	private function get_sorting() : array {
+	private function get_sorting(): array {
 		if ( ! $this->sort ) {
 			return [];
 		}
@@ -258,7 +261,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_fields() : array {
+	public function get_fields(): array {
 		if ( isset( $this->fields ) ) {
 			return $this->fields;
 		}
@@ -286,7 +289,9 @@ final class GravityFormsDataSource extends BaseDataSource {
 			}
 		}
 
-		return $this->fields = $output;
+		$this->fields = $output;
+
+		return $output;
 	}
 
 	/**
@@ -295,7 +300,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @since $ver$
 	 * @return GF_Field[] The form fields.
 	 */
-	private function get_form_fields() : array {
+	private function get_form_fields(): array {
 		return array_filter(
 			$this->form['fields'],
 			static fn( $value ) => $value instanceof GF_Field,

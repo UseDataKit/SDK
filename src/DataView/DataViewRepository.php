@@ -14,7 +14,7 @@ interface DataViewRepository {
 	 * @since $ver$
 	 * @return array<string, DataView> The DataViews.
 	 */
-	public function all() : array;
+	public function all(): array;
 
 	/**
 	 * Returns a DataView by its ID.a
@@ -24,7 +24,7 @@ interface DataViewRepository {
 	 * @return DataView The DataView.
 	 * @throws DataViewNotFoundException When the DataView could not be found.
 	 */
-	public function get( string $id ) : DataView;
+	public function get( string $id ): DataView;
 
 	/**
 	 * Returns whether a DataView is registered in the repository by the provided ID.
@@ -35,7 +35,7 @@ interface DataViewRepository {
 	 *
 	 * @return bool Whether a DataView is registered by the ID.
 	 */
-	public function has( string $id ) : bool;
+	public function has( string $id ): bool;
 
 	/**
 	 * Saves the DataView on the repository.
@@ -46,7 +46,7 @@ interface DataViewRepository {
 	 *
 	 * @return void
 	 */
-	public function save( DataView $data_view ) : void;
+	public function save( DataView $data_view ): void;
 
 	/**
 	 * Removes the DataView from the repository.
@@ -57,5 +57,5 @@ interface DataViewRepository {
 	 *
 	 * @return void
 	 */
-	public function delete( DataView $data_view ) : void;
+	public function delete( DataView $data_view ): void;
 }

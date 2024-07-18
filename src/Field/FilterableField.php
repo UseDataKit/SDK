@@ -48,14 +48,14 @@ abstract class FilterableField extends Field {
 	 * @since $ver$
 	 * @return array|null The filter options.
 	 */
-	private function get_filter_by() : ?array {
+	private function get_filter_by(): ?array {
 		if ( ! $this->operators ) {
 			return null;
 		}
 
 		return [
 			'operators' => array_map(
-				static fn( Operator $operator ) : string => (string) $operator,
+				static fn( Operator $operator ): string => (string) $operator,
 				$this->operators,
 			),
 			'isPrimary' => $this->is_primary,
@@ -99,9 +99,12 @@ abstract class FilterableField extends Field {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function to_array() : array {
-		return array_merge( parent::to_array(), [
-			'filterBy' => $this->get_filter_by(),
-		] );
+	public function to_array(): array {
+		return array_merge(
+            parent::to_array(),
+            [
+				'filterBy' => $this->get_filter_by(),
+			]
+        );
 	}
 }

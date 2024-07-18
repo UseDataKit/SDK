@@ -37,7 +37,8 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 *
 	 * @since $ver$
 	 *
-	 * @param array $data The data.
+	 * @param string $id   The data source identifier.
+	 * @param array  $data The data.
 	 */
 	public function __construct(
 		string $id,
@@ -51,7 +52,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function id() : string {
+	public function id(): string {
 		return $this->id;
 	}
 
@@ -59,7 +60,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_ids( int $limit = 20, int $offset = 0 ) : array {
+	public function get_data_ids( int $limit = 20, int $offset = 0 ): array {
 		return array_slice( array_keys( $this->get_data() ), $offset, $limit );
 	}
 
@@ -67,7 +68,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_by_id( string $id ) : array {
+	public function get_data_by_id( string $id ): array {
 		$result = $this->data[ $id ] ?? null;
 		if ( ! $result ) {
 			throw DataNotFoundException::with_id( $this, $id );
@@ -82,7 +83,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function count() : int {
+	public function count(): int {
 		return count( $this->get_data() );
 	}
 
@@ -92,12 +93,12 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * @since $ver$
 	 * @return array The filtered data.
 	 */
-	private function get_data() : array {
+	private function get_data(): array {
 		$data = $this->data;
 
 		$data = array_filter(
 			$data,
-			function ( array $item ) : bool {
+			function ( array $item ): bool {
 				if ( $this->search && ! ArrayDataMatcher::is_data_matched_by_string( $item, $this->search ) ) {
 					return false;
 				}
@@ -107,22 +108,25 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 				}
 
 				return true;
-			} );
+			},
+		);
 
 		if ( $this->sort ) {
-			$sort = $this->sort->to_array();
+			$sort    = $this->sort->to_array();
 			$is_desc = Sort::DESC === $sort['direction'];
-			$field = $sort['field'];
+			$field   = $sort['field'];
 
-			uasort( $data, static function ( array $a, array $b ) use ( $is_desc, $field ) : int {
-				if ( $is_desc ) {
-					[ $b, $a ] = [ $a, $b ];
-				}
+			uasort(
+				$data,
+				static function ( array $a, array $b ) use ( $is_desc, $field ): int {
+					if ( $is_desc ) {
+						[ $b, $a ] = [ $a, $b ];
+					}
 
-				return strnatcmp( $a[ $field ] ?? '', $b[ $field ] ?? '' );
-			} );
+					return strnatcmp( $a[ $field ] ?? '', $b[ $field ] ?? '' );
+				},
+			);
 		}
-
 
 		return $data;
 	}
@@ -132,7 +136,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 *
 	 * @since $ver$
 	 */
-	public function can_delete() : bool {
+	public function can_delete(): bool {
 		return true;
 	}
 
@@ -140,7 +144,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function delete_data_by_id( string ...$ids ) : void {
+	public function delete_data_by_id( string ...$ids ): void {
 		foreach ( $ids as $id ) {
 			if ( ! isset( $this->data[ $id ] ) ) {
 				throw DataNotFoundException::with_id( $this, $id );
@@ -154,7 +158,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_fields() : array {
+	public function get_fields(): array {
 		$keys = [];
 
 		foreach ( $this->data as $data ) {

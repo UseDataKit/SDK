@@ -44,9 +44,9 @@ final class DataItem {
 	 *
 	 * @since $ver$
 	 *
-	 * @param Field ...$fields The fields.*
+	 * @param Field ...$fields The fields.
 	 */
-	private function add_fields( Field ...$fields ) : void {
+	private function add_fields( Field ...$fields ): void {
 		$this->fields = $fields;
 	}
 
@@ -55,14 +55,14 @@ final class DataItem {
 	 *
 	 * @since $ver$
 	 *
-	 * @param array $array The array
+	 * @param array $data_item The array.
 	 *
 	 * @return self The instance.
 	 */
-	public static function from_array( array $array ) : self {
+	public static function from_array( array $data_item ): self {
 		return new self(
-			$array['fields'] ?? [],
-			$array['data'] ?? [],
+			$data_item['fields'] ?? [],
+			$data_item['data'] ?? [],
 		);
 	}
 
@@ -72,7 +72,7 @@ final class DataItem {
 	 * @since $ver$
 	 * @return array The array.
 	 */
-	public function to_array() : array {
+	public function to_array(): array {
 		return [
 			'fields' => $this->fields,
 			'data'   => $this->data,
@@ -85,7 +85,7 @@ final class DataItem {
 	 * @since $ver$
 	 * @return Field[] The fields.
 	 */
-	public function fields() : array {
+	public function fields(): array {
 		return $this->fields;
 	}
 
@@ -95,7 +95,7 @@ final class DataItem {
 	 * @since $ver$
 	 * @return array The data.
 	 */
-	public function data() : array {
+	public function data(): array {
 		return $this->data;
 	}
 }

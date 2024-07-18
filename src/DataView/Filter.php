@@ -66,6 +66,7 @@ final class Filter {
 			throw new InvalidArgumentException( 'Filter needs a field, operator and value' );
 		}
 
+		// phpcs:disable WordPress.PHP.StrictInArray.FoundNonStrictFalse
 		if (
 			! is_array( $value )
 			&& in_array( $operator, Operator::multiCases(), false )
@@ -115,7 +116,7 @@ final class Filter {
 	 *
 	 * @return bool Whether the value can be cast to a string.
 	 */
-	private static function is_stringable( $value ) : bool {
+	private static function is_stringable( $value ): bool {
 		if ( is_scalar( $value ) || is_null( $value ) ) {
 			return true;
 		}
@@ -133,7 +134,7 @@ final class Filter {
 	 * @since $ver$
 	 * @return FilterShape The filter array.
 	 */
-	public function to_array() : array {
+	public function to_array(): array {
 		return [
 			'field'    => $this->field,
 			'operator' => (string) $this->operator,
@@ -146,20 +147,20 @@ final class Filter {
 	 *
 	 * @since $ver$
 	 *
-	 * @param array $array The array.
+	 * @param array $filter_array The array.
 	 *
 	 * @return self The filter.
 	 */
-	public static function from_array( array $array ) : self {
-		$operator = Operator::tryFrom( $array['operator'] ?? '' );
+	public static function from_array( array $filter_array ): self {
+		$operator = Operator::try_from( $filter_array['operator'] ?? '' );
 		if ( ! $operator ) {
 			throw new \InvalidArgumentException( 'No valid operator provided.' );
 		}
 
 		return new self(
-			$array['field'] ?? '',
+			$filter_array['field'] ?? '',
 			$operator,
-			$array['value'] ?? '',
+			$filter_array['value'] ?? '',
 		);
 	}
 
@@ -173,8 +174,8 @@ final class Filter {
 	 *
 	 * @return self The filter.
 	 */
-	public static function __callStatic( string $method, array $arguments ) : self {
-		$operator = Operator::tryFrom( $method );
+	public static function __callStatic( string $method, array $arguments ): self {
+		$operator = Operator::try_from( $method );
 
 		if ( ! $operator ) {
 			throw new BadMethodCallException( sprintf( 'Static method "%s" not found.', $method ) );
@@ -198,7 +199,7 @@ final class Filter {
 	 *
 	 * @return bool Whether the value matches the filter.
 	 */
-	public function matches( array $data ) : bool {
+	public function matches( array $data ): bool {
 		$value = $data[ $this->field ] ?? null;
 		if ( ! $value ) {
 			return false;

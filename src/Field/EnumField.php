@@ -13,6 +13,7 @@ final class EnumField extends FilterableField {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
+	 * @var string
 	 */
 	protected string $render = 'datakit_fields.html';
 
@@ -42,10 +43,13 @@ final class EnumField extends FilterableField {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function to_array() : array {
-		return array_merge( parent::to_array(), [
-			'elements' => array_values( $this->elements ),
-		] );
+	public function to_array(): array {
+		return array_merge(
+			parent::to_array(),
+			[
+				'elements' => array_values( $this->elements ),
+			],
+		);
 	}
 
 	/**
@@ -55,13 +59,15 @@ final class EnumField extends FilterableField {
 	 *
 	 * @param array $elements The elements.
 	 */
-	protected function set_elements( array $elements ) : void {
+	protected function set_elements( array $elements ): void {
 		foreach ( $elements as $key => $element ) {
 			if ( is_string( $key ) && is_string( $element ) ) {
-				$elements[ $key ] = $element = [
+				$element = [
 					'label' => $element,
 					'value' => $key,
 				];
+
+				$elements[ $key ] = $element;
 			}
 
 			if (

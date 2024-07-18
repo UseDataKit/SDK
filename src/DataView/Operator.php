@@ -21,7 +21,7 @@ final class Operator extends EnumObject {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected static function cases() : array {
+	protected static function cases(): array {
 		return [
 			'is'       => 'is',
 			'isNot'    => 'isNot',
@@ -38,7 +38,7 @@ final class Operator extends EnumObject {
 	 * @since $ver$
 	 * @return self[] The operators.
 	 */
-	public static function singleCases() : array {
+	public static function singleCases(): array {
 		return [
 			self::is(),
 			self::isNot(),
@@ -51,7 +51,7 @@ final class Operator extends EnumObject {
 	 * @since $ver$
 	 * @return self[] The operators.
 	 */
-	public static function multiCases() : array {
+	public static function multiCases(): array {
 		return [
 			self::isAny(),
 			self::isAll(),

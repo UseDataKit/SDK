@@ -52,7 +52,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function id() : string {
+	public function id(): string {
 		return $this->inner->id();
 	}
 
@@ -65,7 +65,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 *
 	 * @return string @return string The cache key.
 	 */
-	private function get_cache_key( ...$arguments ) : string {
+	private function get_cache_key( ...$arguments ): string {
 		$arguments[] = $this->inner->id();
 
 		try {
@@ -88,7 +88,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 *
 	 * @return string The cache key.
 	 */
-	private function get_filter_aware_cache_key( ...$arguments ) : string {
+	private function get_filter_aware_cache_key( ...$arguments ): string {
 		$arguments[] = $this->filters ? $this->filters->to_array() : null;
 		$arguments[] = $this->sort ? $this->sort->to_array() : null;
 		$arguments[] = $this->search;
@@ -109,7 +109,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	private function fetch( string $cache_key, callable $retrieve_result ) {
 		$result = $this->cache->get( $cache_key );
 
-		if ( $result !== null ) {
+		if ( null !== $result ) {
 			return $result;
 		}
 
@@ -125,24 +125,30 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_ids( int $limit = 20, int $offset = 0 ) : array {
+	public function get_data_ids( int $limit = 20, int $offset = 0 ): array {
 		$key = $this->get_filter_aware_cache_key( __FUNCTION__, $limit, $offset );
 
-		return $this->fetch( $key, function () use ( $limit, $offset ) {
-			return $this->inner->get_data_ids( $limit, $offset );
-		} );
+		return $this->fetch(
+			$key,
+			function () use ( $limit, $offset ) {
+				return $this->inner->get_data_ids( $limit, $offset );
+			},
+		);
 	}
 
 	/**
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_by_id( string $id ) : array {
+	public function get_data_by_id( string $id ): array {
 		$key = $this->get_cache_key( __FUNCTION__, $id );
 
-		return $this->fetch( $key, function () use ( $id ) {
-			return $this->inner->get_data_by_id( $id );
-		} );
+		return $this->fetch(
+			$key,
+			function () use ( $id ) {
+				return $this->inner->get_data_by_id( $id );
+			},
+		);
 	}
 
 	/**
@@ -152,7 +158,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 *
 	 * @since $ver$
 	 */
-	public function get_fields() : array {
+	public function get_fields(): array {
 		return $this->inner->get_fields();
 	}
 
@@ -160,7 +166,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function count() : int {
+	public function count(): int {
 		$key = $this->get_filter_aware_cache_key( __FUNCTION__ );
 
 		return $this->fetch( $key, fn() => $this->inner->count() );
@@ -170,7 +176,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function filter_by( ?Filters $filters ) : self {
+	public function filter_by( ?Filters $filters ): self {
 		$cached        = parent::filter_by( $filters );
 		$cached->inner = $this->inner->filter_by( $filters );
 
@@ -181,7 +187,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function search_by( string $search ) : self {
+	public function search_by( string $search ): self {
 		$cached = parent::search_by( $search );
 
 		if ( ! $cached instanceof self ) {
@@ -197,7 +203,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function sort_by( ?Sort $sort ) : self {
+	public function sort_by( ?Sort $sort ): self {
 		$cached = parent::sort_by( $sort );
 		if ( ! $cached instanceof self ) {
 			throw new RuntimeException( 'Wrong data source provided' );
@@ -212,7 +218,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function can_delete() : bool {
+	public function can_delete(): bool {
 		if ( ! $this->inner instanceof MutableDataSource ) {
 			return false;
 		}
@@ -224,7 +230,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function delete_data_by_id( string ...$ids ) : void {
+	public function delete_data_by_id( string ...$ids ): void {
 		if ( ! $this->inner instanceof MutableDataSource ) {
 			return;
 		}
@@ -239,7 +245,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @since $ver$
 	 * @return bool Whether the cache was cleared.
 	 */
-	public function clear_cache() : bool {
+	public function clear_cache(): bool {
 		// Todo: only clear the cache for the keys for this data source.
 		return $this->cache->clear();
 	}

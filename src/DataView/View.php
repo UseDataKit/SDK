@@ -17,7 +17,7 @@ final class View extends EnumObject {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected static function cases() : array {
+	protected static function cases(): array {
 		return [
 			'Table' => 'table',
 			'Grid'  => 'grid',

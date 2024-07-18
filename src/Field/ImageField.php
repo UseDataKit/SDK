@@ -11,6 +11,7 @@ final class ImageField extends Field {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
+	 * @var string
 	 */
 	protected string $render = 'datakit_fields.html';
 
@@ -18,12 +19,15 @@ final class ImageField extends Field {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected function default_context() : array {
-		return array_merge( parent::default_context(), [
-			'class'  => '',
-			'width'  => null,
-			'height' => null,
-		] );
+	protected function default_context(): array {
+		return array_merge(
+			parent::default_context(),
+			[
+				'class'  => '',
+				'width'  => null,
+				'height' => null,
+			],
+		);
 	}
 
 	/**
@@ -36,7 +40,7 @@ final class ImageField extends Field {
 	 *
 	 * @return self The field.
 	 */
-	public function size( int $width, ?int $height = null ) : self {
+	public function size( int $width, ?int $height = null ): self {
 		$clone = clone $this;
 
 		$clone->context['width']  = $width;
@@ -50,13 +54,13 @@ final class ImageField extends Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $class The class to set on the image.
+	 * @param string $class_name The class to set on the image.
 	 *
 	 * @return self The field.
 	 */
-	public function class( string $class ) : self {
+	public function class( string $class_name ): self {
 		$clone                   = clone $this;
-		$clone->context['class'] = $class;
+		$clone->context['class'] = $class_name;
 
 		return $clone;
 	}
@@ -70,7 +74,7 @@ final class ImageField extends Field {
 	 *
 	 * @return self the field.
 	 */
-	public function alt( string $alt ) : self {
+	public function alt( string $alt ): self {
 		$clone                 = clone $this;
 		$clone->context['alt'] = $alt;
 
@@ -81,10 +85,13 @@ final class ImageField extends Field {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_value( array $data ) : string {
-		$attributes = array_merge( $this->context(), [
-			'src' => parent::get_value( $data ),
-		] );
+	public function get_value( array $data ): string {
+		$attributes = array_merge(
+			$this->context(),
+			[
+				'src' => parent::get_value( $data ),
+			],
+		);
 
 		$params = [];
 		foreach ( array_filter( $attributes ) as $key => $value ) {

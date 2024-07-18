@@ -25,6 +25,7 @@ abstract class BaseDataSource implements DataSource {
 	 * The sorting to use.
 	 *
 	 * @since $ver$
+	 * @var Sort|null
 	 */
 	protected ?Sort $sort = null;
 
@@ -32,6 +33,7 @@ abstract class BaseDataSource implements DataSource {
 	 * The string to search by.
 	 *
 	 * @since $ver$
+	 * @var string
 	 */
 	protected string $search = '';
 

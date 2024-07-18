@@ -24,7 +24,7 @@ final class ArrayDataMatcher {
 		array $data,
 		string $query,
 		bool $is_exact_search = false
-	) : bool {
+	): bool {
 		if ( ! $query ) {
 			return true;
 		}
@@ -55,7 +55,7 @@ final class ArrayDataMatcher {
 	 *
 	 * @return array The query parts.
 	 */
-	private static function parse_query_string( string $query ) : array {
+	private static function parse_query_string( string $query ): array {
 		return preg_split( '/\s+/', $query );
 	}
 }

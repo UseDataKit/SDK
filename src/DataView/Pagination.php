@@ -56,16 +56,16 @@ final class Pagination {
 	 *
 	 * @since $ver$
 	 *
-	 * @param array $array The array.
+	 * @param array $pagination_array The array.
 	 *
 	 * @return self A pagination instance.
 	 */
-	public static function from_array( array $array ) : self {
-		if ( ! isset( $array['per_page'], $array['page'] ) ) {
+	public static function from_array( array $pagination_array ): self {
+		if ( ! isset( $pagination_array['per_page'], $pagination_array['page'] ) ) {
 			throw new \InvalidArgumentException( 'No page and per page provided.' );
 		}
 
-		return new self( (int) $array['page'], (int) $array['per_page'] );
+		return new self( (int) $pagination_array['page'], (int) $pagination_array['per_page'] );
 	}
 
 	/**
@@ -74,7 +74,7 @@ final class Pagination {
 	 * @since $ver$
 	 * @return self A pagination object.
 	 */
-	public static function default() : self {
+	public static function default(): self {
 		return new self( 1 );
 	}
 
@@ -84,7 +84,7 @@ final class Pagination {
 	 * @since $ver$
 	 * @return int The limit.
 	 */
-	public function limit() : int {
+	public function limit(): int {
 		return $this->per_page;
 	}
 
@@ -94,7 +94,7 @@ final class Pagination {
 	 * @since $ver$
 	 * @return int The offset.
 	 */
-	public function offset() : int {
+	public function offset(): int {
 		return ( $this->page - 1 ) * $this->per_page;
 	}
 
@@ -107,7 +107,7 @@ final class Pagination {
 	 *
 	 * @return array The JSON data.
 	 */
-	public function info( DataSource $data_source ) : array {
+	public function info( DataSource $data_source ): array {
 		$total = $data_source->count();
 
 		return [
@@ -122,7 +122,7 @@ final class Pagination {
 	 * @since $ver$
 	 * @return int The current page.
 	 */
-	public function page() : int {
+	public function page(): int {
 		return $this->page;
 	}
 }

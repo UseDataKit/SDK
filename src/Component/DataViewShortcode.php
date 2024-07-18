@@ -63,7 +63,7 @@ final class DataViewShortcode {
 	 * @todo Add search & sorting attributes.
 	 * @return string The shortcode output.
 	 */
-	public function render_shortcode( array $attributes ) : string {
+	public function render_shortcode( array $attributes ): string {
 		$id = $attributes['id'] ?? null;
 
 		if (
@@ -85,9 +85,12 @@ final class DataViewShortcode {
 				wp_is_block_theme()
 				&& ! wp_script_is( 'datakit/dataview', 'registered' )
 			) {
-				add_action( 'wp_enqueue_scripts', function () use ( $js ) {
-					wp_add_inline_script( 'datakit/dataview', $js, 'before' );
-				} );
+				add_action(
+                    'wp_enqueue_scripts',
+                    function () use ( $js ) {
+						wp_add_inline_script( 'datakit/dataview', $js, 'before' );
+					}
+                );
 			}
 			wp_add_inline_script( 'datakit/dataview', $js, 'before' );
 
@@ -103,7 +106,7 @@ final class DataViewShortcode {
 	 * @since $ver$
 	 * @return self The singleton.
 	 */
-	public static function get_instance( DataViewRepository $data_view_repository ) : self {
+	public static function get_instance( DataViewRepository $data_view_repository ): self {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self( $data_view_repository );
 		}

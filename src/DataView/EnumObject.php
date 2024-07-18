@@ -24,21 +24,23 @@ abstract class EnumObject {
 	 * @since $ver$
 	 * @return array<string, string> Cases as key => value.
 	 */
-	abstract protected static function cases() : array;
+	abstract protected static function cases(): array;
 
 	/**
 	 * Create the enum object.
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $case The enum case.
+	 * @param string $enum_case The enum case.
+	 *
+	 * @throws InvalidArgumentException If the case is invalid.
 	 */
-	final private function __construct( string $case ) {
-		if ( ! isset( static::cases()[ $case ] ) ) {
-			throw new \InvalidArgumentException( 'No valid enum option provided.' );
+	final private function __construct( string $enum_case ) {
+		if ( ! isset( static::cases()[ $enum_case ] ) ) {
+			throw new InvalidArgumentException( 'No valid enum option provided.' );
 		}
 
-		$this->value = static::cases()[ $case ];
+		$this->value = static::cases()[ $enum_case ];
 	}
 
 	/**
@@ -46,14 +48,14 @@ abstract class EnumObject {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $case The case.
+	 * @param string $enum_case The case.
 	 *
 	 * @return static|null The enum is valid.
 	 */
-	final public static function tryFrom( string $case ) {
+	final public static function try_from( string $enum_case ) {
 		try {
-			return new static ( $case );
-		} catch ( \InvalidArgumentException $e ) {
+			return new static( $enum_case );
+		} catch ( InvalidArgumentException $e ) {
 			return null;
 		}
 	}
@@ -67,9 +69,10 @@ abstract class EnumObject {
 	 * @param array  $_      Unused arguments.
 	 *
 	 * @return static The enum object.
+	 * @throws InvalidArgumentException
 	 */
 	final public static function __callStatic( string $method, array $_ ) {
-		$type = self::tryFrom( $method );
+		$type = self::try_from( $method );
 
 		if ( ! $type ) {
 			throw new InvalidArgumentException( 'No valid enum object provided.' );
@@ -83,7 +86,7 @@ abstract class EnumObject {
 	 *
 	 * @since $ver$
 	 */
-	public function __toString() : string {
+	public function __toString(): string {
 		return $this->as_string();
 	}
 
@@ -92,7 +95,7 @@ abstract class EnumObject {
 	 *
 	 * @since $ver$
 	 */
-	public function as_string() : string {
+	public function as_string(): string {
 		return $this->value;
 	}
 }

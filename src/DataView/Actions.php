@@ -44,7 +44,7 @@ final class Actions implements IteratorAggregate {
 	 *
 	 * @return self The collection.
 	 */
-	public static function of( Action ...$actions ) : self {
+	public static function of( Action ...$actions ): self {
 		return new self( ...$actions );
 	}
 
@@ -54,9 +54,9 @@ final class Actions implements IteratorAggregate {
 	 * @since $ver$
 	 * @return array
 	 */
-	public function to_array() : array {
+	public function to_array(): array {
 		return array_map(
-			static fn( Action $action ) : array => $action->to_array(),
+			static fn( Action $action ): array => $action->to_array(),
 			$this->actions,
 		);
 	}
@@ -67,7 +67,7 @@ final class Actions implements IteratorAggregate {
 	 * @since $ver$
 	 * @return ArrayIterator The iterator.
 	 */
-	public function getIterator() : ArrayIterator {
+	public function getIterator(): ArrayIterator {
 		return new ArrayIterator( $this->actions );
 	}
 }

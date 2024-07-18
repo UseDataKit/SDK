@@ -21,7 +21,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 	 *
 	 * @since $ver$
 	 *
-	 * @param array $data_views
+	 * @param DataView[] $data_views The DataViews.
 	 */
 	public function __construct( array $data_views = [] ) {
 		foreach ( $data_views as $data_view ) {
@@ -33,7 +33,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function all() : array {
+	public function all(): array {
 		return $this->data_views;
 	}
 
@@ -41,7 +41,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get( string $id ) : DataView {
+	public function get( string $id ): DataView {
 		$data_view = $this->data_views[ $id ] ?? null;
 		if ( ! $data_view ) {
 			throw new DataViewNotFoundException();
@@ -54,7 +54,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function save( DataView $data_view ) : void {
+	public function save( DataView $data_view ): void {
 		$this->data_views[ $data_view->id() ] = $data_view;
 	}
 
@@ -62,7 +62,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function delete( DataView $data_view ) : void {
+	public function delete( DataView $data_view ): void {
 		unset( $this->data_views[ $data_view->id() ] );
 	}
 
@@ -70,7 +70,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function has( string $id ) : bool {
+	public function has( string $id ): bool {
 		return isset( $this->data_views[ $id ] );
 	}
 }

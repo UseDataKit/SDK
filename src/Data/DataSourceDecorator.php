@@ -22,14 +22,14 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 	 *
 	 * @return DataSource The data source to decorate or proxy.
 	 */
-	abstract protected function decorated_datasource() : DataSource;
+	abstract protected function decorated_datasource(): DataSource;
 
 
 	/**
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_ids( int $limit = 20, int $offset = 0 ) : array {
+	public function get_data_ids( int $limit = 20, int $offset = 0 ): array {
 		return $this->decorated_datasource()->get_data_ids( $limit, $offset );
 	}
 
@@ -37,7 +37,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_data_by_id( string $id ) : array {
+	public function get_data_by_id( string $id ): array {
 		return $this->decorated_datasource()->get_data_by_id( $id );
 	}
 
@@ -45,7 +45,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get_fields() : array {
+	public function get_fields(): array {
 		return $this->decorated_datasource()->get_fields();
 	}
 
@@ -53,7 +53,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function count() : int {
+	public function count(): int {
 		return $this->decorated_datasource()->count();
 	}
 
@@ -85,7 +85,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function can_delete() : bool {
+	public function can_delete(): bool {
 		$inner = $this->decorated_datasource();
 
 		if ( ! $inner instanceof MutableDataSource ) {
@@ -99,7 +99,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function delete_data_by_id( string ...$ids ) : void {
+	public function delete_data_by_id( string ...$ids ): void {
 		$inner = $this->decorated_datasource();
 
 		if ( $inner instanceof MutableDataSource ) {

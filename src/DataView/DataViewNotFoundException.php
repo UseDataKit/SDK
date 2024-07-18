@@ -12,10 +12,14 @@ use Exception;
  */
 final class DataViewNotFoundException extends DataViewException {
 	/**
-	 * @inheritDoc
+	 * Create the exception.
+	 *
 	 * @since $ver$
+	 *
+	 * @param string         $message  The message.
+	 * @param Exception|null $previous The previous exception.
 	 */
-	public function __construct( $message = "The DataView was not found.", Exception $previous = null ) {
+	public function __construct( $message = 'The DataView was not found.', Exception $previous = null ) {
 		parent::__construct( $message, 404, $previous );
 	}
 }

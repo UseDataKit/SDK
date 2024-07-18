@@ -13,6 +13,8 @@ final class DataSourceNotFoundException extends DataViewException {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
+	 *
+	 * @phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
 	 */
 	public function __construct( $message = 'Data source not found.', $code = 404, \Throwable $previous = null ) {
 		parent::__construct( $message, $code, $previous );

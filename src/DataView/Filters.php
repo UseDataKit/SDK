@@ -41,7 +41,7 @@ final class Filters implements IteratorAggregate {
 	 *
 	 * @return self The filter collection.
 	 */
-	public static function of( Filter $filter, Filter ...$filters ) : self {
+	public static function of( Filter $filter, Filter ...$filters ): self {
 		return new self( $filter, ...$filters );
 	}
 
@@ -50,17 +50,17 @@ final class Filters implements IteratorAggregate {
 	 *
 	 * @since $ver$
 	 *
-	 * @param array $array The array of filters.
+	 * @param array $filters_array The array of filters.
 	 *
 	 * @return self The filter collection.
 	 */
-	public static function from_array( array $array ) : self {
+	public static function from_array( array $filters_array ): self {
 		$filters = [];
-		foreach ( $array as $filter ) {
+		foreach ( $filters_array as $filter ) {
 			$filters[] = Filter::from_array( $filter );
 		}
 
-		return new self( ... $filters );
+		return new self( ...$filters );
 	}
 
 	/**
@@ -69,9 +69,9 @@ final class Filters implements IteratorAggregate {
 	 * @since $ver$
 	 * @return array<FilterShape>The fields as an array.
 	 */
-	public function to_array() : array {
+	public function to_array(): array {
 		return array_map(
-			static fn( Filter $filter ) : array => $filter->to_array(),
+			static fn( Filter $filter ): array => $filter->to_array(),
 			$this->filters,
 		);
 	}
@@ -80,7 +80,7 @@ final class Filters implements IteratorAggregate {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function getIterator() : ArrayIterator {
+	public function getIterator(): ArrayIterator {
 		return new ArrayIterator( $this->filters );
 	}
 
@@ -93,7 +93,7 @@ final class Filters implements IteratorAggregate {
 	 *
 	 * @return bool whether the entry matches the filters.
 	 */
-	public function match( array $data ) : bool {
+	public function match( array $data ): bool {
 		foreach ( $this->filters as $filter ) {
 			if ( ! $filter->matches( $data ) ) {
 				return false;

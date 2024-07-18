@@ -44,8 +44,8 @@ final class DataNotFoundException extends DataViewException {
 	 *
 	 * @return self The exception.
 	 */
-	public static function with_id( DataSource $data_source, string $id ) : self {
-		return new self ( $data_source, sprintf( 'Data set with id "%s" not found.', $id ) );
+	public static function with_id( DataSource $data_source, string $id ): self {
+		return new self( $data_source, sprintf( 'Data set with id "%s" not found.', $id ) );
 	}
 
 	/**
@@ -54,7 +54,7 @@ final class DataNotFoundException extends DataViewException {
 	 * @since $ver$
 	 * @return DataSource
 	 */
-	public function data_source() : DataSource {
+	public function data_source(): DataSource {
 		return $this->data_source;
 	}
 }

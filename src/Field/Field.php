@@ -112,11 +112,16 @@ abstract class Field {
 	 * @since $ver$
 	 * @return string
 	 */
-	final public function uuid() : string {
-		return sprintf( '%s-%s',
-			$this->id(),
-			md5( serialize( [ $this->id, $this->header ] ) ),
-		);
+	final public function uuid(): string {
+		try {
+			return sprintf(
+				'%s-%s',
+				$this->id(),
+				md5( json_encode( [ $this->id, $this->header ], JSON_THROW_ON_ERROR ) ),
+			);
+		} catch ( JsonException $e ) {
+			return 'error';
+		}
 	}
 
 	/**
@@ -126,7 +131,7 @@ abstract class Field {
 	 * @return static The field instance.
 	 */
 	public static function create( ...$args ) {
-		$instance = new static( ... $args );
+		$instance = new static( ...$args );
 
 		if ( ! $instance->render() ) {
 			throw new InvalidArgumentException( 'The field requires a `render` option.' );
@@ -141,7 +146,7 @@ abstract class Field {
 	 * @since $ver$
 	 * @return string
 	 */
-	public function id() : string {
+	public function id(): string {
 		return $this->id;
 	}
 
@@ -151,7 +156,7 @@ abstract class Field {
 	 * @since $ver$
 	 * @return string
 	 */
-	public function header() : string {
+	public function header(): string {
 		return $this->header;
 	}
 
@@ -161,7 +166,7 @@ abstract class Field {
 	 * @since $ver$
 	 * @return string
 	 */
-	public function render() : string {
+	public function render(): string {
 		try {
 			$function = sprintf(
 				'( data ) => %s(%s, data, %s)',
@@ -298,7 +303,7 @@ abstract class Field {
 	 * @since $ver$
 	 * @return bool Whether the field is hidden.
 	 */
-	public function is_hidden() : bool {
+	public function is_hidden(): bool {
 		return $this->is_hidden;
 	}
 
@@ -321,7 +326,7 @@ abstract class Field {
 	 * @since $ver$
 	 * @return array<string, mixed> The field configuration.
 	 */
-	public function to_array() : array {
+	public function to_array(): array {
 		return [
 			'id'            => $this->id(),
 			'header'        => $this->header(),
@@ -337,7 +342,7 @@ abstract class Field {
 	 * @since $ver$
 	 * @return array[] The context.
 	 */
-	protected function context() : array {
+	protected function context(): array {
 		return $this->context;
 	}
 
@@ -349,7 +354,7 @@ abstract class Field {
 	 * @since $ver$
 	 * @return array The default context values.
 	 */
-	protected function default_context() : array {
+	protected function default_context(): array {
 		return [];
 	}
 }

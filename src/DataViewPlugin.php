@@ -9,11 +9,13 @@ use DataKit\DataViews\Rest\Router;
 
 /**
  * Entry point for the plugin.
+ *
  * @since $ver$
  */
 final class DataViewPlugin {
 	/**
 	 * The singleton plugin instance.
+	 *
 	 * @since $ver$
 	 * @var self
 	 */
@@ -21,6 +23,7 @@ final class DataViewPlugin {
 
 	/**
 	 * The DataView Repository.
+	 *
 	 * @since $ver$
 	 * @var DataViewRepository
 	 */
@@ -28,6 +31,7 @@ final class DataViewPlugin {
 
 	/**
 	 * Creates the plugin.
+	 *
 	 * @since $ver$
 	 *
 	 * @param DataViewRepository $data_view_repository The DataView repository.
@@ -45,6 +49,7 @@ final class DataViewPlugin {
 
 	/**
 	 * Registers a DataView on the repository.
+	 *
 	 * @since $ver$
 	 *
 	 * @param DataView $data_view The DataView.
@@ -55,24 +60,33 @@ final class DataViewPlugin {
 
 	/**
 	 * Register the scripts and styles.
+	 *
 	 * @since $ver$
 	 */
 	public function register_scripts(): void {
 		$assets_dir = plugin_dir_url( DATAVIEW_PLUGIN_PATH );
 
-		wp_register_script( 'datakit/dataview', $assets_dir . 'assets/js/dataview.js', [], null, true );
-		wp_register_style( 'datakit/dataview', $assets_dir . 'assets/css/dataview.css' );
+		wp_register_script( 'datakit/dataview', $assets_dir . 'assets/js/dataview.js', [], DATAVIEW_VERSION, true );
+		wp_register_style( 'datakit/dataview', $assets_dir . 'assets/css/dataview.css', [], DATAVIEW_VERSION );
 		wp_add_inline_script(
 			'datakit/dataview',
-			implode( "\n", [
-				'let datakit_dataviews = {};',
-				sprintf( 'const datakit_dataviews_rest_endpoint = "%s";', esc_attr( get_rest_url( null, Router::NAMESPACE ) ) ),
-			] ),
-			'before' );
+			implode(
+				"\n",
+				[
+					'let datakit_dataviews = {};',
+					sprintf(
+						'const datakit_dataviews_rest_endpoint = "%s";',
+						esc_attr( get_rest_url( null, Router::NAMESPACE ) ),
+					),
+				],
+			),
+			'before',
+		);
 	}
 
 	/**
 	 * Return and maybe initialize the singleton plugin.
+	 *
 	 * @since $ver$
 	 * @return self The plugin.
 	 */

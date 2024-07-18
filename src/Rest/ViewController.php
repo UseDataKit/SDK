@@ -26,7 +26,7 @@ final class ViewController {
 	 *
 	 * @since $ver$
 	 *
-	 * @param DataViewRepository $dataview_repository The dataview repository
+	 * @param DataViewRepository $dataview_repository The dataview repository.
 	 */
 	public function __construct( DataViewRepository $dataview_repository ) {
 		$this->dataview_repository = $dataview_repository;
@@ -42,7 +42,8 @@ final class ViewController {
 	 * @return bool Whether the current user can view the result.
 	 * @todo  Add security from DataView.
 	 */
-	public function can_view( WP_REST_Request $request ) : bool {
+	public function can_view( WP_REST_Request $request ): bool {
+		$view_id = (string) ( $request->get_param( 'view_id' ) ?? '' );
 		return true;
 	}
 
@@ -55,7 +56,7 @@ final class ViewController {
 	 *
 	 * @return array The response..
 	 */
-	public function get_item( WP_REST_Request $request ) : array {
+	public function get_item( WP_REST_Request $request ): array {
 		$view_id = (string) ( $request->get_param( 'view_id' ) ?? '' );
 		$data_id = (string) ( $request->get_param( 'data_id' ) ?? '' );
 
@@ -82,7 +83,7 @@ final class ViewController {
 		);
 
 		// Scope rendering of template to avoid class leaking.
-		// @phpstan-ignore closure.unusedUse
+		/* @phpstan-ignore closure.unusedUse */
 		( static function () use ( $template, $data_item ) {
 			require $template;
 		} )();

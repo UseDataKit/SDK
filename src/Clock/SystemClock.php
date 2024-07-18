@@ -12,7 +12,7 @@ final class SystemClock implements Clock {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function now() : \DateTimeImmutable {
+	public function now(): \DateTimeImmutable {
 		return new \DateTimeImmutable();
 	}
 }

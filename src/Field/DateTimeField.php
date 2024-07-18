@@ -47,6 +47,7 @@ final class DateTimeField extends Field {
 	/**
 	 * @inheritDoc
 	 * @since $ver
+	 * @var string
 	 */
 	protected string $render = 'datakit_fields.html';
 
@@ -61,7 +62,7 @@ final class DateTimeField extends Field {
 	 *
 	 * @return self A date time field.
 	 */
-	public function to_format( string $format, ?DateTimeZone $to_timezone = null ) : self {
+	public function to_format( string $format, ?DateTimeZone $to_timezone = null ): self {
 		$clone              = clone $this;
 		$clone->to_format   = $format;
 		$clone->to_timezone = $to_timezone;
@@ -79,7 +80,7 @@ final class DateTimeField extends Field {
 	 *
 	 * @return self A datetime field.
 	 */
-	public function from_format( ?string $format, ?DateTimeZone $time_zone = null ) : self {
+	public function from_format( ?string $format, ?DateTimeZone $time_zone = null ): self {
 		$clone                = clone $this;
 		$clone->from_format   = $format;
 		$clone->from_timezone = $time_zone;
@@ -92,7 +93,7 @@ final class DateTimeField extends Field {
 	 * @since $ver$
 	 * @return string
 	 */
-	public function get_value( array $data ) : string {
+	public function get_value( array $data ): string {
 		$value = parent::get_value( $data );
 
 		try {
@@ -103,7 +104,7 @@ final class DateTimeField extends Field {
 			$datetime = false;
 		}
 
-		if ( $datetime === false ) {
+		if ( false === $datetime ) {
 			return $value;
 		}
 

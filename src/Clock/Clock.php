@@ -15,5 +15,5 @@ interface Clock {
 	 *
 	 * @since $ver$
 	 */
-	public function now() : DateTimeInterface;
+	public function now(): DateTimeInterface;
 }

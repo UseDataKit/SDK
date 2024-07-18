@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name:         DataKit
  * Description:         Easily create your own DataViews components with just PHP.
@@ -23,6 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once __DIR__ . '/vendor/autoload.php';
 
 const DATAVIEW_PLUGIN_PATH = __FILE__;
+const DATAVIEW_VERSION     = '0.1.0';
 
 // Initialize the plugin.
 try {
@@ -31,4 +31,5 @@ try {
 	);
 } catch ( \Throwable $e ) {
 	// Todo: log errors somewhere.
+	return;
 }

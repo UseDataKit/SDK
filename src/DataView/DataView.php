@@ -142,8 +142,8 @@ final class DataView {
 	 * @since $ver$
 	 *
 	 * @param string       $id          The DataView ID.
-	 * @param array        $fields      The fields.
 	 * @param DataSource   $data_source The data source.
+	 * @param array        $fields      The fields.
 	 * @param Sort|null    $sort        The sorting.
 	 * @param Filters|null $filters     The filters.
 	 * @param Actions|null $actions     The actions.
@@ -155,7 +155,7 @@ final class DataView {
 		?Sort $sort = null,
 		?Filters $filters = null,
 		?Actions $actions = null
-	) : self {
+	): self {
 		return new self(
 			View::Table(),
 			$id,
@@ -174,7 +174,7 @@ final class DataView {
 	 *
 	 * @param Field ...$fields The fields.
 	 **/
-	private function ensure_valid_fields( Field ...$fields ) : void {
+	private function ensure_valid_fields( Field ...$fields ): void {
 		$this->directory_fields = array_merge( $this->directory_fields, $fields );
 	}
 
@@ -184,7 +184,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return string The ID.
 	 */
-	public function id() : string {
+	public function id(): string {
 		return $this->id;
 	}
 
@@ -194,7 +194,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return array The view data object.
 	 */
-	private function view() : array {
+	private function view(): array {
 		return [
 			'search'       => $this->search,
 			'type'         => (string) $this->view,
@@ -213,7 +213,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return DataSource The data source.
 	 */
-	public function data_source() : DataSource {
+	public function data_source(): DataSource {
 		return $this->data_source
 			->sort_by( $this->sort )
 			->filter_by( $this->filters )
@@ -230,7 +230,7 @@ final class DataView {
 	 *
 	 * @return array The data object.
 	 */
-	public function get_data( ?DataSource $data_source = null, ?Pagination $pagination = null ) : array {
+	public function get_data( ?DataSource $data_source = null, ?Pagination $pagination = null ): array {
 		$data_source ??= $this->data_source();
 		$pagination  ??= $this->pagination;
 
@@ -264,17 +264,19 @@ final class DataView {
 	 *
 	 * @return DataItem The data item.
 	 */
-	public function get_view_data_item( string $data_id ) : DataItem {
+	public function get_view_data_item( string $data_id ): DataItem {
 		$data = $this->data_source()->get_data_by_id( $data_id );
 
 		foreach ( $this->view_fields as $field ) {
 			$data[ $field->uuid() ] = $field->get_value( $data );
 		}
 
-		return DataItem::from_array( [
-			'fields' => $this->view_fields,
-			'data'   => $data,
-		] );
+		return DataItem::from_array(
+			[
+				'fields' => $this->view_fields,
+				'data'   => $data,
+			],
+		);
 	}
 
 	/**
@@ -283,7 +285,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return array[] The fields as arrays.
 	 */
-	private function dictionary_fields() : array {
+	private function dictionary_fields(): array {
 		$fields = [];
 
 		foreach ( $this->directory_fields as $field ) {
@@ -303,7 +305,7 @@ final class DataView {
 	 * @return string[] The supported layouts.
 	 * @todo  provide option to add more.
 	 */
-	private function supported_layouts() : array {
+	private function supported_layouts(): array {
 		return [ (string) $this->view ];
 	}
 
@@ -313,7 +315,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return string[] The field ID's.
 	 */
-	private function hidden_fields() : array {
+	private function hidden_fields(): array {
 		$hidden_fields = [];
 		foreach ( $this->directory_fields as $field ) {
 			if ( ! $field->is_hidden() ) {
@@ -336,7 +338,7 @@ final class DataView {
 	 *
 	 * @return self The dataview.
 	 */
-	public function paginate( int $per_page, int $page = 1 ) : self {
+	public function paginate( int $per_page, int $page = 1 ): self {
 		$this->pagination = new Pagination( $page, $per_page );
 
 		return $this;
@@ -351,7 +353,7 @@ final class DataView {
 	 *
 	 * @return self The dataview.
 	 */
-	public function search( string $search = '' ) : self {
+	public function search( string $search = '' ): self {
 		$this->has_search = true;
 		$this->search     = $search;
 
@@ -365,7 +367,7 @@ final class DataView {
 	 *
 	 * @return self The data view instance.
 	 */
-	public function disable_search() : self {
+	public function disable_search(): self {
 		$this->has_search = false;
 		$this->search     = '';
 
@@ -381,7 +383,7 @@ final class DataView {
 	 *
 	 * @return self The dataview.
 	 */
-	public function sort( ?Sort $sort ) : self {
+	public function sort( ?Sort $sort ): self {
 		$this->sort = $sort;
 
 		return $this;
@@ -394,7 +396,7 @@ final class DataView {
 	 *
 	 * @return array The data for a WordPress DataViews component.
 	 */
-	public function to_array() : array {
+	public function to_array(): array {
 		return [
 			'search'           => $this->has_search,
 			'supportedLayouts' => $this->supported_layouts(),
@@ -414,7 +416,7 @@ final class DataView {
 	 * @since $ver$
 	 * @return string The javascript object.
 	 */
-	public function to_js( bool $is_pretty = false ) : string {
+	public function to_js( bool $is_pretty = false ): string {
 		$flags = JSON_THROW_ON_ERROR;
 		if ( $is_pretty ) {
 			$flags |= JSON_PRETTY_PRINT;
@@ -423,7 +425,7 @@ final class DataView {
 		try {
 			return preg_replace_callback(
 				'/\"__RAW__(.*?)__ENDRAW__\"/s',
-				static fn( array $matches ) : string => stripslashes( $matches[1] ),
+				static fn( array $matches ): string => stripslashes( $matches[1] ),
 				json_encode( $this->to_array(), $flags ),
 			);
 		} catch ( JsonException $e ) {
@@ -443,7 +445,7 @@ final class DataView {
 	 *
 	 * @return self The dataview with the view action.
 	 */
-	public function viewable( array $fields, string $label = 'View' ) : self {
+	public function viewable( array $fields, string $label = 'View' ): self {
 		$this->add_view_fields( ...$fields );
 
 		$actions       = $this->actions ? iterator_to_array( $this->actions ) : [];
@@ -472,7 +474,7 @@ final class DataView {
 	 *
 	 * @return self The dataview with a delete action.
 	 */
-	public function deletable( string $label = 'Delete', ?callable $callback = null ) : self {
+	public function deletable( string $label = 'Delete', ?callable $callback = null ): self {
 		if (
 			! $this->data_source instanceof MutableDataSource
 			|| ! $this->data_source->can_delete()
@@ -510,7 +512,7 @@ final class DataView {
 	 *
 	 * @param Field ...$fields The fields.
 	 */
-	private function add_view_fields( Field ...$fields ) : void {
+	private function add_view_fields( Field ...$fields ): void {
 		$this->view_fields = $fields;
 	}
 }

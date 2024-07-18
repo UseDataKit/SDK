@@ -15,7 +15,7 @@ final class Sort {
 	 *
 	 * @since $ver$
 	 */
-	public const ASC = 'ASC';
+	public const ASC  = 'ASC';
 	public const DESC = 'DESC';
 
 	/**
@@ -39,8 +39,8 @@ final class Sort {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $direction The direction.
 	 * @param string $field     The field name.
+	 * @param string $direction The direction.
 	 */
 	private function __construct( string $field, string $direction ) {
 		$this->direction = strtoupper( $direction );
@@ -60,7 +60,7 @@ final class Sort {
 	 * @since $ver$
 	 * @return array<string, string> The serialized sort object.
 	 */
-	public function to_array() : array {
+	public function to_array(): array {
 		return [
 			'field'     => $this->field,
 			'direction' => $this->direction,
@@ -72,12 +72,12 @@ final class Sort {
 	 *
 	 * @since $ver$
 	 *
-	 * @param array $array The array.
+	 * @param array $field_array The array.
 	 *
 	 * @return self The sort object.
 	 */
-	public static function from_array( array $array ) : self {
-		return new self( $array['field'] ?? '', $array['direction'] ?? '' );
+	public static function from_array( array $field_array ): self {
+		return new self( $field_array['field'] ?? '', $field_array['direction'] ?? '' );
 	}
 
 	/**
@@ -89,7 +89,7 @@ final class Sort {
 	 *
 	 * @return self The sort object.
 	 */
-	public static function asc( string $field ) : self {
+	public static function asc( string $field ): self {
 		return new self( $field, self::ASC );
 	}
 
@@ -102,7 +102,7 @@ final class Sort {
 	 *
 	 * @return self The sort object.
 	 */
-	public static function desc( string $field ) : self {
+	public static function desc( string $field ): self {
 		return new self( $field, self::DESC );
 	}
 }

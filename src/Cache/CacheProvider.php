@@ -15,19 +15,19 @@ interface CacheProvider {
 	 * @param mixed    $value The value to cache.
 	 * @param int|null $ttl   The time to live in seconds.
 	 */
-	public function set( string $key, $value, ?int $ttl = null ) : void;
+	public function set( string $key, $value, ?int $ttl = null ): void;
 
 	/**
 	 * Retrieves the value from the cache, or the default if no value is stored.
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $key     The key.
-	 * @param mixed  $default The default in case of a missing (or expired) cache.
+	 * @param string $key      The key.
+	 * @param mixed  $fallback The default in case of a missing (or expired) cache.
 	 *
 	 * @return mixed
 	 */
-	public function get( string $key, $default = null );
+	public function get( string $key, $fallback = null );
 
 	/**
 	 * Whether the cache contains a value for the provided key.
@@ -41,7 +41,7 @@ interface CacheProvider {
 	 *
 	 * @return bool Whether the cache contains the current key.
 	 */
-	public function has( string $key ) : bool;
+	public function has( string $key ): bool;
 
 	/**
 	 * Deletes the cache for a key.
@@ -52,7 +52,7 @@ interface CacheProvider {
 	 *
 	 * @return bool Whether the value was deleted.
 	 */
-	public function delete( string $key ) : bool;
+	public function delete( string $key ): bool;
 
 	/**
 	 * Clears the entire cache.
@@ -60,5 +60,5 @@ interface CacheProvider {
 	 * @since $ver$
 	 * @return bool Whether the clearing of the cache was successful.
 	 */
-	public function clear() : bool;
+	public function clear(): bool;
 }

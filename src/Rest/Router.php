@@ -72,7 +72,7 @@ final class Router {
 	 *
 	 * @return string The full url.
 	 */
-	public static function get_url( string $url ) : string {
+	public static function get_url( string $url ): string {
 		return rest_url( self::NAMESPACE . '/' . trim( $url, '/' ) );
 	}
 
@@ -81,52 +81,64 @@ final class Router {
 	 *
 	 * @since $ver$
 	 */
-	public function register_routes() : void {
-		register_rest_route( self::NAMESPACE, '/' . 'views/(?<id>[^/]+)$', [
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_view' ],
-				'permission_callback' => [ $this, 'get_view_permissions_check' ],
-				'args'                => [
-					'search'  => [
-						'default'           => '',
-						'sanitize_callback' => fn( $value ) : string => (string) $value,
-					],
-					'filters' => [
-						'default'           => [],
-						'validate_callback' => fn( $value ) => is_array( $value ),
-					],
-					'page'    => [
-						'default'           => 1,
-						'validate_callback' => fn( $value ) => is_numeric( $value ) && $value > 0,
-					],
-					'perPage' => [
-						'default'           => 100,
-						'validate_callback' => fn( $value ) => is_int( $value ) && $value > 0,
-					],
-					'sort'    => [
-						'default'           => [],
-						'validate_callback' => fn( $value ) => is_array( $value ),
+	public function register_routes(): void {
+		register_rest_route(
+            self::NAMESPACE,
+            '/views/(?<id>[^/]+)$',
+            [
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_view' ],
+					'permission_callback' => [ $this, 'get_view_permissions_check' ],
+					'args'                => [
+						'search'  => [
+							'default'           => '',
+							'sanitize_callback' => fn( $value ): string => (string) $value,
+						],
+						'filters' => [
+							'default'           => [],
+							'validate_callback' => fn( $value ) => is_array( $value ),
+						],
+						'page'    => [
+							'default'           => 1,
+							'validate_callback' => fn( $value ) => is_numeric( $value ) && $value > 0,
+						],
+						'perPage' => [
+							'default'           => 100,
+							'validate_callback' => fn( $value ) => is_int( $value ) && $value > 0,
+						],
+						'sort'    => [
+							'default'           => [],
+							'validate_callback' => fn( $value ) => is_array( $value ),
+						],
 					],
 				],
-			],
-		] );
+			]
+        );
 
-		register_rest_route( self::NAMESPACE, '/' . 'views/(?<view_id>[^/]+)/data/(?<data_id>[^/]+)', [
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this->view_controller, 'get_item' ],
-				'permission_callback' => [ $this->view_controller, 'can_view' ],
-			],
-		] );
+		register_rest_route(
+            self::NAMESPACE,
+            '/views/(?<view_id>[^/]+)/data/(?<data_id>[^/]+)',
+            [
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this->view_controller, 'get_item' ],
+					'permission_callback' => [ $this->view_controller, 'can_view' ],
+				],
+			]
+        );
 
-		register_rest_route( self::NAMESPACE, '/' . 'views/(?<view_id>[^/]+)/data', [
-			[
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [ $this, 'delete_view_data' ],
-				'permission_callback' => [ $this, 'delete_view_data_permissions_check' ],
-			],
-		] );
+		register_rest_route(
+            self::NAMESPACE,
+            '/views/(?<view_id>[^/]+)/data',
+            [
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'delete_view_data' ],
+					'permission_callback' => [ $this, 'delete_view_data_permissions_check' ],
+				],
+			]
+        );
 	}
 
 	/**
@@ -135,8 +147,8 @@ final class Router {
 	 * @since $ver$
 	 * @return bool
 	 */
-	public function get_view_permissions_check() : bool {
-		// todo
+	public function get_view_permissions_check(): bool {
+		// todo: Add permissions checks.
 		return true;
 	}
 
@@ -149,7 +161,7 @@ final class Router {
 	 *
 	 * @return bool
 	 */
-	public function delete_view_data_permissions_check( WP_REST_Request $request ) : bool {
+	public function delete_view_data_permissions_check( WP_REST_Request $request ): bool {
 		try {
 			$data_view   = $this->data_view_repository->get( $request->get_param( 'view_id' ) ?? '' );
 			$data_source = $data_view->data_source();
@@ -224,7 +236,7 @@ final class Router {
 			}
 
 			$data_ids = $request->get_param( 'id' ) ?? [];
-			$data_source->delete_data_by_id( ... $data_ids );
+			$data_source->delete_data_by_id( ...$data_ids );
 
 			return [ 'id' => $data_ids ];
 		} catch ( \Exception $e ) {
@@ -238,7 +250,7 @@ final class Router {
 	 * @since $ver$
 	 * @return self The router.
 	 */
-	public static function get_instance( DataViewRepository $repository ) : self {
+	public static function get_instance( DataViewRepository $repository ): self {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self( $repository );
 		}

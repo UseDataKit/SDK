@@ -19,8 +19,8 @@ final class Action {
 	 *
 	 * @since $ver$
 	 */
-	private const TYPE_URL = 'url';
-	private const TYPE_AJAX = 'ajax';
+	private const TYPE_URL   = 'url';
+	private const TYPE_AJAX  = 'ajax';
 	private const TYPE_MODAL = 'modal';
 
 	/**
@@ -102,7 +102,6 @@ final class Action {
 	 * @see   Action::modal() for an action that opens a modal.
 	 * @see   Action::url() for an action that opens a url.
 	 * @see   Action::ajax() for an action that is performed via an ajax request.
-	 *
 	 */
 	private function __construct( string $id, string $label ) {
 		$this->id    = $id;
@@ -121,7 +120,7 @@ final class Action {
 	 *
 	 * @return self The action instance.
 	 */
-	public static function modal( string $id, string $label, string $url, bool $is_header_hidden = false ) : self {
+	public static function modal( string $id, string $label, string $url, bool $is_header_hidden = false ): self {
 		$action                   = new self( $id, $label );
 		$action->type             = self::TYPE_MODAL;
 		$action->is_header_hidden = $is_header_hidden;
@@ -142,7 +141,7 @@ final class Action {
 	 *
 	 * @return self The action instance.
 	 */
-	public static function url( string $id, string $label, string $url ) : self {
+	public static function url( string $id, string $label, string $url ): self {
 		$action       = new self( $id, $label );
 		$action->type = self::TYPE_URL;
 
@@ -159,7 +158,7 @@ final class Action {
 	 * @param string $id                 The unique ID of the action.
 	 * @param string $label              The label of the action.
 	 * @param string $url                The URL to open inside the modal.
-	 * @param string $method             The method type to use for the AJAX call (GET, POST, PUT, etc.)
+	 * @param string $method             The method type to use for the AJAX call (GET, POST, PUT, etc.).
 	 * @param array  $params             The parameters passed along to the URL.
 	 * @param bool   $use_single_request Whether there should be a single ajax call on a BULK action. Will perform a
 	 *                                   call per item when set to `false`.
@@ -173,7 +172,7 @@ final class Action {
 		string $method = 'GET',
 		array $params = [],
 		bool $use_single_request = false
-	) : self {
+	): self {
 		$action       = new self( $id, $label );
 		$action->type = self::TYPE_AJAX;
 
@@ -194,7 +193,7 @@ final class Action {
 	 *
 	 * @return self The action instance.
 	 */
-	public function confirm( ?string $message ) : self {
+	public function confirm( ?string $message ): self {
 		$action                     = clone $this;
 		$action->context['confirm'] = $message;
 
@@ -214,7 +213,7 @@ final class Action {
 	 *
 	 * @return self The action instance.
 	 */
-	public function primary( string $icon ) : self {
+	public function primary( string $icon ): self {
 		$action       = clone $this;
 		$action->icon = $icon;
 
@@ -228,7 +227,7 @@ final class Action {
 	 *
 	 * @return self The action instance.
 	 */
-	public function secondary() : self {
+	public function secondary(): self {
 		$action       = clone $this;
 		$action->icon = '';
 
@@ -242,7 +241,7 @@ final class Action {
 	 *
 	 * @return self The action instance.
 	 */
-	public function destructive() : self {
+	public function destructive(): self {
 		$action                 = clone $this;
 		$action->is_destructive = true;
 
@@ -256,7 +255,7 @@ final class Action {
 	 *
 	 * @return self The action instance.
 	 */
-	public function not_destructive() : self {
+	public function not_destructive(): self {
 		$action                 = clone $this;
 		$action->is_destructive = false;
 
@@ -270,7 +269,7 @@ final class Action {
 	 *
 	 * @return self The action instance.
 	 */
-	public function bulk() : self {
+	public function bulk(): self {
 		$action          = clone $this;
 		$action->is_bulk = true;
 
@@ -284,7 +283,7 @@ final class Action {
 	 *
 	 * @return self The action instance.
 	 */
-	public function single() : self {
+	public function single(): self {
 		$action          = clone $this;
 		$action->is_bulk = false;
 
@@ -297,18 +296,18 @@ final class Action {
 	 * @since $ver$
 	 * @return array The serialized state.
 	 */
-	public function to_array() : array {
+	public function to_array(): array {
 		$result = [
 			'id'            => $this->id,
 			'label'         => $this->label,
-			'isPrimary'     => $this->icon !== '',
+			'isPrimary'     => '' !== $this->icon,
 			'isDestructive' => $this->is_destructive,
 			'icon'          => $this->icon,
 			'callback'      => $this->js_callback(),
 			'supportsBulk'  => $this->is_bulk,
 		];
 
-		if ( $this->type === self::TYPE_MODAL ) {
+		if ( self::TYPE_MODAL === $this->type ) {
 			$result['RenderModal']     = $this->js_render_modal();
 			$result['hideModalHeader'] = $this->is_header_hidden;
 		}
@@ -325,8 +324,8 @@ final class Action {
 	 * @since $ver$
 	 * @return string|null The javascript callback.
 	 */
-	private function js_callback() : ?string {
-		if ( $this->type === self::TYPE_MODAL ) {
+	private function js_callback(): ?string {
+		if ( self::TYPE_MODAL === $this->type ) {
 			return null;
 		}
 
@@ -349,8 +348,8 @@ final class Action {
 	 * @since $ver$
 	 * @return string|null The javascript settings.
 	 */
-	private function js_render_modal() : ?string {
-		if ( $this->type !== self::TYPE_MODAL ) {
+	private function js_render_modal(): ?string {
+		if ( self::TYPE_MODAL !== $this->type ) {
 			return null;
 		}
 
@@ -373,7 +372,7 @@ final class Action {
 	 * @since $ver$
 	 * @return array The context object.
 	 */
-	private function context() : array {
+	private function context(): array {
 		return array_merge(
 			$this->context,
 			[

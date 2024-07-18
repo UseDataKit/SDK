@@ -46,7 +46,7 @@ final class ArrayCacheProvider implements CacheProvider {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function set( string $key, $value, ?int $ttl = null ) : void {
+	public function set( string $key, $value, ?int $ttl = null ): void {
 		$time = $ttl
 			? ( $this->clock->now()->getTimestamp() + $ttl )
 			: null;
@@ -58,23 +58,23 @@ final class ArrayCacheProvider implements CacheProvider {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function get( string $key, $default = null ) {
+	public function get( string $key, $fallback = null ) {
 		$item = $this->items[ $key ] ?? [];
 
 		if ( $this->is_expired( $item ) ) {
 			unset( $this->items[ $key ] );
 
-			return $default;
+			return $fallback;
 		}
 
-		return $item['value'] ?? $default;
+		return $item['value'] ?? $fallback;
 	}
 
 	/**
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function has( string $key ) : bool {
+	public function has( string $key ): bool {
 		if (
 			isset( $this->items[ $key ] )
 			&& ! $this->is_expired( $this->items[ $key ] )
@@ -91,7 +91,7 @@ final class ArrayCacheProvider implements CacheProvider {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function delete( string $key ) : bool {
+	public function delete( string $key ): bool {
 		unset( $this->items[ $key ] );
 
 		return true;
@@ -101,7 +101,7 @@ final class ArrayCacheProvider implements CacheProvider {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function clear() : bool {
+	public function clear(): bool {
 		$this->items = [];
 
 		return true;
@@ -116,7 +116,7 @@ final class ArrayCacheProvider implements CacheProvider {
 	 *
 	 * @return bool Whether the cache is expired.
 	 */
-	private function is_expired( array $item ) : bool {
+	private function is_expired( array $item ): bool {
 		return (
 			( $item['time'] ?? null )
 			&& $this->clock->now()->getTimestamp() > $item['time']
