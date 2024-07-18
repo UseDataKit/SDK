@@ -43,12 +43,12 @@
 	"scripts": {
 		"test": "./vendor/bin/phpunit",
 		"analyse": "./vendor/bin/phpstan analyse",
-		"linter": "vendor/bin/phplint --no-progress --no-cache -v"
-	},
-	"post-install-cmd": [
-		"composer dump-autoload -o"
-	],
-	"post-update-cmd": [
-		"composer dump-autoload -o"
-	]
+		"linter": "vendor/bin/phplint --no-progress --no-cache -v",
+		"post-install-cmd": [
+			"composer dump-autoload -o"
+		],
+		"post-update-cmd": [
+			"composer dump-autoload -o"
+		]
+	}
 }
