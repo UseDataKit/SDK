@@ -2,7 +2,7 @@
 
 DataKit is a PHP-based abstraction
 around [`@wordpress/dataviews`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/).
-It provides an easy-to-understand way of composing dataviews based applications, with a set of default field types and
+It provides an easy-to-understand way of composing DataViews-based applications, with a set of default field types and
 rendering.
 
 ## Folder structure
@@ -78,15 +78,16 @@ DataKit provides a fluent PHP API for creating `DataView` objects. A `DataView` 
 
 DataViews are very powerful out-of-the box. It features:
 
-- [Filtering](docs/Fields/using-fields.md)
+- [Filtering](docs/Fields/20-enum-field.md#filtering)
 - Searching
 - Sorting
 - (fast) Pagination
 - (bulk) Actions (with View & Delete built-in)
 - Different Field types
 
-DataKit is also built to be extended by you with ease. You can create your own `DataSource` or invent your own `Field`.
-Please take a look at our [Documentation](docs) to learn more about these concepts.
+DataKit is also built to be extended by you with ease. You can [create your own `DataSource`](https://github.com/GravityKit/DataKit/blob/main/docs/Data-sources/10-create-a-data-source.md) or [invent your own `Field`](https://github.com/GravityKit/DataKit/blob/main/docs/Fields/10-using-fields.md).
+
+**Please take a look at our [Documentation](docs) to learn more.**
 
 ## Be part of the Community
 
