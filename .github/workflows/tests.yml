@@ -1,0 +1,44 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: [ '7.4', '8.0','8.1', '8.2', '8.3' ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+      - name: Check PHP Version
+        run: php -v
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-build-${{ matrix.php-versions }}-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ matrix.php-versions }}-
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        # We run `--no-scripts` to avoid using Strauss during unit tests
+        run: composer install --prefer-dist --no-progress --no-scripts
+      # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
+      # Docs: https://getcomposer.org/doc/articles/scripts.md
+
+      - name: Run linter
+        run: composer run-script linter
+
+      - name: Run test suite
+        run: composer run-script test
