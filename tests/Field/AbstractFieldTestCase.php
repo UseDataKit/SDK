@@ -50,13 +50,13 @@ abstract class AbstractFieldTestCase extends TestCase {
 	}
 
 	/**
-	 * Test case for {@see Field::toArray()}.
+	 * Test case for {@see Field::to_array()}.
 	 *
 	 * @since $ver$
 	 */
 	public function testToArray() : Field {
 		$field       = $this->createField( 'field_id', 'Field header' );
-		$field_array = $field->toArray();
+		$field_array = $field->to_array();
 
 		self::assertSame( 'field_id', $field_array['id'] );
 		self::assertSame( 'Field header', $field_array['header'] );
@@ -78,11 +78,11 @@ abstract class AbstractFieldTestCase extends TestCase {
 		$not_sortable = $hideable->not_sortable();
 		$sortable     = $not_sortable->sortable();
 
-		self::assertTrue( $field->toArray()['enableHiding'] );
-		self::assertTrue( $hideable->toArray()['enableHiding'] );
-		self::assertTrue( $sortable->toArray()['enableSorting'] );
-		self::assertFalse( $not_hideable->toArray()['enableHiding'] );
-		self::assertFalse( $not_sortable->toArray()['enableSorting'] );
+		self::assertTrue( $field->to_array()['enableHiding'] );
+		self::assertTrue( $hideable->to_array()['enableHiding'] );
+		self::assertTrue( $sortable->to_array()['enableSorting'] );
+		self::assertFalse( $not_hideable->to_array()['enableHiding'] );
+		self::assertFalse( $not_sortable->to_array()['enableSorting'] );
 	}
 
 	/**

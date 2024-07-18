@@ -2,7 +2,7 @@
 
 namespace DataKit\DataViews\DataView;
 
-use DataKit\DataViews\DataViewsException;
+use DataKit\DataViews\DataViewException;
 use Exception;
 
 /**
@@ -10,7 +10,7 @@ use Exception;
  *
  * @since $ver$
  */
-final class DataViewNotFoundException extends DataViewsException {
+final class DataViewNotFoundException extends DataViewException {
 	/**
 	 * @inheritDoc
 	 * @since $ver$

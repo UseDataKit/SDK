@@ -55,7 +55,7 @@ The following methods are available on any `Field`:
 
 - `->sortable()` (default) Makes entries sortable (Ascending / Descending) on this Field.
 - `->not_sortable()` Removes the ability to sort entries on this field.
-- `->hidable()` (default) Allows the field to be hidden on the view.
+- `->hideable()` (default) Allows the field to be hidden on the view.
 - `->always_visible()` Makes this field always visible on the view; it cannot be hidden.
 - `->visible()` (default) Will show the field on initial load.
 - `->hidden()` Will not show the field on the initial load.

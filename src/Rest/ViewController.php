@@ -82,6 +82,7 @@ final class ViewController {
 		);
 
 		// Scope rendering of template to avoid class leaking.
+		// @phpstan-ignore closure.unusedUse
 		( static function () use ( $template, $data_item ) {
 			require $template;
 		} )();

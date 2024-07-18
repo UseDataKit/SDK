@@ -9,5 +9,5 @@ use RuntimeException;
  *
  * @since $ver$
  */
-class DataViewsException extends RuntimeException {
+class DataViewException extends RuntimeException {
 }

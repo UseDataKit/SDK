@@ -36,7 +36,7 @@ abstract class EnumObject {
 	 *
 	 * @param string $case The enum case.
 	 */
-	private function __construct( string $case ) {
+	final private function __construct( string $case ) {
 		if ( ! isset( self::cases()[ $case ] ) ) {
 			throw new \InvalidArgumentException( 'No valid enum option provided.' );
 		}
@@ -53,7 +53,7 @@ abstract class EnumObject {
 	 *
 	 * @return static|null The enum is valid.
 	 */
-	public static function tryFrom( string $case ) {
+	final public static function tryFrom( string $case ) {
 		try {
 			return new static ( $case );
 		} catch ( \InvalidArgumentException $e ) {
@@ -71,7 +71,7 @@ abstract class EnumObject {
 	 *
 	 * @return static The enum object.
 	 */
-	public static function __callStatic( string $method, array $_ ) {
+	final public static function __callStatic( string $method, array $_ ) {
 		$type = self::tryFrom( $method );
 
 		if ( ! $type ) {

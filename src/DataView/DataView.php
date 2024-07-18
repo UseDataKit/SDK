@@ -288,7 +288,7 @@ final class DataView {
 
 		foreach ( $this->directory_fields as $field ) {
 			$fields[] = array_filter(
-				$field->toArray(),
+				$field->to_array(),
 				static fn( $value ) => ! is_null( $value ),
 			);
 		}
@@ -331,8 +331,8 @@ final class DataView {
 	 *
 	 * @since $ver$
 	 *
-	 * @param int      $per_page The results per page.
-	 * @param int|null $page     The current page.
+	 * @param int $per_page The results per page.
+	 * @param int $page     The current page.
 	 *
 	 * @return self The dataview.
 	 */

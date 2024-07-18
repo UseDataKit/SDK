@@ -16,7 +16,7 @@ final class Pagination {
 	 * The current page.
 	 *
 	 * @since $ver$
-	 * @var int|mixed
+	 * @var int
 	 */
 	private int $page;
 
@@ -24,7 +24,7 @@ final class Pagination {
 	 * The amount of results per page.
 	 *
 	 * @since $ver$
-	 * @var int|mixed
+	 * @var int
 	 */
 	private int $per_page;
 

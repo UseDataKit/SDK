@@ -42,8 +42,8 @@ final class EnumField extends FilterableField {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function toArray() : array {
-		return array_merge( parent::toArray(), [
+	public function to_array() : array {
+		return array_merge( parent::to_array(), [
 			'elements' => array_values( $this->elements ),
 		] );
 	}

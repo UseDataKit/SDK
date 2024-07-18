@@ -7,6 +7,7 @@ use DataKit\DataViews\DataView\Filters;
 use DataKit\DataViews\DataView\Sort;
 use InvalidArgumentException;
 use JsonException;
+use RuntimeException;
 
 /**
  * A data sources that wraps a different data source in a cache layer.
@@ -181,7 +182,12 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @since $ver$
 	 */
 	public function search_by( string $search ) : self {
-		$cached        = parent::search_by( $search );
+		$cached = parent::search_by( $search );
+
+		if ( ! $cached instanceof self ) {
+			throw new RuntimeException( 'Wrong data source provided' );
+		}
+
 		$cached->inner = $this->inner->search_by( $search );
 
 		return $cached;
@@ -192,7 +198,11 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @since $ver$
 	 */
 	public function sort_by( ?Sort $sort ) : self {
-		$cached        = parent::sort_by( $sort );
+		$cached = parent::sort_by( $sort );
+		if ( ! $cached instanceof self ) {
+			throw new RuntimeException( 'Wrong data source provided' );
+		}
+
 		$cached->inner = $this->inner->sort_by( $sort );
 
 		return $cached;

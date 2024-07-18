@@ -97,7 +97,7 @@ final class DateTimeField extends Field {
 
 		try {
 			$datetime = $this->from_format
-				? DateTimeImmutable::createFromFormat( $this->from_format ?? '', $value, $this->from_timezone )
+				? DateTimeImmutable::createFromFormat( $this->from_format, $value, $this->from_timezone )
 				: new DateTimeImmutable( $value, $this->from_timezone );
 		} catch ( Exception $e ) {
 			$datetime = false;

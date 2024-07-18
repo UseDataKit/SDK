@@ -9,7 +9,7 @@ use DataKit\DataViews\DataView\DataViewRepository;
  *
  * @since $ver$
  */
-final class DataviewShortcode {
+final class DataViewShortcode {
 	/**
 	 * The name of the shortcode.
 	 *

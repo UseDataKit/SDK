@@ -42,7 +42,7 @@ final class EnumFieldTest extends AbstractFieldTestCase {
 	 */
 	public function testToArray() : Field {
 		$field       = parent::testToArray();
-		$field_array = $field->toArray();
+		$field_array = $field->to_array();
 
 		self::assertNull( $field_array['filterBy'] );
 		self::assertSame(

@@ -28,6 +28,10 @@ final class Filters implements IteratorAggregate {
 	 * @param Filter ...$filters The filters.
 	 */
 	private function __construct( Filter ...$filters ) {
+		if ( ! $filters ) {
+			throw new InvalidArgumentException( 'No filters provided.' );
+		}
+
 		$this->filters = $filters;
 	}
 
@@ -41,10 +45,6 @@ final class Filters implements IteratorAggregate {
 	 * @return self The filter collection.
 	 */
 	public static function of( Filter ...$filters ) : self {
-		if ( ! $filters ) {
-			throw new InvalidArgumentException( 'No filters provided.' );
-		}
-
 		return new self( ...$filters );
 	}
 
@@ -70,7 +70,7 @@ final class Filters implements IteratorAggregate {
 	 * Serializes the collection to an array.
 	 *
 	 * @since $ver$
-	 * @return array[array{field: string, operator: string, value: string}] The fields as an array.
+	 * @return non-empty-array<array>>The fields as an array.
 	 */
 	public function to_array() : array {
 		return array_map(
@@ -82,7 +82,7 @@ final class Filters implements IteratorAggregate {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
-	 * @return ArrayIterator|Field[] The field iterator.
+	 * @return ArrayIterator&iterable<Field> The field iterator.
 	 */
 	public function getIterator() : ArrayIterator {
 		return new ArrayIterator( $this->filters );

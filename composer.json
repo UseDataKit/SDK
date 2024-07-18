@@ -28,6 +28,6 @@
 		}
 	},
 	"require-dev": {
-		"phpunit/phpunit": "~8.5"
-	}
+		"phpunit/phpunit": "~8.5",
+		"szepeviktor/phpstan-wordpress": "^1.3"}
 }

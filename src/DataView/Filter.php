@@ -129,7 +129,7 @@ final class Filter {
 	 * Serializes a Filter to an array.
 	 *
 	 * @since $ver$
-	 * @return array{field: string, operator: string, value: string} The filter array.
+	 * @return non-empty-array<array{field: string, operator: string, value: string}> The filter array.
 	 */
 	public function to_array() : array {
 		return [

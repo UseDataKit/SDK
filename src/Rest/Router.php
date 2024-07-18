@@ -58,6 +58,7 @@ final class Router {
 		$this->data_view_repository = $data_view_repository;
 		$this->view_controller      = new ViewController( $data_view_repository );
 
+		// @phpstan-ignore return.missing
 		add_filter( 'rest_api_init', [ $this, 'register_routes' ] );
 	}
 
@@ -79,7 +80,6 @@ final class Router {
 	 * Registers the REST endpoints.
 	 *
 	 * @since $ver$
-	 * @return void
 	 */
 	public function register_routes() : void {
 		register_rest_route( self::NAMESPACE, '/' . 'views/(?<id>[^/]+)$', [

@@ -3,5 +3,6 @@ composer.lock
 .DS_Store
 node_modules
 phpunit.xml
+phpstan.neon
 .phpunit.cache
 .phpunit.result.cache

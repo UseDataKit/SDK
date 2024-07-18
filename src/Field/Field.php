@@ -11,6 +11,7 @@ use JsonException;
  * @link  https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/#fields-object
  *
  * @since $ver$
+ * @phpstan-consistent-constructor
  */
 abstract class Field {
 	/**
@@ -318,9 +319,9 @@ abstract class Field {
 	 * Returns the field as an array object.
 	 *
 	 * @since $ver$
-	 * @return array[] The field configuration.
+	 * @return array{id: string, header: string, render: string, enableHiding: bool, enableSorting: bool} The field configuration.
 	 */
-	public function toArray() : array {
+	public function to_array() : array {
 		return [
 			'id'            => $this->id(),
 			'header'        => $this->header(),

@@ -2,14 +2,14 @@
 
 namespace DataKit\DataViews\Data\Exception;
 
-use DataKit\DataViews\DataViewsException;
+use DataKit\DataViews\DataViewException;
 
 /**
  * Thrown when the data source could not be found.
  *
  * @since $ver$
  */
-final class DataSourceNotFoundException extends DataViewsException {
+final class DataSourceNotFoundException extends DataViewException {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
