@@ -140,6 +140,7 @@ final class FilterTest extends TestCase {
 		$this->expectException( 'BadMethodCallException' );
 		$this->expectExceptionMessage( 'Static method "invalid" not found.' );
 
+		// @phpstan-ignore staticMethod.notFound
 		Filter::invalid( 'field', 'value' );
 	}
 

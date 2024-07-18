@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for {@see BaseDataSource}
+ *
  * @since $ver$
  */
 final class BaseDataSourceTest extends TestCase {
@@ -55,6 +56,7 @@ final class BaseDataSourceTest extends TestCase {
 
 	/**
 	 * Test case for {@see BaseDataSource::sort_by()}
+	 *
 	 * @since $ver$
 	 */
 	public function test_sort_by() : void {
@@ -64,13 +66,17 @@ final class BaseDataSourceTest extends TestCase {
 
 		self::assertNotSame( $source, $this->data_source );
 		self::assertNotSame( $source, $removed );
+		// @phpstan-ignore property.notFound
 		self::assertSame( $source->sort, $sort );
+		// @phpstan-ignore property.notFound
 		self::assertNull( $removed->sort );
+		// @phpstan-ignore property.protected
 		self::assertNull( $this->data_source->sort );
 	}
 
 	/**
 	 * Test case for {@see BaseDataSource::filter_by()}
+	 *
 	 * @since $ver$
 	 */
 	public function test_filter_by() : void {
@@ -82,8 +88,11 @@ final class BaseDataSourceTest extends TestCase {
 
 		self::assertNotSame( $source, $this->data_source );
 		self::assertNotSame( $source, $removed );
+		// @phpstan-ignore property.protected
 		self::assertSame( $source->filters, $filters );
+		// @phpstan-ignore property.protected
 		self::assertNull( $removed->filters );
+		// @phpstan-ignore property.protected
 		self::assertNull( $this->data_source->filters );
 	}
 }

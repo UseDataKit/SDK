@@ -14,11 +14,14 @@ namespace DataKit\DataViews\DataView;
  */
 final class View extends EnumObject {
 	/**
-	 * The possible view types.
-	 *
+	 * @inheritDoc
 	 * @since $ver$
 	 */
-	private const Table = 'table';
-	private const Grid = 'grid';
-	private const List = 'list';
+	protected static function cases() : array {
+		return [
+			'Table' => 'table',
+			'Grid'  => 'grid',
+			'List'  => 'list',
+		];
+	}
 }

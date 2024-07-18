@@ -29,7 +29,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * The form object.
 	 *
 	 * @since $ver$
-	 * @var array[]
+	 * @var array<string|int, mixed>
 	 */
 	private array $form;
 
@@ -103,7 +103,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ) : array {
-		$entry = $this->entries[ $id ] ?? GFAPI::get_entry( $id );
+		$entry = $this->entries[ $id ] ?? GFAPI::get_entry( (int) $id );
 		if ( ! is_array( $entry ) ) {
 			return [];
 		}
@@ -219,7 +219,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * Returns the top level filters for the Gravity Forms API.
 	 *
 	 * @since $ver$
-	 * @return array[] The filters.
+	 * @return array<string, string> The filters.
 	 */
 	private function top_level_filters() : array {
 		$filters = [];

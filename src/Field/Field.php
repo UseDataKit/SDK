@@ -319,7 +319,7 @@ abstract class Field {
 	 * Returns the field as an array object.
 	 *
 	 * @since $ver$
-	 * @return array{id: string, header: string, render: string, enableHiding: bool, enableSorting: bool} The field configuration.
+	 * @return array<string, mixed> The field configuration.
 	 */
 	public function to_array() : array {
 		return [

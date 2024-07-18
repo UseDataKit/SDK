@@ -3,14 +3,14 @@
 namespace DataKit\DataViews\DataView;
 
 use ArrayIterator;
-use DataKit\DataViews\Field\Field;
-use InvalidArgumentException;
 use IteratorAggregate;
 
 /**
  * Represents a collection of fields.
  *
  * @since $ver$
+ * @phpstan-import-type FilterShape from Filter
+ * @implements IteratorAggregate<Filter>
  */
 final class Filters implements IteratorAggregate {
 	/**
@@ -25,13 +25,9 @@ final class Filters implements IteratorAggregate {
 	 *
 	 * @since $ver$
 	 *
-	 * @param Filter ...$filters The filters.
+	 * @param Filter ...$filters More filters.
 	 */
 	private function __construct( Filter ...$filters ) {
-		if ( ! $filters ) {
-			throw new InvalidArgumentException( 'No filters provided.' );
-		}
-
 		$this->filters = $filters;
 	}
 
@@ -40,12 +36,13 @@ final class Filters implements IteratorAggregate {
 	 *
 	 * @since $ver$
 	 *
-	 * @param Filter ...$filters The filters.
+	 * @param Filter $filter     The primary filter.
+	 * @param Filter ...$filters More filters.
 	 *
 	 * @return self The filter collection.
 	 */
-	public static function of( Filter ...$filters ) : self {
-		return new self( ...$filters );
+	public static function of( Filter $filter, Filter ...$filters ) : self {
+		return new self( $filter, ...$filters );
 	}
 
 	/**
@@ -70,7 +67,7 @@ final class Filters implements IteratorAggregate {
 	 * Serializes the collection to an array.
 	 *
 	 * @since $ver$
-	 * @return non-empty-array<array>>The fields as an array.
+	 * @return array<FilterShape>The fields as an array.
 	 */
 	public function to_array() : array {
 		return array_map(
@@ -82,7 +79,6 @@ final class Filters implements IteratorAggregate {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
-	 * @return ArrayIterator&iterable<Field> The field iterator.
 	 */
 	public function getIterator() : ArrayIterator {
 		return new ArrayIterator( $this->filters );

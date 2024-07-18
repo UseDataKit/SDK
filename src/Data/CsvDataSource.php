@@ -172,7 +172,7 @@ final class CsvDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function get_fields() : array {
-		return $this->file()->current() ?? [];
+		return $this->file()->current() ?: [];
 	}
 
 	/**

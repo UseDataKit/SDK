@@ -72,7 +72,7 @@ final class Sort {
 	 *
 	 * @since $ver$
 	 *
-	 * @param array{field: string, direction: string} $array The array.
+	 * @param array $array The array.
 	 *
 	 * @return self The sort object.
 	 */

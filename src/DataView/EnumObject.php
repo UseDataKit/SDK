@@ -3,7 +3,6 @@
 namespace DataKit\DataViews\DataView;
 
 use InvalidArgumentException;
-use ReflectionClass;
 
 /**
  * An enum object backed by a string.
@@ -25,9 +24,7 @@ abstract class EnumObject {
 	 * @since $ver$
 	 * @return array<string, string> Cases as key => value.
 	 */
-	protected static function cases() : array {
-		return ( new ReflectionClass( static::class ) )->getConstants();
-	}
+	abstract protected static function cases() : array;
 
 	/**
 	 * Create the enum object.
@@ -37,11 +34,11 @@ abstract class EnumObject {
 	 * @param string $case The enum case.
 	 */
 	final private function __construct( string $case ) {
-		if ( ! isset( self::cases()[ $case ] ) ) {
+		if ( ! isset( static::cases()[ $case ] ) ) {
 			throw new \InvalidArgumentException( 'No valid enum option provided.' );
 		}
 
-		$this->value = self::cases()[ $case ];
+		$this->value = static::cases()[ $case ];
 	}
 
 	/**

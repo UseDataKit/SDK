@@ -18,16 +18,19 @@ namespace DataKit\DataViews\DataView;
  */
 final class Operator extends EnumObject {
 	/**
-	 * The possible operator types.
-	 *
+	 * @inheritDoc
 	 * @since $ver$
 	 */
-	private const is = 'is';
-	private const isNot = 'isNot';
-	private const isAny = 'isAny';
-	private const isAll = 'isAll';
-	private const isNone = 'isNone';
-	private const isNotAll = 'isNotAll';
+	protected static function cases() : array {
+		return [
+			'is'       => 'is',
+			'isNot'    => 'isNot',
+			'isAny'    => 'isAny',
+			'isAll'    => 'isAll',
+			'isNone'   => 'isNone',
+			'isNotAll' => 'isNotAll',
+		];
+	}
 
 	/**
 	 * A list of operators applicable to single values.

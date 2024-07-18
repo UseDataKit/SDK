@@ -16,6 +16,8 @@ use InvalidArgumentException;
  * @method static self isAll( string $field, array $value )
  * @method static self isNone( string $field, array $value )
  * @method static self isNotAll( string $field, array $value )
+ *
+ * @phpstan-type FilterShape array{field: string, operator: string, value: string}
  */
 final class Filter {
 	/**
@@ -129,7 +131,7 @@ final class Filter {
 	 * Serializes a Filter to an array.
 	 *
 	 * @since $ver$
-	 * @return non-empty-array<array{field: string, operator: string, value: string}> The filter array.
+	 * @return FilterShape The filter array.
 	 */
 	public function to_array() : array {
 		return [

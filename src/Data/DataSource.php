@@ -73,7 +73,7 @@ interface DataSource extends Countable {
 	 *
 	 * @param null|Filters $filters The filter.
 	 *
-	 * @return DataSource The data source.
+	 * @return DataSource|static The data source.
 	 */
 	public function filter_by( ?Filters $filters );
 
@@ -84,7 +84,7 @@ interface DataSource extends Countable {
 	 *
 	 * @param string $search The search query.
 	 *
-	 * @return DataSource The data source.
+	 * @return DataSource|static The data source.
 	 */
 	public function search_by( string $search );
 
@@ -95,7 +95,7 @@ interface DataSource extends Countable {
 	 *
 	 * @param Sort|null $sort The sorting.
 	 *
-	 * @return DataSource The data source.
+	 * @return DataSource|static The data source.
 	 */
 	public function sort_by( ?Sort $sort );
 }
