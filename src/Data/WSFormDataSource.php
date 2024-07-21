@@ -16,9 +16,9 @@ final class WSFormDataSource extends BaseDataSource implements MutableDataSource
 	 * The submit export object.
 	 *
 	 * @since $ver$
-	 * @var array<string|int, mixed>
+	 * @var \WS_Form_Submit_Export
 	 */
-	private object $ws_form_submit_export;
+	private \WS_Form_Submit_Export $ws_form_submit_export;
 
 	/**
 	 * Microcache for the "current" entries.
@@ -75,7 +75,8 @@ final class WSFormDataSource extends BaseDataSource implements MutableDataSource
 				$this->get_order_by(),    // Order by
 				$this->get_order(),       // Order
 				true,                     // Bypass capabilities check
-				false                     // Clear hidden fields
+				false,                    // Clear hidden fields,
+				false                     // Sanitize rows (DataKit already sanitizes data, set to false to prevent double escaping)
 			);
 
 		} catch (Exception $e) {
@@ -94,8 +95,8 @@ final class WSFormDataSource extends BaseDataSource implements MutableDataSource
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ): array {
-		if ( isset ( $this->entries[ $id ] ) ) {
-			$entry = $this->entries[ $id ];
+		if ( isset( $this->entries[ $id ] ) ) {
+			return $this->entries[ $id ];
 
 		} else {
 
@@ -162,14 +163,14 @@ final class WSFormDataSource extends BaseDataSource implements MutableDataSource
 	 */
 	private function get_filters(): array {
 		if ( ! $this->filters ) {
-			return array();
+			return [];
 		}
 
 		// Get DataKit filters as array
 		$filters = $this->filters->to_array();
 
 		// Operator lookups (DataKit => WS Form)
-		$datakit_to_wsform_operators = array(
+		$datakit_to_wsform_operators = [
 
 			(string) Operator::is()       => '==',
 			(string) Operator::isNot()    => '!=',
@@ -177,14 +178,11 @@ final class WSFormDataSource extends BaseDataSource implements MutableDataSource
 			(string) Operator::isAll()    => '==',
 			(string) Operator::isNotAll() => 'in',
 			(string) Operator::isNone()   => 'not_in'
-		);
+		];
 
 		// Process each filter
-		foreach($filters as $filter_index => $filter) {
-			if(
-				isset( $filter['operator'] ) &&
-				isset( $datakit_to_wsform_operators[$filter['operator']] )
-			) {
+		foreach ( $filters as $filter_index => $filter ) {
+			if ( $datakit_to_wsform_operators[$filter['operator']] ?? false ) {
 				$filters[$filter_index]['operator'] = $datakit_to_wsform_operators[$filter['operator']];
 			}
 		}
@@ -206,7 +204,7 @@ final class WSFormDataSource extends BaseDataSource implements MutableDataSource
 
 		$sort_array = $this->sort->to_array();
 
-		return isset( $sort_array['field'] ) ? $sort_array['field'] : 'id';
+		return $sort_array['field'];
 	}
 
 	/**
@@ -223,7 +221,7 @@ final class WSFormDataSource extends BaseDataSource implements MutableDataSource
 
 		$sort_array = $this->sort->to_array();
 
-		return isset( $sort_array['direction'] ) ? $sort_array['direction'] : 'DESC';
+		return $sort_array['direction'];
 	}
 
 	/**
