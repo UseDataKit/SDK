@@ -63,7 +63,7 @@ while retrieving the result ids in `get_data_ids()`.
 
 #### Filters
 
-If filters are applied, you can use the `Filters` object to filter your results. The `Filtes` object is an iterable
+If filters are applied, you can use the `Filters` object to filter your results. The `Filters` object is an iterable
 class that returns `Filter` objects, which in turn can be turned into an array. Alternatively the `Filters` object can
 also be turned into a usable array. In both cases you call the `to_array` method on the object.
 
