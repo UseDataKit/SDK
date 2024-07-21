@@ -17,6 +17,14 @@ final class LinkField extends Field {
 	private const TYPE_FIELD = 'field';
 
 	/**
+	 * Contains a custom label.
+	 *
+	 * @since $ver$
+	 * @var string|null
+	 */
+	private ?string $label = null;
+
+	/**
 	 * @inheritDoc
 	 * @since $ver$
 	 * @var string
@@ -78,6 +86,36 @@ final class LinkField extends Field {
 		return $clone;
 	}
 
+	/**
+	 * Apply a custom label on the link.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string $label The label.
+	 *
+	 * @return self
+	 */
+	public function with_label( string $label ): self {
+		$clone        = clone $this;
+		$clone->label = $label;
+
+		return $clone;
+	}
+
+	/**
+	 * Remove a custom label on the link.
+	 *
+	 * @since $ver$
+	 *
+	 * @return self
+	 */
+	public function without_label(): self {
+		$clone        = clone $this;
+		$clone->label = null;
+
+		return $clone;
+	}
+
 
 	/**
 	 * Returns a link based on the context settings.
@@ -89,6 +127,11 @@ final class LinkField extends Field {
 	 * @return string The value.
 	 */
 	public function get_value( array $data ) {
+		$href = $this->href( $data );
+		if ( ! $href ) {
+			return '';
+		}
+
 		return sprintf(
 			'<a href="%s" target="%s">%s</a>',
 			esc_attr( $this->href( $data ) ),
@@ -134,6 +177,7 @@ final class LinkField extends Field {
 	 * @return string The label.
 	 */
 	private function label( array $data ): string {
-		return parent::get_value( $data ) ?? '';
+		// Todo: replace placeholders in custom label.
+		return $this->label ?? parent::get_value( $data ) ?? '';
 	}
 }
