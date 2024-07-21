@@ -86,10 +86,15 @@ final class ImageField extends Field {
 	 * @since $ver$
 	 */
 	public function get_value( array $data ): string {
+		$src = parent::get_value( $data );
+		if ( ! $src ) {
+			return '';
+		}
+
 		$attributes = array_merge(
 			$this->context(),
 			[
-				'src' => parent::get_value( $data ),
+				'src' => $src,
 			],
 		);
 

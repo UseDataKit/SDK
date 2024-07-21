@@ -14,7 +14,7 @@ final class ImageFieldTest extends AbstractFieldTestCase {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected static function fieldClass() : string {
+	protected static function fieldClass(): string {
 		return ImageField::class;
 	}
 
@@ -23,7 +23,7 @@ final class ImageFieldTest extends AbstractFieldTestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function test_get_value() : void {
+	public function test_get_value(): void {
 		$data  = [ 'image' => 'https://datakit.org/logo.png' ];
 		$field = ImageField::create( 'image', 'Image' );
 
@@ -45,5 +45,7 @@ final class ImageFieldTest extends AbstractFieldTestCase {
 			'<img width="100" height="50" src="https://datakit.org/logo.png" />',
 			$field->size( 100, 50 )->get_value( $data ),
 		);
+
+		self::assertEmpty( $field->get_value( [] ) );
 	}
 }
