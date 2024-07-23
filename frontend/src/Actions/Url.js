@@ -1,10 +1,14 @@
 import { get, replace_tags } from '@src/helpers';
 
 /**
- * Action that takes the user to a url.
+ * Action that takes the user to a URL.
  *
  * @since $ver$
+ *
+ * @constructor
+ *
  * @typedef Context The context object.
+ *
  * @property {string} url The url to resolve.
  * @property {string} type The action type.
  * @property {string} method The action method.
@@ -16,7 +20,6 @@ import { get, replace_tags } from '@src/helpers';
  *
  * @param {Object.<string, string>[]} items The data object.
  * @param {Context} context The context object.
- * @constructor
  */
 export default function Url( items, context ) {
     if ( ( context.confirm ?? null ) && !window.confirm( context.confirm ) ) {
@@ -30,6 +33,7 @@ export default function Url( items, context ) {
 
 /**
  * @since $ver$
+ *
  * @param {Object.<string, string>[]} items The data object.
  * @param {Context} context The context object.
  */
@@ -92,6 +96,7 @@ function handleAjax( items, context ) {
 
 /**
  * @since $ver$
+ *
  * @param {Object.<string, string>[]} items The data object.
  * @param {Context} context The context object.
  */

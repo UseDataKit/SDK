@@ -11,9 +11,10 @@ use DataKit\DataViews\Data\Exception\DataNotFoundException;
  */
 interface MutableDataSource extends DataSource {
 	/**
-	 * Whether the data source can delete results.
+	 * Returns whether the data source can delete results.
 	 *
 	 * @since $ver$
+	 *
 	 * @return bool
 	 */
 	public function can_delete(): bool;
@@ -21,7 +22,7 @@ interface MutableDataSource extends DataSource {
 	/**
 	 * Deletes all data by their ID.
 	 *
-	 * @param string ...$ids The ids of the data sets to delete..
+	 * @param string ...$ids The IDs of the data sets to delete.
 	 *
 	 * @throws DataNotFoundException When the data was not found.
 	 */

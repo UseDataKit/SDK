@@ -12,7 +12,9 @@ use InvalidArgumentException;
 final class EnumField extends FilterableField {
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	protected string $render = 'datakit_fields.html';
@@ -21,12 +23,14 @@ final class EnumField extends FilterableField {
 	 * Contains the list of elements.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array{value:string, label:string}[].
 	 */
 	protected array $elements = [];
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	protected function __construct(
@@ -41,6 +45,7 @@ final class EnumField extends FilterableField {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function to_array(): array {
@@ -83,6 +88,7 @@ final class EnumField extends FilterableField {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_value( array $data ) {

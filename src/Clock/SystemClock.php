@@ -2,6 +2,8 @@
 
 namespace DataKit\DataViews\Clock;
 
+use DateTimeImmutable;
+
 /**
  * Clock that uses the system time.
  *
@@ -10,9 +12,10 @@ namespace DataKit\DataViews\Clock;
 final class SystemClock implements Clock {
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
-	public function now(): \DateTimeImmutable {
-		return new \DateTimeImmutable();
+	public function now(): DateTimeImmutable {
+		return new DateTimeImmutable();
 	}
 }

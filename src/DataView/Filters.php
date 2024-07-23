@@ -9,7 +9,9 @@ use IteratorAggregate;
  * Represents a collection of fields.
  *
  * @since $ver$
+ *
  * @phpstan-import-type FilterShape from Filter
+ *
  * @implements IteratorAggregate<Filter>
  */
 final class Filters implements IteratorAggregate {
@@ -32,7 +34,7 @@ final class Filters implements IteratorAggregate {
 	}
 
 	/**
-	 * Creates collection of filters.
+	 * Creates the collection of filters.
 	 *
 	 * @since $ver$
 	 *
@@ -46,7 +48,7 @@ final class Filters implements IteratorAggregate {
 	}
 
 	/**
-	 * Creates collection of filters from an array.
+	 * Creates the collection of filters from an array.
 	 *
 	 * @since $ver$
 	 *
@@ -56,6 +58,7 @@ final class Filters implements IteratorAggregate {
 	 */
 	public static function from_array( array $filters_array ): self {
 		$filters = [];
+
 		foreach ( $filters_array as $filter ) {
 			$filters[] = Filter::from_array( $filter );
 		}
@@ -67,7 +70,8 @@ final class Filters implements IteratorAggregate {
 	 * Serializes the collection to an array.
 	 *
 	 * @since $ver$
-	 * @return array<FilterShape>The fields as an array.
+	 *
+	 * @return array<FilterShape> The fields as an array.
 	 */
 	public function to_array(): array {
 		return array_map(
@@ -78,6 +82,7 @@ final class Filters implements IteratorAggregate {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function getIterator(): ArrayIterator {
@@ -91,7 +96,7 @@ final class Filters implements IteratorAggregate {
 	 *
 	 * @param array $data The data to match against.
 	 *
-	 * @return bool whether the entry matches the filters.
+	 * @return bool Whether the entry matches the filters.
 	 */
 	public function match( array $data ): bool {
 		foreach ( $this->filters as $filter ) {

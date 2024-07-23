@@ -15,6 +15,7 @@ namespace DataKit\DataViews\DataView;
 final class View extends EnumObject {
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	protected static function cases(): array {

@@ -10,13 +10,16 @@ namespace DataKit\DataViews\Field;
 final class ImageField extends Field {
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	protected string $render = 'datakit_fields.html';
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	protected function default_context(): array {

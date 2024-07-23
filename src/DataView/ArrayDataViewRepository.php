@@ -12,6 +12,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 	 * Contains the registered DataViews.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array<string, DataView>
 	 */
 	private array $data_views = [];
@@ -31,6 +32,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function all(): array {
@@ -39,10 +41,12 @@ final class ArrayDataViewRepository implements DataViewRepository {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get( string $id ): DataView {
 		$data_view = $this->data_views[ $id ] ?? null;
+
 		if ( ! $data_view ) {
 			throw new DataViewNotFoundException();
 		}
@@ -52,6 +56,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function save( DataView $data_view ): void {
@@ -60,6 +65,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function delete( DataView $data_view ): void {
@@ -68,6 +74,7 @@ final class ArrayDataViewRepository implements DataViewRepository {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function has( string $id ): bool {

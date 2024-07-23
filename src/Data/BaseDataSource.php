@@ -8,7 +8,7 @@ use DataKit\DataViews\DataView\Sort;
 /**
  * Abstract data source that provides common filtering and sorting methods.
  *
- * Note: Methods are implemented to create an immutable data source.
+ * Note: methods are implemented to create an immutable data source.
  *
  * @since $ver$
  */
@@ -17,6 +17,7 @@ abstract class BaseDataSource implements DataSource {
 	 * The filters to use.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Filters|null
 	 */
 	protected ?Filters $filters = null;
@@ -25,6 +26,7 @@ abstract class BaseDataSource implements DataSource {
 	 * The sorting to use.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Sort|null
 	 */
 	protected ?Sort $sort = null;
@@ -33,14 +35,17 @@ abstract class BaseDataSource implements DataSource {
 	 * The string to search by.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	protected string $search = '';
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
-	 * @return static
+	 *
+	 * @return self
 	 */
 	public function filter_by( ?Filters $filters ) {
 		$clone          = clone $this;
@@ -51,6 +56,7 @@ abstract class BaseDataSource implements DataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function sort_by( ?Sort $sort ) {
@@ -62,6 +68,7 @@ abstract class BaseDataSource implements DataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function search_by( string $search ) {

@@ -11,7 +11,7 @@ use DateTimeInterface;
  */
 interface Clock {
 	/**
-	 * Returns the current time as a DateTimeImmutable Object
+	 * Returns the current time as a DateTimeImmutable object.
 	 *
 	 * @since $ver$
 	 */

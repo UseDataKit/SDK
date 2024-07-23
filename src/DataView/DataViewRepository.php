@@ -12,17 +12,19 @@ interface DataViewRepository {
 	 * Returns an array of DataViews, keyed by their ID.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array<string, DataView> The DataViews.
 	 */
 	public function all(): array;
 
 	/**
-	 * Returns a DataView by its ID.a
+	 * Returns a DataView by its ID.
 	 *
 	 * @param string $id The DataView ID.
 	 *
-	 * @return DataView The DataView.
 	 * @throws DataViewNotFoundException When the DataView could not be found.
+	 *
+	 * @return DataView The DataView.
 	 */
 	public function get( string $id ): DataView;
 

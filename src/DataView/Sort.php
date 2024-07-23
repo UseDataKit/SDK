@@ -5,7 +5,7 @@ namespace DataKit\DataViews\DataView;
 use InvalidArgumentException;
 
 /**
- * Represents the sorting applied to a data view.
+ * Represents the sorting applied to a DataView.
  *
  * @since $ver$
  */
@@ -30,6 +30,7 @@ final class Sort {
 	 * The direction to sort in.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $direction;
@@ -55,9 +56,10 @@ final class Sort {
 	}
 
 	/**
-	 * Serialize the sort as an array.
+	 * Serializes the sort as an array.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array<string, string> The serialized sort object.
 	 */
 	public function to_array(): array {
@@ -68,7 +70,7 @@ final class Sort {
 	}
 
 	/**
-	 * Create a sort object from an array.
+	 * Creates a sort object from an array.
 	 *
 	 * @since $ver$
 	 *

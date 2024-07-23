@@ -2,6 +2,7 @@
 
 namespace DataKit\DataViews\Data;
 
+use Closure;
 use DataKit\DataViews\Data\Exception\DataSourceNotFoundException;
 use DataKit\DataViews\DataView\Operator;
 use GF_Field;
@@ -21,6 +22,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * Note: These filters are handled differently by the Gravity Forms search API.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string[]
 	 */
 	private static array $top_level_filters = [ 'status', 'start_date', 'end_date' ];
@@ -29,6 +31,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * The form object.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array<string|int, mixed>
 	 */
 	private array $form;
@@ -37,6 +40,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * Microcache for the "current" entries.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array[]
 	 */
 	private array $entries;
@@ -45,6 +49,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * Microcache for the data source fields.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array<string, string>
 	 */
 	private array $fields;
@@ -67,6 +72,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function id(): string {
@@ -75,6 +81,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_data_ids( int $limit = 100, int $offset = 0 ): array {
@@ -95,22 +102,24 @@ final class GravityFormsDataSource extends BaseDataSource {
 		// Microcache entries on their ID.
 		$this->entries = array_column( $entries, null, 'id' );
 
-		// Return the ID's for the current set.
+		// Return IDs for the current set.
 		return array_column( $entries, 'id' );
 	}
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ): array {
 		$entry = $this->entries[ $id ] ?? GFAPI::get_entry( (int) $id );
+
 		if ( ! is_array( $entry ) ) {
 			return [];
 		}
 
 		foreach ( $this->get_form_fields() as $field ) {
-			// Returns the values for the entire field, as well as all sub input separately; e.g. 1, 1.1, 1.2, etc.
+			// Returns the values for the entire field, as well as all sub input separately (e.g., 1, 1.1, 1.2, etc.).
 			$inputs = [ $field->id, ...array_column( $field->inputs ?? [], 'id' ) ];
 
 			foreach ( $inputs as $input_id ) {
@@ -123,6 +132,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function count(): int {
@@ -147,11 +157,11 @@ final class GravityFormsDataSource extends BaseDataSource {
 			$filters                  = $this->top_level_filters();
 			$filters['field_filters'] = array_merge(
 				...array_filter(
-					array_map(
-						\Closure::fromCallable( [ $this, 'transform_filter_to_field_filters' ] ),
-						$this->filters->to_array(),
-					),
-				),
+                    array_map(
+                        Closure::fromCallable( [ $this, 'transform_filter_to_field_filters' ] ),
+                        $this->filters->to_array(),
+                    ),
+                ),
 			);
 		}
 
@@ -196,12 +206,13 @@ final class GravityFormsDataSource extends BaseDataSource {
 	/**
 	 * Maps the field operator to a Gravity Forms search operator.
 	 *
+	 * @todo  this needs to be fixed for all cases.
+	 *
 	 * @since $ver$
 	 *
 	 * @param string $operator The field operator.
 	 *
 	 * @return string The Gravity Forms search operator.
-	 * @todo  this needs to be fixed for all cases.
 	 */
 	private function map_operator( string $operator ): string {
 		$case = Operator::try_from( $operator );
@@ -222,6 +233,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * Returns the top level filters for the Gravity Forms API.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array<string, string> The filters.
 	 */
 	private function top_level_filters(): array {
@@ -239,9 +251,10 @@ final class GravityFormsDataSource extends BaseDataSource {
 	}
 
 	/**
-	 * Returns the sorting for gravity forms based on the Sort object.
+	 * Returns the sorting for Gravity Forms based on the sort object.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array The Gravity Forms sorting.
 	 */
 	private function get_sorting(): array {
@@ -259,6 +272,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_fields(): array {
@@ -298,6 +312,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * Returns the form fields.
 	 *
 	 * @since $ver$
+	 *
 	 * @return GF_Field[] The form fields.
 	 */
 	private function get_form_fields(): array {

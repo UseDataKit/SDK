@@ -8,10 +8,9 @@ use DataKit\DataViews\DataView\Filters;
 use DataKit\DataViews\DataView\Sort;
 
 /**
- * A data source backed by a kay/value array.
+ * A data source backed by a kay/value array. This source is useful for testing and composition.
  *
- * Note: Technically this data source can delete, but it will not be persisted outside the session.
- * This source is useful for testing and composition.
+ * Note: technically this data source can delete, but it will not be persisted outside the session.
  *
  * @since $ver$
  */
@@ -20,6 +19,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * The unique ID for the data source.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $id;
@@ -28,6 +28,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * The backing array.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array<string, array<string,string>> Key is ID, value is array of key=>value pairs.
 	 */
 	private array $data;
@@ -50,6 +51,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function id(): string {
@@ -58,6 +60,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_data_ids( int $limit = 20, int $offset = 0 ): array {
@@ -66,10 +69,12 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ): array {
 		$result = $this->data[ $id ] ?? null;
+
 		if ( ! $result ) {
 			throw DataNotFoundException::with_id( $this, $id );
 		}
@@ -91,6 +96,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 * Returns the data, filtered by the {@see Filters}.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array The filtered data.
 	 */
 	private function get_data(): array {
@@ -142,6 +148,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function delete_data_by_id( string ...$ids ): void {
@@ -156,6 +163,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_fields(): array {

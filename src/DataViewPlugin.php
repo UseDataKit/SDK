@@ -17,14 +17,16 @@ final class DataViewPlugin {
 	 * The singleton plugin instance.
 	 *
 	 * @since $ver$
+	 *
 	 * @var self
 	 */
 	private static self $instance;
 
 	/**
-	 * The DataView Repository.
+	 * The DataView repository.
 	 *
 	 * @since $ver$
+	 *
 	 * @var DataViewRepository
 	 */
 	private DataViewRepository $data_view_repository;
@@ -67,7 +69,9 @@ final class DataViewPlugin {
 		$assets_dir = plugin_dir_url( DATAVIEW_PLUGIN_PATH );
 
 		wp_register_script( 'datakit/dataview', $assets_dir . 'assets/js/dataview.js', [], DATAVIEW_VERSION, true );
+
 		wp_register_style( 'datakit/dataview', $assets_dir . 'assets/css/dataview.css', [], DATAVIEW_VERSION );
+
 		wp_add_inline_script(
 			'datakit/dataview',
 			implode(
@@ -85,9 +89,10 @@ final class DataViewPlugin {
 	}
 
 	/**
-	 * Return and maybe initialize the singleton plugin.
+	 * Returns and maybe initializes the singleton plugin.
 	 *
 	 * @since $ver$
+	 *
 	 * @return self The plugin.
 	 */
 	public static function get_instance( DataViewRepository $repository ): self {

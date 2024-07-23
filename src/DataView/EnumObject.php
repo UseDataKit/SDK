@@ -27,30 +27,30 @@ abstract class EnumObject {
 	abstract protected static function cases(): array;
 
 	/**
-	 * Create the enum object.
+	 * Create the Enum object.
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $enum_case The enum case.
+	 * @param string $enum_case The Enum case.
 	 *
 	 * @throws InvalidArgumentException If the case is invalid.
 	 */
 	final private function __construct( string $enum_case ) {
 		if ( ! isset( static::cases()[ $enum_case ] ) ) {
-			throw new InvalidArgumentException( 'No valid enum option provided.' );
+			throw new InvalidArgumentException( 'No valid Enum option provided.' );
 		}
 
 		$this->value = static::cases()[ $enum_case ];
 	}
 
 	/**
-	 * Constructor to create an enum by its backing value.
+	 * Constructor to create an Enum by its backing value.
 	 *
 	 * @since $ver$
 	 *
 	 * @param string $enum_case The case.
 	 *
-	 * @return static|null The enum is valid.
+	 * @return self|null The Enum is valid.
 	 */
 	final public static function try_from( string $enum_case ) {
 		try {
@@ -61,28 +61,29 @@ abstract class EnumObject {
 	}
 
 	/**
-	 * Dynamically create enums from their constant name, as a method.
+	 * Dynamically create Enums from their constant name, as a method.
 	 *
 	 * @since $ver$
 	 *
 	 * @param string $method The case name.
 	 * @param array  $_      Unused arguments.
 	 *
-	 * @return static The enum object.
 	 * @throws InvalidArgumentException
+	 *
+	 * @return self The Enum object.
 	 */
 	final public static function __callStatic( string $method, array $_ ) {
 		$type = self::try_from( $method );
 
 		if ( ! $type ) {
-			throw new InvalidArgumentException( 'No valid enum object provided.' );
+			throw new InvalidArgumentException( 'No valid Enum object provided.' );
 		}
 
 		return $type;
 	}
 
 	/**
-	 * Returns the backing value of the enum.
+	 * Returns the backing value of the Enum.
 	 *
 	 * @since $ver$
 	 */
@@ -91,7 +92,7 @@ abstract class EnumObject {
 	}
 
 	/**
-	 * Returns the backing value of the enum.
+	 * Returns the backing value of the Enum.
 	 *
 	 * @since $ver$
 	 */

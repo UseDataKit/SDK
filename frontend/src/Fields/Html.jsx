@@ -1,5 +1,6 @@
 /**
- * Javascript side of the HTML field.
+ * JavaScript side of the HTML field.
+ *
  * @since $ver$
  */
 export default function Html( { name, item } ) {

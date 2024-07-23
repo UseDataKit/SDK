@@ -5,7 +5,7 @@ namespace DataKit\DataViews\DataView;
 use JsonException;
 
 /**
- * Represent an action object on a data view.
+ * Represent an action object on a DataView.
  *
  * Actions are rendered as buttons with an icon.
  *
@@ -27,6 +27,7 @@ final class Action {
 	 * The action type.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $type;
@@ -35,6 +36,7 @@ final class Action {
 	 * The unique ID for the action.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $id;
@@ -43,6 +45,7 @@ final class Action {
 	 * The action button label.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $label;
@@ -50,15 +53,17 @@ final class Action {
 	/**
 	 * The icon name used for a primary action.
 	 *
-	 * @since$ver$
+	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $icon = '';
 
 	/**
-	 * Whether the action is destructive; and displayed as such.
+	 * Whether the action is destructive and is displayed as such.
 	 *
 	 * @since $ver$
+	 *
 	 * @var bool
 	 */
 	private bool $is_destructive = false;
@@ -67,6 +72,7 @@ final class Action {
 	 * Whether the header of a modal should be hidden.
 	 *
 	 * @since $ver$
+	 *
 	 * @var bool
 	 */
 	private bool $is_header_hidden = false;
@@ -75,6 +81,7 @@ final class Action {
 	 * Whether the action is applicable to multiple items.
 	 *
 	 * @since $ver$
+	 *
 	 * @var bool
 	 */
 	private bool $is_bulk = false;
@@ -85,6 +92,7 @@ final class Action {
 	 * This context is available during the rendering of the action.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array
 	 */
 	private array $context = [];
@@ -92,16 +100,16 @@ final class Action {
 	/**
 	 * Creates an action.
 	 *
-	 * Note, the constructor is private as there are multiple named constructors available.
+	 * Note: the constructor is private as there are multiple named constructors available.
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $id    The unique ID of the action.
-	 * @param string $label The label of the action.
-	 *
 	 * @see   Action::modal() for an action that opens a modal.
-	 * @see   Action::url() for an action that opens a url.
-	 * @see   Action::ajax() for an action that is performed via an ajax request.
+	 * @see   Action::url() for an action that opens a URL.
+	 * @see   Action::ajax() for an action that is performed via an Ajax request.
+	 *
+	 * @param string $id The unique ID of the action.
+	 * @param string $label The label of the action.
 	 */
 	private function __construct( string $id, string $label ) {
 		$this->id    = $id;
@@ -151,14 +159,14 @@ final class Action {
 	}
 
 	/**
-	 * Creates an action that calls a URL via an AJAX call.
+	 * Creates an action that calls a URL via an Ajax call.
 	 *
 	 * @since $ver$
 	 *
 	 * @param string $id                 The unique ID of the action.
 	 * @param string $label              The label of the action.
 	 * @param string $url                The URL to open inside the modal.
-	 * @param string $method             The method type to use for the AJAX call (GET, POST, PUT, etc.).
+	 * @param string $method             The method type to use for the Ajax call (GET, POST, PUT, etc.).
 	 * @param array  $params             The parameters passed along to the URL.
 	 * @param bool   $use_single_request Whether there should be a single ajax call on a BULK action. Will perform a
 	 *                                   call per item when set to `false`.
@@ -277,7 +285,7 @@ final class Action {
 	}
 
 	/**
-	 * Returns an action that can be performed a single item at a time.
+	 * Returns an action that can be performed one item at a time.
 	 *
 	 * @since $ver$
 	 *
@@ -294,6 +302,7 @@ final class Action {
 	 * Returns a serialized state of the action.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array The serialized state.
 	 */
 	public function to_array(): array {
@@ -316,13 +325,15 @@ final class Action {
 	}
 
 	/**
-	 * Returns the actions javascript callback.
+	 * Returns the actions JavaScript callback.
 	 *
-	 * The URL and AJAX action are both handled through a `url` javascript callback.
-	 * NOTE: __RAW__ and __ENDRAW__ is used to make sure the callback is rendered as javascript, instead of a string.
+	 * The URL and Ajax action are both handled through a `url` JavaScript callback.
+	 *
+	 * Note: __RAW__ and __ENDRAW__ is used to make sure the callback is rendered as JavaScript, instead of a string.
 	 *
 	 * @since $ver$
-	 * @return string|null The javascript callback.
+	 *
+	 * @return string|null The JavaScript callback.
 	 */
 	private function js_callback(): ?string {
 		if ( self::TYPE_MODAL === $this->type ) {
@@ -343,10 +354,11 @@ final class Action {
 	}
 
 	/**
-	 * Returns the actions javascript modal properties.
+	 * Returns the actions JavaScript modal properties.
 	 *
 	 * @since $ver$
-	 * @return string|null The javascript settings.
+	 *
+	 * @return string|null The JavaScript settings.
 	 */
 	private function js_render_modal(): ?string {
 		if ( self::TYPE_MODAL !== $this->type ) {
@@ -370,6 +382,7 @@ final class Action {
 	 * Returns the context required for the different action types.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array The context object.
 	 */
 	private function context(): array {

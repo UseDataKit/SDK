@@ -13,31 +13,34 @@ use Exception;
  */
 final class DateTimeField extends Field {
 	/**
-	 * The format the datetime is in.
+	 * The format the DateTime is in.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string|null
 	 */
 	private ?string $from_format = null;
 
 	/**
-	 * The format to represent the datetime in.
+	 * The format to represent the DateTime in.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $to_format = 'Y-m-d H:i:s';
 
 	/**
-	 * The timezone the original datetime is in.
+	 * The timezone the original DateTime is in.
 	 *
 	 * @since $ver$
+	 *
 	 * @var DateTimeZone|null
 	 */
 	private ?DateTimeZone $from_timezone = null;
 
 	/**
-	 * The time zone the datetime should contain.
+	 * The timezone the DateTime should contain.
 	 *
 	 * @since $ver$
 	 * @var DateTimeZone|null
@@ -46,11 +49,12 @@ final class DateTimeField extends Field {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver
+	 *
 	 * @var string
 	 */
 	protected string $render = 'datakit_fields.html';
-
 
 	/**
 	 * Applies a format to the date.
@@ -58,9 +62,9 @@ final class DateTimeField extends Field {
 	 * @since $ver$
 	 *
 	 * @param string            $format      The format to use.
-	 * @param DateTimeZone|null $to_timezone The timezone to format the datetime in.
+	 * @param DateTimeZone|null $to_timezone The timezone to format the DateTime in.
 	 *
-	 * @return self A date time field.
+	 * @return self A DateTime field.
 	 */
 	public function to_format( string $format, ?DateTimeZone $to_timezone = null ): self {
 		$clone              = clone $this;
@@ -71,26 +75,28 @@ final class DateTimeField extends Field {
 	}
 
 	/**
-	 * Applies the format used to read the original date,
+	 * Applies the format used to read the original date.
 	 *
 	 * @since $ver$
 	 *
-	 * @param string|null       $format    The format to apply.
-	 * @param DateTimeZone|null $time_zone The timezone the datetime is in.
+	 * @param string|null       $format   The format to apply.
+	 * @param DateTimeZone|null $timezone The DateTime timezone.
 	 *
 	 * @return self A datetime field.
 	 */
-	public function from_format( ?string $format, ?DateTimeZone $time_zone = null ): self {
+	public function from_format( ?string $format, ?DateTimeZone $timezone = null ): self {
 		$clone                = clone $this;
 		$clone->from_format   = $format;
-		$clone->from_timezone = $time_zone;
+		$clone->from_timezone = $timezone;
 
 		return $clone;
 	}
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
+	 *
 	 * @return string
 	 */
 	public function get_value( array $data ): string {

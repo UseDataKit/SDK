@@ -12,17 +12,19 @@ use RuntimeException;
 /**
  * A data sources that wraps a different data source in a cache layer.
  *
- * NOTE: This class is used internally. When registering your data source you do not need to wrap
- * the instance yourself. This will be done by DataKit.
+ * Note: This class is used internally. When registering your data source,
+ * you do not need to wrap the instance yourself. This will be done by DataKit.
+ *
+ * @internal This class is subject to change.
  *
  * @since    $ver$
- * @internal This class is subject to change.
  */
 final class CachedDataSource extends BaseDataSource implements MutableDataSource {
 	/**
 	 * The data source to cache.
 	 *
 	 * @since $ver$
+	 *
 	 * @var DataSource
 	 */
 	private DataSource $inner;
@@ -31,6 +33,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * The caching provider.
 	 *
 	 * @since $ver$
+	 *
 	 * @var CacheProvider
 	 */
 	private CacheProvider $cache;
@@ -50,6 +53,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function id(): string {
@@ -123,6 +127,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_data_ids( int $limit = 20, int $offset = 0 ): array {
@@ -138,6 +143,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ): array {
@@ -154,7 +160,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	/**
 	 * @inheritDoc
 	 *
-	 * Note: This method is not cached, as it should always show the actual fields.
+	 * Note: this method is not cached, as it should always show the actual fields.
 	 *
 	 * @since $ver$
 	 */
@@ -164,6 +170,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function count(): int {
@@ -174,6 +181,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function filter_by( ?Filters $filters ): self {
@@ -201,10 +209,12 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function sort_by( ?Sort $sort ): self {
 		$cached = parent::sort_by( $sort );
+
 		if ( ! $cached instanceof self ) {
 			throw new RuntimeException( 'Wrong data source provided' );
 		}
@@ -216,6 +226,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function can_delete(): bool {
@@ -236,6 +247,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 		}
 
 		$this->inner->delete_data_by_id( ...$ids );
+
 		$this->clear_cache();
 	}
 
@@ -243,6 +255,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * Clears the underlying cache for this data source.
 	 *
 	 * @since $ver$
+	 *
 	 * @return bool Whether the cache was cleared.
 	 */
 	public function clear_cache(): bool {

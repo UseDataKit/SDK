@@ -6,7 +6,7 @@ use BadMethodCallException;
 use InvalidArgumentException;
 
 /**
- * Represents a filter on Data Views and Data sources.
+ * Represents a filter on DataViews and Data sources.
  *
  * @since $ver$
  *
@@ -23,7 +23,8 @@ final class Filter {
 	/**
 	 * The field to filter on.
 	 *
-	 * @since $ve$
+	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $field;
@@ -32,6 +33,7 @@ final class Filter {
 	 * The filter operation.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Operator
 	 */
 	private Operator $operator;
@@ -40,6 +42,7 @@ final class Filter {
 	 * The filter value.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array|string
 	 */
 	private $value;
@@ -63,7 +66,7 @@ final class Filter {
 		$this->field    = $field;
 
 		if ( empty( $field ) || empty( $value ) ) {
-			throw new InvalidArgumentException( 'Filter needs a field, operator and value' );
+			throw new InvalidArgumentException( 'Filter needs a field, operator and value.' );
 		}
 
 		// phpcs:disable WordPress.PHP.StrictInArray.FoundNonStrictFalse
@@ -108,7 +111,7 @@ final class Filter {
 	}
 
 	/**
-	 * Returns whether the value is a string, or able to cast to a string.
+	 * Returns whether the value is a string or can be cast to a string.
 	 *
 	 * @since $ver$
 	 *
@@ -132,6 +135,7 @@ final class Filter {
 	 * Serializes a Filter to an array.
 	 *
 	 * @since $ver$
+	 *
 	 * @return FilterShape The filter array.
 	 */
 	public function to_array(): array {
@@ -153,6 +157,7 @@ final class Filter {
 	 */
 	public static function from_array( array $filter_array ): self {
 		$operator = Operator::try_from( $filter_array['operator'] ?? '' );
+
 		if ( ! $operator ) {
 			throw new \InvalidArgumentException( 'No valid operator provided.' );
 		}
@@ -191,16 +196,17 @@ final class Filter {
 	}
 
 	/**
-	 * Whether the given value matches the filter.
+	 * Returns whether the given value matches the filter.
 	 *
 	 * @since $ver$
 	 *
-	 * @param array $data The dataset to match against.
+	 * @param array $data The data set to match against.
 	 *
 	 * @return bool Whether the value matches the filter.
 	 */
 	public function matches( array $data ): bool {
 		$value = $data[ $this->field ] ?? null;
+
 		if ( ! $value ) {
 			return false;
 		}

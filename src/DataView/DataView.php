@@ -6,6 +6,7 @@ use DataKit\DataViews\Data\DataSource;
 use DataKit\DataViews\Data\MutableDataSource;
 use DataKit\DataViews\Field\Field;
 use DataKit\DataViews\Rest\Router;
+use InvalidArgumentException;
 use JsonException;
 
 /**
@@ -15,9 +16,10 @@ use JsonException;
  */
 final class DataView {
 	/**
-	 * The dataview ID.
+	 * The DataView ID.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $id;
@@ -26,6 +28,7 @@ final class DataView {
 	 * The primary view type.
 	 *
 	 * @since $ver$
+	 *
 	 * @var View
 	 */
 	private View $view;
@@ -34,6 +37,7 @@ final class DataView {
 	 * The fields to show on the DataView.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Field[]
 	 */
 	private array $directory_fields = [];
@@ -58,6 +62,7 @@ final class DataView {
 	 * The sorting order.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Sort|null
 	 */
 	private ?Sort $sort;
@@ -66,6 +71,7 @@ final class DataView {
 	 * The provided filters.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Filters|null
 	 */
 	private ?Filters $filters;
@@ -74,6 +80,7 @@ final class DataView {
 	 * The provided actions.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Actions|null
 	 */
 	private ?Actions $actions;
@@ -82,6 +89,7 @@ final class DataView {
 	 * The applied search query.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $search = '';
@@ -90,14 +98,16 @@ final class DataView {
 	 * The pagination info.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Pagination
 	 */
 	private Pagination $pagination;
 
 	/**
-	 * Whether the dataview supports searching.
+	 * Whether the DataView supports searching.
 	 *
 	 * @since $ver$
+	 *
 	 * @var bool
 	 */
 	private bool $has_search = true;
@@ -211,6 +221,7 @@ final class DataView {
 	 * Returns a data source with sorting and filters applied.
 	 *
 	 * @since $ver$
+	 *
 	 * @return DataSource The data source.
 	 */
 	public function data_source(): DataSource {
@@ -221,7 +232,7 @@ final class DataView {
 	}
 
 	/**
-	 * Returns the data object for Data View.
+	 * Returns the data object for DataView.
 	 *
 	 * @since $ver$
 	 *
@@ -238,11 +249,12 @@ final class DataView {
 
 		foreach ( $data_source->get_data_ids( $pagination->limit(), $pagination->offset() ) as $data_id ) {
 			/**
-			 * Todo: this is a possible breach of security as all data is passed along in the JS.
+			 * // Todo: this is a possible breach of security as all data is passed along in the JS.
 			 * But the merge tags need access to the raw data, so the field needs to tell us which field is need,
 			 * and only disclose those values.
 			 */
 			$data = $data_source->get_data_by_id( $data_id );
+
 			foreach ( $this->directory_fields as $field ) {
 				$data[ $field->uuid() ] = $field->get_value( $data );
 			}
@@ -283,6 +295,7 @@ final class DataView {
 	 * Returns all the fields for the dictionary view.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array[] The fields as arrays.
 	 */
 	private function dictionary_fields(): array {
@@ -301,9 +314,11 @@ final class DataView {
 	/**
 	 * Returns the supportedLayouts object.
 	 *
+	 * @todo  Provide option to add more.
+	 *
 	 * @since $ver$
+	 *
 	 * @return string[] The supported layouts.
-	 * @todo  provide option to add more.
 	 */
 	private function supported_layouts(): array {
 		return [ (string) $this->view ];
@@ -313,10 +328,12 @@ final class DataView {
 	 * Returns the field keys that should be hidden.
 	 *
 	 * @since $ver$
-	 * @return string[] The field ID's.
+	 *
+	 * @return string[] The field IDs.
 	 */
 	private function hidden_fields(): array {
 		$hidden_fields = [];
+
 		foreach ( $this->directory_fields as $field ) {
 			if ( ! $field->is_hidden() ) {
 				continue;
@@ -329,14 +346,14 @@ final class DataView {
 	}
 
 	/**
-	 * Returns an instance of the data view with a particular pagination.
+	 * Returns an instance of the DataView with a particular pagination.
 	 *
 	 * @since $ver$
 	 *
 	 * @param int $per_page The results per page.
 	 * @param int $page     The current page.
 	 *
-	 * @return self The dataview.
+	 * @return self The DataView.
 	 */
 	public function paginate( int $per_page, int $page = 1 ): self {
 		$this->pagination = new Pagination( $page, $per_page );
@@ -345,13 +362,13 @@ final class DataView {
 	}
 
 	/**
-	 * Returns an instance of the data view with search enabled, and a provided search string.
+	 * Returns an instance of the DataView with search enabled, and a provided search string.
 	 *
 	 * @since $ver$
 	 *
 	 * @param string $search The query to search.
 	 *
-	 * @return self The dataview.
+	 * @return self The DataView.
 	 */
 	public function search( string $search = '' ): self {
 		$this->has_search = true;
@@ -361,11 +378,11 @@ final class DataView {
 	}
 
 	/**
-	 * Returns an instance of the data view with searching disabled.
+	 * Returns an instance of the DataView with searching disabled.
 	 *
 	 * @since $ver$
 	 *
-	 * @return self The data view instance.
+	 * @return self The DataView instance.
 	 */
 	public function disable_search(): self {
 		$this->has_search = false;
@@ -375,13 +392,13 @@ final class DataView {
 	}
 
 	/**
-	 * Returns an instance of the data view with a particular sorting applied.
+	 * Returns an instance of the DataView with a particular sorting applied.
 	 *
 	 * @since $ver$
 	 *
 	 * @param Sort|null $sort The sort object.
 	 *
-	 * @return self The dataview.
+	 * @return self The DataView.
 	 */
 	public function sort( ?Sort $sort ): self {
 		$this->sort = $sort;
@@ -409,12 +426,13 @@ final class DataView {
 	}
 
 	/**
-	 * Returns the javascript object for a WordPress DataViews component.
+	 * Returns the JavaScript object for a WordPress DataViews component.
 	 *
-	 * Note: removing "__RAW__ and __ENDRAW__" ensure certain code is provided as javascript, instead of a string.
+	 * Note: removing "__RAW__ and __ENDRAW__" ensure certain code is provided as JavaScript, instead of a string.
 	 *
 	 * @since $ver$
-	 * @return string The javascript object.
+	 *
+	 * @return string The JavaScript object.
 	 */
 	public function to_js( bool $is_pretty = false ): string {
 		$flags = JSON_THROW_ON_ERROR;
@@ -434,7 +452,7 @@ final class DataView {
 	}
 
 	/**
-	 * Makes a single result of a dataview visible within a modal.
+	 * Makes a single result of a DataView visible within a modal.
 	 *
 	 * Note: This method adds a primary action to open a single entry template in a modal.
 	 *
@@ -443,7 +461,7 @@ final class DataView {
 	 * @param array  $fields The fields to show.
 	 * @param string $label  The label to call the action.
 	 *
-	 * @return self The dataview with the view action.
+	 * @return self The DataView with the view action.
 	 */
 	public function viewable( array $fields, string $label = 'View' ): self {
 		$this->add_view_fields( ...$fields );
@@ -452,7 +470,7 @@ final class DataView {
 		$view_rest_url = Router::get_url( sprintf( 'views/%s/data/{id}', $this->id() ) );
 
 		$view_action = Action::modal( 'view', $label, $view_rest_url, true )
-			->primary( 'info' );
+							->primary( 'info' );
 
 		$actions[] = $view_action;
 
@@ -462,9 +480,9 @@ final class DataView {
 	}
 
 	/**
-	 * Returns an instance of the dataview which includes a delete action.
+	 * Returns an instance of the DataView which includes a delete action.
 	 *
-	 * Note: The method adds a primary destructive action, with a confirmation. To change anything to the action, you
+	 * Note: The method adds a primary destructive action, with a confirmation. To change the action, you
 	 * can provide a callback which receives (and should return) the action.
 	 *
 	 * @since $ver$
@@ -472,7 +490,7 @@ final class DataView {
 	 * @param string        $label    The label to use on the button.
 	 * @param callable|null $callback Callback that receives the action as the single argument to perform changes on.
 	 *
-	 * @return self The dataview with a delete action.
+	 * @return self The DataView with a delete action.
 	 */
 	public function deletable( string $label = 'Delete', ?callable $callback = null ): self {
 		if (
@@ -486,15 +504,15 @@ final class DataView {
 		$delete_rest_url = Router::get_url( sprintf( 'views/%s/data', $this->id() ) );
 
 		$delete_action = Action::ajax( 'delete', $label, $delete_rest_url, 'DELETE', [ 'id' => '{id}' ], true )
-			->destructive()
-			->bulk()
-			->primary( 'trash' )
-			->confirm( 'Are you sure you want to delete these items?' );
+								->destructive()
+								->bulk()
+								->primary( 'trash' )
+								->confirm( esc_html__( 'Are you sure you want to delete these items?', 'dk-datakit' ) );
 
 		if ( $callback ) {
 			$delete_action = $callback( $delete_action );
 			if ( ! $delete_action instanceof Action ) {
-				throw new \InvalidArgumentException( 'The provided callback should return an Action object.' );
+				throw new InvalidArgumentException( 'The provided callback should return an Action object.' );
 			}
 		}
 

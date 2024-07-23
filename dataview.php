@@ -29,7 +29,7 @@ try {
 	DataViewPlugin::get_instance(
 		new ArrayDataViewRepository(),
 	);
-} catch ( \Throwable $e ) {
+} catch ( Throwable $e ) {
 	// Todo: log errors somewhere.
 	return;
 }

@@ -19,6 +19,7 @@ namespace DataKit\DataViews\DataView;
 final class Operator extends EnumObject {
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	protected static function cases(): array {
@@ -33,9 +34,10 @@ final class Operator extends EnumObject {
 	}
 
 	/**
-	 * A list of operators applicable to single values.
+	 * Returns the list of operators applicable to single values.
 	 *
 	 * @since $ver$
+	 *
 	 * @return self[] The operators.
 	 */
 	public static function singleCases(): array {
@@ -46,9 +48,10 @@ final class Operator extends EnumObject {
 	}
 
 	/**
-	 * A list of operators applicable to multiple values.
+	 * Return the list of operators applicable to multiple values.
 	 *
 	 * @since $ver$
+	 *
 	 * @return self[] The operators.
 	 */
 	public static function multiCases(): array {

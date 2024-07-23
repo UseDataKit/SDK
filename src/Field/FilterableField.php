@@ -14,6 +14,7 @@ abstract class FilterableField extends Field {
 	 * The filter operators.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array
 	 */
 	protected array $operators = [];
@@ -22,6 +23,7 @@ abstract class FilterableField extends Field {
 	 * Whether the fields filter is a primary filter.
 	 *
 	 * @since $ver$
+	 *
 	 * @var bool
 	 */
 	protected bool $is_primary = false;
@@ -33,7 +35,7 @@ abstract class FilterableField extends Field {
 	 *
 	 * @param Operator ...$operators The operators.
 	 *
-	 * @return static A new instance with the filters applied.
+	 * @return self A new instance with the filters applied.
 	 */
 	public function filterable_by( Operator ...$operators ) {
 		$clone            = clone $this;
@@ -43,9 +45,10 @@ abstract class FilterableField extends Field {
 	}
 
 	/**
-	 * Returns the `filterBy` options for the javascript object.
+	 * Returns the `filterBy` options for the JavaScript object.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array|null The filter options.
 	 */
 	private function get_filter_by(): ?array {
@@ -69,7 +72,7 @@ abstract class FilterableField extends Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return static The field which is primary.
+	 * @return self The field which is primary.
 	 */
 	public function primary() {
 		$clone             = clone $this;
@@ -85,7 +88,7 @@ abstract class FilterableField extends Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return static The field which is primary.
+	 * @return self The field which is primary.
 	 */
 	public function secondary() {
 		$clone             = clone $this;
@@ -94,9 +97,9 @@ abstract class FilterableField extends Field {
 		return $clone;
 	}
 
-
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function to_array(): array {

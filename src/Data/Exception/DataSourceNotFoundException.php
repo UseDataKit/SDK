@@ -3,6 +3,7 @@
 namespace DataKit\DataViews\Data\Exception;
 
 use DataKit\DataViews\DataViewException;
+use Throwable;
 
 /**
  * Thrown when the data source could not be found.
@@ -12,11 +13,12 @@ use DataKit\DataViews\DataViewException;
 final class DataSourceNotFoundException extends DataViewException {
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 *
 	 * @phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
 	 */
-	public function __construct( $message = 'Data source not found.', $code = 404, \Throwable $previous = null ) {
+	public function __construct( $message = 'Data source not found.', $code = 404, Throwable $previous = null ) {
 		parent::__construct( $message, $code, $previous );
 	}
 }

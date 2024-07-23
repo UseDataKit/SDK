@@ -14,6 +14,7 @@ final class DataViewShortcode {
 	 * The name of the shortcode.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private const SHORTCODE = 'dataview';
@@ -22,6 +23,7 @@ final class DataViewShortcode {
 	 * The singleton plugin instance.
 	 *
 	 * @since $ver$
+	 *
 	 * @var self
 	 */
 	private static self $instance;
@@ -30,14 +32,16 @@ final class DataViewShortcode {
 	 * The DataView repository.
 	 *
 	 * @since $ver$
+	 *
 	 * @var DataViewRepository
 	 */
 	private DataViewRepository $data_view_repository;
 
 	/**
-	 * Runtime cache for which dataviews are rendered.
+	 * Runtime cache for which DataViews are rendered.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array
 	 */
 	private array $rendered = [];
@@ -53,14 +57,15 @@ final class DataViewShortcode {
 		add_shortcode( self::SHORTCODE, [ $this, 'render_shortcode' ] );
 	}
 
-
 	/**
 	 * Renders the shortcode.
+	 *
+	 * @todo  Add search & sorting attributes.
 	 *
 	 * @since $ver$
 	 *
 	 * @param array $attributes The shortcode attributes.
-	 * @todo Add search & sorting attributes.
+	 *
 	 * @return string The shortcode output.
 	 */
 	public function render_shortcode( array $attributes ): string {
@@ -73,7 +78,7 @@ final class DataViewShortcode {
 			return '';
 		}
 
-		// Only add dataset once per id.
+		// Only add data set once per ID.
 		if ( ! in_array( $id, $this->rendered, true ) ) {
 			wp_enqueue_script( 'datakit/dataview' );
 			wp_enqueue_style( 'datakit/dataview' );
@@ -86,11 +91,11 @@ final class DataViewShortcode {
 				&& ! wp_script_is( 'datakit/dataview', 'registered' )
 			) {
 				add_action(
-                    'wp_enqueue_scripts',
-                    function () use ( $js ) {
+					'wp_enqueue_scripts',
+					function () use ( $js ) {
 						wp_add_inline_script( 'datakit/dataview', $js, 'before' );
 					}
-                );
+				);
 			}
 			wp_add_inline_script( 'datakit/dataview', $js, 'before' );
 
@@ -101,9 +106,10 @@ final class DataViewShortcode {
 	}
 
 	/**
-	 * Return and maybe initialize the singleton.
+	 * Returns and maybe initializes the singleton.
 	 *
 	 * @since $ver$
+	 *
 	 * @return self The singleton.
 	 */
 	public static function get_instance( DataViewRepository $data_view_repository ): self {

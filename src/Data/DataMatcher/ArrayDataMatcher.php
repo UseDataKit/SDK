@@ -5,8 +5,9 @@ namespace DataKit\DataViews\Data\DataMatcher;
 /**
  * Helper class that can perform basic pattern matching on a data item.
  *
- * @since $ver$
  * @todo  Add support for search operators like +, - and "exact phrases".
+ *
+ * @since $ver$
  */
 final class ArrayDataMatcher {
 	/**
@@ -47,7 +48,7 @@ final class ArrayDataMatcher {
 	}
 
 	/**
-	 * Parse a full query string into multiple possible parts.
+	 * Parses a full query string into multiple possible parts.
 	 *
 	 * @since $ver$
 	 *

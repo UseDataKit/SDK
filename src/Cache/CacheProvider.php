@@ -9,7 +9,9 @@ namespace DataKit\DataViews\Cache;
  */
 interface CacheProvider {
 	/**
-	 * Sets the cache for a key with an optional time to live (ttl) in seconds.
+	 * Sets the cache for a key with an optional time to live (TTL) in seconds.
+	 *
+	 * @since $ver$
 	 *
 	 * @param string   $key   The key.
 	 * @param mixed    $value The value to cache.
@@ -30,7 +32,7 @@ interface CacheProvider {
 	public function get( string $key, $fallback = null );
 
 	/**
-	 * Whether the cache contains a value for the provided key.
+	 * Returns whether the cache contains a value for the provided key.
 	 *
 	 * NOTE: Use this only for priming a cache, as this method is subject to a race condition
 	 * where the subsequent `get()` call no longer contains a valid cache.
@@ -58,6 +60,7 @@ interface CacheProvider {
 	 * Clears the entire cache.
 	 *
 	 * @since $ver$
+	 *
 	 * @return bool Whether the clearing of the cache was successful.
 	 */
 	public function clear(): bool;

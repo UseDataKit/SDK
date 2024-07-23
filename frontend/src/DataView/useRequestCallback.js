@@ -7,8 +7,10 @@ import { useEffect, useState } from 'react';
  * a useless extra API call.
  *
  * @since $ver$
+ *
  * @param {CallableFunction} callback The callback to trigger on the effect.
  * @param {RequestState} requestState The request state used for the effect.
+ *
  * @return void
  */
 export function useRequestCallback( callback, requestState ) {

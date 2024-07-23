@@ -26,13 +26,16 @@ final class LinkField extends Field {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	protected string $render = 'datakit_fields.html';
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	protected function default_context(): array {
@@ -61,9 +64,10 @@ final class LinkField extends Field {
 	}
 
 	/**
-	 * Whether to have the link open on a new window.
+	 * Returns whether to have the link open in a new window.
 	 *
 	 * @since $ver$
+	 *
 	 * @return self
 	 */
 	public function on_new_window(): self {
@@ -74,9 +78,10 @@ final class LinkField extends Field {
 	}
 
 	/**
-	 * Whether to have the link open on the same window.
+	 * Returns whether to have the link open in the same window.
 	 *
 	 * @since $ver$
+	 *
 	 * @return self
 	 */
 	public function on_same_window(): self {
@@ -87,7 +92,7 @@ final class LinkField extends Field {
 	}
 
 	/**
-	 * Apply a custom label on the link.
+	 * Applies a custom label to the link.
 	 *
 	 * @since $ver$
 	 *
@@ -103,7 +108,7 @@ final class LinkField extends Field {
 	}
 
 	/**
-	 * Remove a custom label on the link.
+	 * Removes a custom label from the link.
 	 *
 	 * @since $ver$
 	 *
@@ -116,7 +121,6 @@ final class LinkField extends Field {
 		return $clone;
 	}
 
-
 	/**
 	 * Returns a link based on the context settings.
 	 *
@@ -128,6 +132,7 @@ final class LinkField extends Field {
 	 */
 	public function get_value( array $data ) {
 		$href = $this->href( $data );
+
 		if ( ! $href ) {
 			return '';
 		}
@@ -141,7 +146,7 @@ final class LinkField extends Field {
 	}
 
 	/**
-	 * Return the href for the link.
+	 * Returns the href for the link.
 	 *
 	 * @since $ver$
 	 *
@@ -161,6 +166,7 @@ final class LinkField extends Field {
 	 * Returns the target for the link.
 	 *
 	 * @since $ver$
+	 *
 	 * @return string
 	 */
 	private function target(): string {
@@ -172,7 +178,7 @@ final class LinkField extends Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @param array $data THe data object.
+	 * @param array $data The data object.
 	 *
 	 * @return string The label.
 	 */

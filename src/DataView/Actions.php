@@ -18,6 +18,7 @@ final class Actions implements IteratorAggregate {
 	 * The actions on the collection.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Action[]
 	 */
 	private array $actions;
@@ -52,6 +53,7 @@ final class Actions implements IteratorAggregate {
 	 * Returns a serialized set of actions.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array
 	 */
 	public function to_array(): array {
@@ -65,6 +67,7 @@ final class Actions implements IteratorAggregate {
 	 * Returns an iterator to loop over the collection.
 	 *
 	 * @since $ver$
+	 *
 	 * @return ArrayIterator The iterator.
 	 */
 	public function getIterator(): ArrayIterator {

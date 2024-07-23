@@ -5,7 +5,7 @@ namespace DataKit\DataViews\DataView;
 use DataKit\DataViews\Data\DataSource;
 
 /**
- * Represents the pagination settings of a dataview.
+ * Represents the pagination settings of a DataView.
  *
  * @link  https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/#paginationinfo-object
  *
@@ -16,6 +16,7 @@ final class Pagination {
 	 * The current page.
 	 *
 	 * @since $ver$
+	 *
 	 * @var int
 	 */
 	private int $page;
@@ -24,6 +25,7 @@ final class Pagination {
 	 * The amount of results per page.
 	 *
 	 * @since $ver$
+	 *
 	 * @var int
 	 */
 	private int $per_page;
@@ -41,9 +43,10 @@ final class Pagination {
 		 * Overwrites the default amount of results per page.
 		 *
 		 * @filter `datakit/dataview/pagination/per-page-default`
+		 *
 		 * @since  $ver$
 		 *
-		 * @param int $per_page The amount of results per page, default 25.
+		 * @param int $per_page The amount of results per page (default is 25).
 		 */
 		$per_page ??= (int) apply_filters( 'datakit/dataview/pagination/per-page-default', 25 );
 
@@ -72,6 +75,7 @@ final class Pagination {
 	 * Returns an instance with the default settings.
 	 *
 	 * @since $ver$
+	 *
 	 * @return self A pagination object.
 	 */
 	public static function default(): self {
@@ -82,6 +86,7 @@ final class Pagination {
 	 * Returns the limit for a DataSource query.
 	 *
 	 * @since $ver$
+	 *
 	 * @return int The limit.
 	 */
 	public function limit(): int {
@@ -92,6 +97,7 @@ final class Pagination {
 	 * Returns the offset based on the current page.
 	 *
 	 * @since $ver$
+	 *
 	 * @return int The offset.
 	 */
 	public function offset(): int {
@@ -120,6 +126,7 @@ final class Pagination {
 	 * Returns the current page.
 	 *
 	 * @since $ver$
+	 *
 	 * @return int The current page.
 	 */
 	public function page(): int {

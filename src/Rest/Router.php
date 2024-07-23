@@ -21,6 +21,7 @@ final class Router {
 	 * The API namespace.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	public const NAMESPACE = 'dataviews/v1';
@@ -29,6 +30,7 @@ final class Router {
 	 * The singleton router instance.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Router
 	 */
 	private static self $instance;
@@ -37,6 +39,7 @@ final class Router {
 	 * The DataViews repository.
 	 *
 	 * @since $ver$
+	 *
 	 * @var DataViewRepository
 	 */
 	private DataViewRepository $data_view_repository;
@@ -45,6 +48,7 @@ final class Router {
 	 * The view controller.
 	 *
 	 * @since $ver$
+	 *
 	 * @var ViewController
 	 */
 	private ViewController $view_controller;
@@ -64,13 +68,13 @@ final class Router {
 
 
 	/**
-	 * Returns a prefixed url.
+	 * Returns a prefixed URL.
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $url The url to prefix.
+	 * @param string $url The URL to prefix.
 	 *
-	 * @return string The full url.
+	 * @return string The full URL.
 	 */
 	public static function get_url( string $url ): string {
 		return rest_url( self::NAMESPACE . '/' . trim( $url, '/' ) );
@@ -83,9 +87,9 @@ final class Router {
 	 */
 	public function register_routes(): void {
 		register_rest_route(
-            self::NAMESPACE,
-            '/views/(?<id>[^/]+)$',
-            [
+			self::NAMESPACE,
+			'/views/(?<id>[^/]+)$',
+			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_view' ],
@@ -114,46 +118,47 @@ final class Router {
 					],
 				],
 			]
-        );
+		);
 
 		register_rest_route(
-            self::NAMESPACE,
-            '/views/(?<view_id>[^/]+)/data/(?<data_id>[^/]+)',
-            [
+			self::NAMESPACE,
+			'/views/(?<view_id>[^/]+)/data/(?<data_id>[^/]+)',
+			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this->view_controller, 'get_item' ],
 					'permission_callback' => [ $this->view_controller, 'can_view' ],
 				],
 			]
-        );
+		);
 
 		register_rest_route(
-            self::NAMESPACE,
-            '/views/(?<view_id>[^/]+)/data',
-            [
+			self::NAMESPACE,
+			'/views/(?<view_id>[^/]+)/data',
+			[
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_view_data' ],
 					'permission_callback' => [ $this, 'delete_view_data_permissions_check' ],
 				],
 			]
-        );
+		);
 	}
 
 	/**
 	 * Returns whether the current user can retrieve the view content.
 	 *
 	 * @since $ver$
+	 *
 	 * @return bool
 	 */
 	public function get_view_permissions_check(): bool {
-		// todo: Add permissions checks.
+		// Todo: add permissions checks.
 		return true;
 	}
 
 	/**
-	 * Returns whether the current user can delete view data the view content.
+	 * Returns whether the current user can delete view data.
 	 *
 	 * @since $ver$
 	 *
@@ -173,7 +178,7 @@ final class Router {
 				return false;
 			}
 
-			// todo: add test for user permissions.
+			// Todo: add test for user permissions.
 			return true;
 		} catch ( \Exception $e ) {
 			return false;
@@ -181,7 +186,7 @@ final class Router {
 	}
 
 	/**
-	 * Returns the data for a DataView.
+	 * Returns the DataView data.
 	 *
 	 * @since $ver$
 	 *
@@ -196,8 +201,8 @@ final class Router {
 
 			// Update view with provided params.
 			$data_source = $data_view->data_source()
-				->filter_by( Filters::from_array( $params['filters'] ?? [] ) )
-				->search_by( $params['search'] ?? '' );
+									->filter_by( Filters::from_array( $params['filters'] ?? [] ) )
+									->search_by( $params['search'] ?? '' );
 
 			$pagination = ( $params['page'] ?? null ) ? Pagination::from_array( $params ) : Pagination::default();
 
@@ -215,7 +220,7 @@ final class Router {
 	}
 
 	/**
-	 * Deletes a dataset on a dataview.
+	 * Deletes a data set on a DataView.
 	 *
 	 * @since $ver$
 	 *
@@ -245,7 +250,7 @@ final class Router {
 	}
 
 	/**
-	 * Return and maybe initialize the singleton router.
+	 * Returns and maybe initializes the singleton router.
 	 *
 	 * @since $ver$
 	 * @return self The router.

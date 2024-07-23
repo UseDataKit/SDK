@@ -15,9 +15,10 @@ use JsonException;
  */
 abstract class Field {
 	/**
-	 * The field id.
+	 * The field ID.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	protected string $id;
@@ -26,6 +27,7 @@ abstract class Field {
 	 * The label on the header.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	protected string $header;
@@ -34,6 +36,7 @@ abstract class Field {
 	 * The render function.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	protected string $render = '';
@@ -42,6 +45,7 @@ abstract class Field {
 	 * Whether the field is hidden by default.
 	 *
 	 * @since $ver$
+	 *
 	 * @var bool
 	 */
 	protected bool $is_hidden = false;
@@ -50,6 +54,7 @@ abstract class Field {
 	 * Whether the field is sortable.
 	 *
 	 * @since $ver$
+	 *
 	 * @var bool
 	 */
 	protected bool $is_sortable = true;
@@ -58,6 +63,7 @@ abstract class Field {
 	 * Whether the field is hideable.
 	 *
 	 * @since $ver$
+	 *
 	 * @var bool
 	 */
 	protected bool $is_hideable = true;
@@ -66,6 +72,7 @@ abstract class Field {
 	 * The default value to use if the value is empty.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string|null
 	 */
 	protected ?string $default_value = null;
@@ -75,12 +82,13 @@ abstract class Field {
 	 * The callback to return the value.
 	 *
 	 * @since $ver$
+	 *
 	 * @var callable
 	 */
 	protected $callback;
 
 	/**
-	 * The context object for the javascript renderer.
+	 * The context object for the JavaScript renderer.
 	 *
 	 * @since $ver$
 	 * @var array
@@ -92,7 +100,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $id     The field id.
+	 * @param string $id     The field ID.
 	 * @param string $header The field label.
 	 */
 	protected function __construct(
@@ -110,6 +118,7 @@ abstract class Field {
 	 * Returns a unique string for this field instance.
 	 *
 	 * @since $ver$
+	 *
 	 * @return string
 	 */
 	final public function uuid(): string {
@@ -125,10 +134,11 @@ abstract class Field {
 	}
 
 	/**
-	 * Named constructor for easy creation.
+	 * Provides a named constructor for easy creation.
 	 *
 	 * @since $ver$
-	 * @return static The field instance.
+	 *
+	 * @return self The field instance.
 	 */
 	public static function create( ...$args ) {
 		$instance = new static( ...$args );
@@ -141,9 +151,10 @@ abstract class Field {
 	}
 
 	/**
-	 * Unique identifier for the field.
+	 * Returns the field's unique identifier.
 	 *
 	 * @since $ver$
+	 *
 	 * @return string
 	 */
 	public function id(): string {
@@ -161,9 +172,10 @@ abstract class Field {
 	}
 
 	/**
-	 * Function that renders the field. Should be any of the field type renderers; e.g. `fields.html`.
+	 * Renders the field. Should be any of the field type renderers (e.g., `fields.html`).
 	 *
 	 * @since $ver$
+	 *
 	 * @return string
 	 */
 	public function render(): string {
@@ -186,7 +198,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return static The field which is *not* sortable.
+	 * @return self The non-sortable field.
 	 */
 	public function not_sortable() {
 		$clone              = clone $this;
@@ -200,7 +212,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return static The field which is sortable.
+	 * @return self The sortable field.
 	 */
 	public function sortable() {
 		$clone              = clone $this;
@@ -214,7 +226,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return static The field which is always visible.
+	 * @return self The always-visible field.
 	 */
 	public function always_visible() {
 		$clone              = clone $this;
@@ -229,7 +241,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return static The field which can be hidden.
+	 * @return self The field that can be hidden.
 	 */
 	public function hideable() {
 		$clone              = clone $this;
@@ -243,7 +255,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return static The field which is hidden.
+	 * @return self The hidden field.
 	 */
 	public function hidden() {
 		$clone              = clone $this;
@@ -258,7 +270,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return static The field which is visible.
+	 * @return self The visible field.
 	 */
 	public function visible() {
 		$clone            = clone $this;
@@ -268,13 +280,13 @@ abstract class Field {
 	}
 
 	/**
-	 * Set the callback for the field to alter the value.
+	 * Sets the callback for the field to alter the value.
 	 *
 	 * @since $ver$
 	 *
 	 * @param callable $callback The callback.
 	 *
-	 * @return static The field.
+	 * @return self The field.
 	 */
 	public function callback( callable $callback ) {
 		$clone           = clone $this;
@@ -288,7 +300,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return static The field with a default value.
+	 * @return self The field with a default value.
 	 */
 	public function default_value( ?string $default_value ) {
 		$clone                = clone $this;
@@ -298,7 +310,7 @@ abstract class Field {
 	}
 
 	/**
-	 * Whether the field is hidden.
+	 * Returns whether the field is hidden.
 	 *
 	 * @since $ver$
 	 * @return bool Whether the field is hidden.
@@ -324,6 +336,7 @@ abstract class Field {
 	 * Returns the field as an array object.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array<string, mixed> The field configuration.
 	 */
 	public function to_array(): array {
@@ -337,9 +350,10 @@ abstract class Field {
 	}
 
 	/**
-	 * Returns the context needed for the javascript part of the field.
+	 * Returns the context needed for the JavaScript part of the field.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array[] The context.
 	 */
 	protected function context(): array {
@@ -352,6 +366,7 @@ abstract class Field {
 	 * Note: this should be overwritten on extending field.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array The default context values.
 	 */
 	protected function default_context(): array {

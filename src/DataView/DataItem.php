@@ -14,6 +14,7 @@ final class DataItem {
 	 * The fields.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Field[]
 	 */
 	private array $fields;
@@ -22,6 +23,7 @@ final class DataItem {
 	 * The provided data.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array
 	 */
 	private array $data;
@@ -36,6 +38,7 @@ final class DataItem {
 	 */
 	private function __construct( array $fields, array $data ) {
 		$this->add_fields( ...$fields );
+
 		$this->data = $data;
 	}
 
@@ -70,6 +73,7 @@ final class DataItem {
 	 * Serializes the instance to an array.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array The array.
 	 */
 	public function to_array(): array {
@@ -83,6 +87,7 @@ final class DataItem {
 	 * Returns the fields for the data item.
 	 *
 	 * @since $ver$
+	 *
 	 * @return Field[] The fields.
 	 */
 	public function fields(): array {
@@ -93,6 +98,7 @@ final class DataItem {
 	 * Returns the data for the data item.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array The data.
 	 */
 	public function data(): array {

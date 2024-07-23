@@ -16,12 +16,14 @@ final class DataNotFoundException extends DataViewException {
 	 * The data source that triggered the exception.
 	 *
 	 * @since $ver$
+	 *
 	 * @var DataSource
 	 */
 	private DataSource $data_source;
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function __construct(
@@ -31,11 +33,12 @@ final class DataNotFoundException extends DataViewException {
 		Throwable $previous = null
 	) {
 		parent::__construct( $message, $code, $previous );
+
 		$this->data_source = $data_source;
 	}
 
 	/**
-	 * Creates instance of the exception for a specific id.
+	 * Creates instance of the exception for a specific ID.
 	 *
 	 * @since $ver$
 	 *
@@ -52,6 +55,7 @@ final class DataNotFoundException extends DataViewException {
 	 * Returns the data source that triggered the exception.
 	 *
 	 * @since $ver$
+	 *
 	 * @return DataSource
 	 */
 	public function data_source(): DataSource {

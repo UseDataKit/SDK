@@ -23,7 +23,8 @@ final class CsvDataSource extends BaseDataSource {
 	 * The CSV file iterator.
 	 *
 	 * @since $ver$
-	 * @var SplFileObject $file;
+	 *
+	 * @var SplFileObject
 	 */
 	private SplFileObject $file;
 
@@ -47,17 +48,20 @@ final class CsvDataSource extends BaseDataSource {
 		}
 
 		$this->file = new SplFileObject( $file_path, 'rb' );
+
 		$this->file->setFlags(
 			SplFileObject::READ_CSV |
 			SplFileObject::READ_AHEAD |
 			SplFileObject::SKIP_EMPTY |
 			SplFileObject::DROP_NEW_LINE,
 		);
+
 		$this->file->setCsvControl( $separator, $enclosure, $escape );
 	}
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function id(): string {
@@ -66,12 +70,13 @@ final class CsvDataSource extends BaseDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_data_ids( int $limit = 100, int $offset = 0 ): array {
 		$lines = new LimitIterator( $this->data( true ), $offset, $limit );
+		$ids   = [];
 
-		$ids = [];
 		foreach ( $lines as $key => $_ ) {
 			$ids[] = (string) $key;
 		}
@@ -81,6 +86,7 @@ final class CsvDataSource extends BaseDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ): array {
@@ -97,7 +103,7 @@ final class CsvDataSource extends BaseDataSource {
 
 
 	/**
-	 * Clean the values from the CSV.
+	 * Cleans CSV data.
 	 *
 	 * @since $ver$
 	 *
@@ -111,6 +117,7 @@ final class CsvDataSource extends BaseDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function count(): int {
@@ -120,9 +127,10 @@ final class CsvDataSource extends BaseDataSource {
 	}
 
 	/**
-	 * Lazy instantiate a file object.
+	 * Lazily instantiates a file object.
 	 *
 	 * @since $ver$
+	 *
 	 * @return SplFileObject The file object.
 	 */
 	private function file(): SplFileObject {
@@ -142,6 +150,7 @@ final class CsvDataSource extends BaseDataSource {
 	 */
 	private function data( bool $is_filtered ): Iterator {
 		$data = new LimitIterator( $this->file(), 1 );
+
 		if ( $is_filtered ) {
 			$data = new CallbackFilterIterator(
 				$data,
@@ -157,14 +166,14 @@ final class CsvDataSource extends BaseDataSource {
 			$data = new ArrayIterator( iterator_to_array( $data ) );
 
 			$data->uasort(
-                static function ( array $a, array $b ) use ( $is_desc, $field ): int {
+				static function ( array $a, array $b ) use ( $is_desc, $field ): int {
 					if ( $is_desc ) {
 						[ $b, $a ] = [ $a, $b ];
 					}
 
 					return strnatcmp( $a[ $field ] ?? '', $b[ $field ] ?? '' );
 				}
-            );
+			);
 		}
 
 		return $data;
@@ -172,6 +181,7 @@ final class CsvDataSource extends BaseDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_fields(): array {

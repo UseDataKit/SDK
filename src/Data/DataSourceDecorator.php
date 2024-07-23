@@ -6,7 +6,7 @@ use DataKit\DataViews\DataView\Filters;
 use DataKit\DataViews\DataView\Sort;
 
 /**
- * A base class for easier decorator or proxy creation.
+ * A base class to facilitate the creation decorators or proxies.
  *
  * @since $ver$
  */
@@ -27,6 +27,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_data_ids( int $limit = 20, int $offset = 0 ): array {
@@ -35,6 +36,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ): array {
@@ -43,6 +45,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get_fields(): array {
@@ -51,6 +54,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function count(): int {
@@ -59,6 +63,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function filter_by( ?Filters $filters ) {
@@ -67,6 +72,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function search_by( string $search ) {
@@ -75,6 +81,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function sort_by( ?Sort $sort ) {
@@ -83,6 +90,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function can_delete(): bool {
@@ -97,6 +105,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function delete_data_by_id( string ...$ids ): void {

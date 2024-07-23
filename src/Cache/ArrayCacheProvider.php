@@ -17,6 +17,7 @@ final class ArrayCacheProvider implements CacheProvider {
 	 * The cached items.
 	 *
 	 * @since $ver$
+	 *
 	 * @var array
 	 */
 	private array $items;
@@ -25,12 +26,13 @@ final class ArrayCacheProvider implements CacheProvider {
 	 * The clock instance.
 	 *
 	 * @since $ver$
+	 *
 	 * @var Clock
 	 */
 	private Clock $clock;
 
 	/**
-	 * Creates an Array Cache Provider.
+	 * Creates an Array cache provider.
 	 *
 	 * @since $ver$
 	 *
@@ -44,6 +46,7 @@ final class ArrayCacheProvider implements CacheProvider {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function set( string $key, $value, ?int $ttl = null ): void {
@@ -56,6 +59,7 @@ final class ArrayCacheProvider implements CacheProvider {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function get( string $key, $fallback = null ) {
@@ -72,6 +76,7 @@ final class ArrayCacheProvider implements CacheProvider {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function has( string $key ): bool {
@@ -89,6 +94,7 @@ final class ArrayCacheProvider implements CacheProvider {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function delete( string $key ): bool {
@@ -99,6 +105,7 @@ final class ArrayCacheProvider implements CacheProvider {
 
 	/**
 	 * @inheritDoc
+	 *
 	 * @since $ver$
 	 */
 	public function clear(): bool {
@@ -108,7 +115,7 @@ final class ArrayCacheProvider implements CacheProvider {
 	}
 
 	/**
-	 * Whether the provided cache item is expired.
+	 * Returns whether the provided cache item is expired.
 	 *
 	 * @since $ver$
 	 *

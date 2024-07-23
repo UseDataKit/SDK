@@ -22,12 +22,15 @@ interface DataSource extends Countable {
 	 * The unique ID of the data source.
 	 *
 	 * @since $ver$
+	 *
 	 * @return string
 	 */
 	public function id(): string;
 
 	/**
-	 * Returns the id's for the data source.
+	 * Returns IDs for the data source.
+	 *
+	 * @since $ver$
 	 *
 	 * @param int $limit  The limit.
 	 * @param int $offset The offset.
@@ -37,21 +40,23 @@ interface DataSource extends Countable {
 	public function get_data_ids( int $limit = 20, int $offset = 0 ): array;
 
 	/**
-	 * Returns the data for the provided id.
+	 * Returns data for the provided ID.
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $id The id.
+	 * @param string $id The ID.
+	 *
+	 * @throws DataNotFoundException When the data was not found.
 	 *
 	 * @return array The provided data.
-	 * @throws DataNotFoundException When the data was not found.
 	 */
 	public function get_data_by_id( string $id ): array;
 
 	/**
-	 * Returns a value => label array of the available fields for the data source.
+	 * Returns a value=>label array of the available fields for the data source.
 	 *
 	 * @since $ver$
+	 *
 	 * @return array<string, string> The fields.
 	 */
 	public function get_fields(): array;
@@ -62,6 +67,7 @@ interface DataSource extends Countable {
 	 * This method should take into account any filtering that might be applied.
 	 *
 	 * @since $ver$
+	 *
 	 * @return int The total amount of results.
 	 */
 	public function count(): int;

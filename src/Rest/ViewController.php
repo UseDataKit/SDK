@@ -14,9 +14,10 @@ use WP_REST_Request;
  */
 final class ViewController {
 	/**
-	 * The dataview repository.
+	 * The DataView repository.
 	 *
 	 * @since $ver$
+	 *
 	 * @var DataViewRepository
 	 */
 	private DataViewRepository $dataview_repository;
@@ -26,7 +27,7 @@ final class ViewController {
 	 *
 	 * @since $ver$
 	 *
-	 * @param DataViewRepository $dataview_repository The dataview repository.
+	 * @param DataViewRepository $dataview_repository The DataView repository.
 	 */
 	public function __construct( DataViewRepository $dataview_repository ) {
 		$this->dataview_repository = $dataview_repository;
@@ -35,15 +36,17 @@ final class ViewController {
 	/**
 	 * Whether the current user can view the result.
 	 *
+	 * @todo  Add security from DataView.
+	 *
 	 * @since $ver$
 	 *
 	 * @param WP_REST_Request $request The request object.
 	 *
 	 * @return bool Whether the current user can view the result.
-	 * @todo  Add security from DataView.
 	 */
 	public function can_view( WP_REST_Request $request ): bool {
 		$view_id = (string) ( $request->get_param( 'view_id' ) ?? '' );
+
 		return true;
 	}
 
@@ -54,7 +57,7 @@ final class ViewController {
 	 *
 	 * @param WP_REST_Request $request The request object.
 	 *
-	 * @return array The response..
+	 * @return array The response.
 	 */
 	public function get_item( WP_REST_Request $request ): array {
 		$view_id = (string) ( $request->get_param( 'view_id' ) ?? '' );
@@ -69,10 +72,11 @@ final class ViewController {
 		 * Overwrites the default template used for a single date item view.
 		 *
 		 * @filter `datakit/dataview/view/template`
+		 *
 		 * @since  $ver$
 		 *
 		 * @param string   $template  The absolute path of the template to render.
-		 * @param DataView $dataview  The dataview.
+		 * @param DataView $dataview  The DataView.
 		 * @param DataItem $data_item The data item to render.
 		 */
 		$template = (string) apply_filters(

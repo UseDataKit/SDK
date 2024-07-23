@@ -1,6 +1,6 @@
 import { DataViews } from '@wordpress/dataviews';
 import { RegistryProvider } from '@wordpress/data';
-import { useState, StrictMode } from 'react';
+import { useState } from 'react';
 import { stringify } from 'qs';
 
 import { useRequest } from '@src/DataView/useRequest';
@@ -11,10 +11,13 @@ import '@wordpress/components/build-style/style.css';
 import '@src/scss/fields.scss';
 
 /**
- * Creates the Dataview.
- * @since $ver$
- * @return {JSX.Element} The dataview object.
+ * Creates the DataView.
+ *
  * @constructor
+ *
+ * @since $ver$
+ *
+ * @return {JSX.Element} The DataView object.
  */
 export default function DataView(
     { id, view, fields, actions, data, paginationInfo, supportedLayouts, search, searchLabel, apiUrl }

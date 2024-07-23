@@ -2,10 +2,12 @@ import { useEffect, useReducer } from 'react';
 
 /**
  * Reducer that only returns a new object if the data has changed.
+ *
  * @since $ver$
  *
  * @param {RequestState} request The current state object.
  * @param {RequestState} new_request The possibly update state object.
+ *
  * @return {RequestState} The possibly updated request object.
  */
 function requestReducer( request, new_request ) {
@@ -16,9 +18,12 @@ function requestReducer( request, new_request ) {
 
 /**
  * Generate a Request object from a view.
+ *
  * @since $ver$
- * @param {String} id The dataview ID.
+ *
+ * @param {String} id The DataView ID.
  * @param {Object} viewState The view state.
+ *
  * @return {RequestState} The resulting object.
  */
 function generateRequestState( id, viewState ) {
