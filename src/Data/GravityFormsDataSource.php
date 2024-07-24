@@ -121,8 +121,10 @@ final class GravityFormsDataSource extends BaseDataSource {
 		}
 
 		foreach ( $this->get_form_fields() as $field ) {
-			// Returns the values for the entire field, as well as all sub input separately (e.g., 1, 1.1, 1.2, etc.).
-			$inputs = [ $field->id, ...array_column( $field->inputs ?? [], 'id' ) ];
+			$field_inputs = is_array( $field->inputs ) ? $field->inputs : [];
+
+			// Returns the values for the entire field, as well as all sub input separately; e.g. 1, 1.1, 1.2, etc.
+			$inputs = [ $field->id, ...array_column( $field_inputs, 'id' ) ];
 
 			foreach ( $inputs as $input_id ) {
 				$entry[ $input_id ] = $field->get_value_export( $entry, $input_id );
