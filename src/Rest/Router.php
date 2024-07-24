@@ -77,6 +77,13 @@ final class Router {
 	 * @return string The full URL.
 	 */
 	public static function get_url( string $url ): string {
+		global $wp_rewrite;
+
+		// Don't rely on the global $wp_rewrite object; it might not be set.
+		if ( ! $wp_rewrite ) {
+			$wp_rewrite = new \WP_Rewrite();
+		}
+
 		return rest_url( self::NAMESPACE . '/' . trim( $url, '/' ) );
 	}
 
