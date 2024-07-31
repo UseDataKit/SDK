@@ -15,7 +15,7 @@ final class Sort {
 	 *
 	 * @since $ver$
 	 */
-	public const ASC = 'ASC';
+	public const ASC  = 'ASC';
 	public const DESC = 'DESC';
 
 	/**
@@ -48,7 +48,7 @@ final class Sort {
 		$this->field     = $field;
 
 		if (
-			( empty( $field ) && $field !== '0' )
+			( empty( $field ) && '0' !== $field )
 			|| ! in_array( $this->direction, [ self::ASC, self::DESC ], true )
 		) {
 			throw new InvalidArgumentException( 'A sort consists of a field and a direction.' );
@@ -62,7 +62,7 @@ final class Sort {
 	 *
 	 * @return array<string, string> The serialized sort object.
 	 */
-	public function to_array() : array {
+	public function to_array(): array {
 		return [
 			'field'     => $this->field,
 			'direction' => $this->direction,
@@ -78,7 +78,7 @@ final class Sort {
 	 *
 	 * @return self The sort object.
 	 */
-	public static function from_array( array $field_array ) : self {
+	public static function from_array( array $field_array ): self {
 		return new self( $field_array['field'] ?? '', $field_array['direction'] ?? '' );
 	}
 
@@ -91,7 +91,7 @@ final class Sort {
 	 *
 	 * @return self The sort object.
 	 */
-	public static function asc( string $field ) : self {
+	public static function asc( string $field ): self {
 		return new self( $field, self::ASC );
 	}
 
@@ -104,7 +104,7 @@ final class Sort {
 	 *
 	 * @return self The sort object.
 	 */
-	public static function desc( string $field ) : self {
+	public static function desc( string $field ): self {
 		return new self( $field, self::DESC );
 	}
 }
