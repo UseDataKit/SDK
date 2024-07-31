@@ -55,6 +55,16 @@ final class GravityFormsDataSource extends BaseDataSource {
 	private array $fields;
 
 	/**
+	 * Whether Gravity Forms is available.
+	 *
+	 * @since $ver$
+	 * @return bool
+	 */
+	private function has_gravity_forms(): bool {
+		return class_exists( 'GFAPI' );
+	}
+
+	/**
 	 * Creates the data source.
 	 *
 	 * @since $ver$
@@ -62,6 +72,10 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @param int $form_id The form ID.
 	 */
 	public function __construct( int $form_id ) {
+		if ( ! $this->has_gravity_forms() ) {
+			return;
+		}
+
 		$form = GFAPI::get_form( $form_id );
 		if ( ! is_array( $form ) ) {
 			throw new DataSourceNotFoundException( sprintf( 'Gravity Forms data source (%d) not found', $form_id ) );
@@ -85,6 +99,10 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function get_data_ids( int $limit = 100, int $offset = 0 ): array {
+		if ( ! $this->has_gravity_forms() ) {
+			return [];
+		}
+
 		$entries = GFAPI::get_entries(
 			$this->form['id'],
 			$this->get_search_criteria(),
@@ -112,6 +130,10 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ): array {
+		if ( ! $this->has_gravity_forms() ) {
+			return [];
+		}
+
 		$entry = $this->entries[ $id ] ?? GFAPI::get_entry( (int) $id );
 
 		if ( ! is_array( $entry ) ) {
@@ -136,6 +158,10 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function count(): int {
+		if ( ! $this->has_gravity_forms() ) {
+			return 0;
+		}
+
 		return GFAPI::count_entries( $this->form['id'], $this->get_search_criteria() );
 	}
 
@@ -206,13 +232,12 @@ final class GravityFormsDataSource extends BaseDataSource {
 	/**
 	 * Maps the field operator to a Gravity Forms search operator.
 	 *
-	 * @todo  this needs to be fixed for all cases.
-	 *
 	 * @since $ver$
 	 *
 	 * @param string $operator The field operator.
 	 *
 	 * @return string The Gravity Forms search operator.
+	 * @todo  this needs to be fixed for all cases.
 	 */
 	private function map_operator( string $operator ): string {
 		$case = Operator::try_from( $operator );
@@ -234,7 +259,7 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 *
 	 * @since $ver$
 	 *
-	 * @return array<string, string> The filters.
+	 * @return array<string, mixed> The filters.
 	 */
 	private function top_level_filters(): array {
 		$filters = [];
@@ -276,6 +301,10 @@ final class GravityFormsDataSource extends BaseDataSource {
 	 * @since $ver$
 	 */
 	public function get_fields(): array {
+		if ( ! $this->has_gravity_forms() ) {
+			return [];
+		}
+
 		if ( isset( $this->fields ) ) {
 			return $this->fields;
 		}

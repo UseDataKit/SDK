@@ -70,7 +70,12 @@ final class DataViewPlugin {
 
 		wp_register_script( 'datakit/dataview', $assets_dir . 'assets/js/dataview.js', [], DATAVIEW_VERSION, true );
 
-		wp_register_style( 'datakit/dataview', $assets_dir . 'assets/css/dataview.css', [], DATAVIEW_VERSION );
+		wp_register_style(
+			'datakit/dataview',
+			$assets_dir . 'assets/css/dataview.css',
+			[ 'dashicons' ],
+			DATAVIEW_VERSION,
+		);
 
 		wp_add_inline_script(
 			'datakit/dataview',
