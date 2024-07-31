@@ -50,7 +50,7 @@ abstract class EnumObject {
 	 *
 	 * @param string $enum_case The case.
 	 *
-	 * @return self|null The Enum is valid.
+	 * @return static|null The Enum is valid.
 	 */
 	final public static function try_from( string $enum_case ) {
 		try {
@@ -70,7 +70,7 @@ abstract class EnumObject {
 	 *
 	 * @throws InvalidArgumentException
 	 *
-	 * @return self The Enum object.
+	 * @return static The Enum object.
 	 */
 	final public static function __callStatic( string $method, array $_ ) {
 		$type = self::try_from( $method );

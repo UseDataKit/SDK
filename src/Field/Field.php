@@ -138,7 +138,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return self The field instance.
+	 * @return static The field instance.
 	 */
 	public static function create( ...$args ) {
 		$instance = new static( ...$args );

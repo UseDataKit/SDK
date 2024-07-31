@@ -4,7 +4,6 @@ namespace DataKit\DataViews\Tests\Field;
 
 use DataKit\DataViews\Field\DateTimeField;
 use DateTimeZone;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for {@see DateTimeField}
