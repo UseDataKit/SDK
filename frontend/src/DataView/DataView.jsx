@@ -38,8 +38,10 @@ export default function DataView(
     const updateData = ( request ) => {
         setLoading( true );
 
-        const query_params = stringify( request );
-        const url = new URL( `${apiUrl}/views/${id}?${query_params}` );
+        const { id, ...params } = request;
+        const query_params = stringify( params );
+        const append = apiUrl.indexOf('?') !== -1 ? '&' : '?';
+        const url = new URL( `${apiUrl}/views/${id}${append}${query_params}` );
 
         fetch( url )
             .then( ( response ) => {
@@ -55,7 +57,8 @@ export default function DataView(
             } )
             .finally( () => {
                 setLoading( false );
-            } );
+            } )
+            .catch( ( reason => console.log( reason ) ) );
     }
 
     /**
