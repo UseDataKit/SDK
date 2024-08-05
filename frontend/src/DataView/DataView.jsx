@@ -58,7 +58,7 @@ export default function DataView(
             .finally( () => {
                 setLoading( false );
             } )
-            .catch( ( reason => console.log( reason ) ) );
+            .catch( ( reason => null ) );
     }
 
     /**

@@ -5,8 +5,10 @@ namespace DataKit\DataViews\DataView;
 use DataKit\DataViews\Data\DataSource;
 use DataKit\DataViews\Data\Exception\DataSourceException;
 use DataKit\DataViews\Data\MutableDataSource;
+use DataKit\DataViews\DataViewException;
 use DataKit\DataViews\Field\Field;
 use InvalidArgumentException;
+use JsonException;
 
 /**
  * Represents a single DataView entity.
@@ -434,6 +436,7 @@ final class DataView {
 	 * @since $ver$
 	 *
 	 * @return string The JavaScript object.
+	 * @throws DataViewException If there was an issue rendering the JSON blob.
 	 */
 	public function to_js( bool $is_pretty = false ): string {
 		$flags = JSON_THROW_ON_ERROR;
@@ -447,8 +450,8 @@ final class DataView {
 				static fn( array $matches ): string => stripslashes( $matches[1] ),
 				json_encode( $this->to_array(), $flags ),
 			);
-		} catch ( \Exception $e ) {
-			return '{}';
+		} catch ( JsonException $e ) {
+			throw new DataViewException( $e->getMessage(), $e->getCode(), $e );
 		}
 	}
 
