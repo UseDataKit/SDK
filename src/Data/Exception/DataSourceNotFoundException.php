@@ -2,7 +2,6 @@
 
 namespace DataKit\DataViews\Data\Exception;
 
-use DataKit\DataViews\DataViewException;
 use Throwable;
 
 /**
@@ -10,7 +9,7 @@ use Throwable;
  *
  * @since $ver$
  */
-final class DataSourceNotFoundException extends DataViewException {
+final class DataSourceNotFoundException extends DataSourceException {
 	/**
 	 * @inheritDoc
 	 *

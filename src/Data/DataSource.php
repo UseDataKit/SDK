@@ -5,6 +5,7 @@ namespace DataKit\DataViews\Data;
 use Countable;
 use DataKit\DataViews\Data\Exception\DataNotFoundException;
 use DataKit\DataViews\Data\Exception\DataSourceNotFoundException;
+use DataKit\DataViews\Data\Exception\DataSourceException;
 use DataKit\DataViews\DataView\Filters;
 use DataKit\DataViews\DataView\Sort;
 
@@ -36,6 +37,7 @@ interface DataSource extends Countable {
 	 * @param int $offset The offset.
 	 *
 	 * @return string[] The id's.
+	 * @throws DataSourceException When the data could not be retrieved.
 	 */
 	public function get_data_ids( int $limit = 20, int $offset = 0 ): array;
 
@@ -46,9 +48,9 @@ interface DataSource extends Countable {
 	 *
 	 * @param string $id The ID.
 	 *
-	 * @throws DataNotFoundException When the data was not found.
-	 *
 	 * @return array The provided data.
+	 * @throws DataSourceException When the data could not be retrieved.
+	 * @throws DataNotFoundException When the data was not found.
 	 */
 	public function get_data_by_id( string $id ): array;
 
@@ -69,6 +71,7 @@ interface DataSource extends Countable {
 	 * @since $ver$
 	 *
 	 * @return int The total amount of results.
+	 * @throws DataSourceException When the data could not be retrieved.
 	 */
 	public function count(): int;
 

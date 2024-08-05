@@ -2,12 +2,12 @@
 
 namespace DataKit\DataViews;
 
-use RuntimeException;
+use Exception;
 
 /**
  * Exception from the DataView namespace.
  *
  * @since $ver$
  */
-class DataViewException extends RuntimeException {
+class DataViewException extends Exception {
 }

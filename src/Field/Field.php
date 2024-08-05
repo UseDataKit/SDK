@@ -83,7 +83,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @var callable
+	 * @var callable(string $id, array $data): mixed
 	 */
 	protected $callback;
 
@@ -198,7 +198,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return self The non-sortable field.
+	 * @return static The non-sortable field.
 	 */
 	public function not_sortable() {
 		$clone              = clone $this;
@@ -212,7 +212,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return self The sortable field.
+	 * @return static The sortable field.
 	 */
 	public function sortable() {
 		$clone              = clone $this;
@@ -226,7 +226,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return self The always-visible field.
+	 * @return static The always-visible field.
 	 */
 	public function always_visible() {
 		$clone              = clone $this;
@@ -241,7 +241,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return self The field that can be hidden.
+	 * @return static The field that can be hidden.
 	 */
 	public function hideable() {
 		$clone              = clone $this;
@@ -255,7 +255,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return self The hidden field.
+	 * @return static The hidden field.
 	 */
 	public function hidden() {
 		$clone              = clone $this;
@@ -270,7 +270,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return self The visible field.
+	 * @return static The visible field.
 	 */
 	public function visible() {
 		$clone            = clone $this;
@@ -282,11 +282,16 @@ abstract class Field {
 	/**
 	 * Sets the callback for the field to alter the value.
 	 *
-	 * @since $ver$
+	 * @since    $ver$
 	 *
-	 * @param callable $callback The callback.
+	 * @formatter:off
 	 *
-	 * @return self The field.
+	 * @phpcs:ignore Squiz.Commenting.FunctionComment.ParamNameNoMatch
+	 * @param callable(string $id, array $data): mixed $callback The callback.
+	 *
+	 * @formatter:on
+	 *
+	 * @return static The field.
 	 */
 	public function callback( callable $callback ) {
 		$clone           = clone $this;
@@ -300,7 +305,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @return self The field with a default value.
+	 * @return static The field with a default value.
 	 */
 	public function default_value( ?string $default_value ) {
 		$clone                = clone $this;

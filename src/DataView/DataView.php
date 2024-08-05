@@ -3,10 +3,10 @@
 namespace DataKit\DataViews\DataView;
 
 use DataKit\DataViews\Data\DataSource;
+use DataKit\DataViews\Data\Exception\DataSourceException;
 use DataKit\DataViews\Data\MutableDataSource;
 use DataKit\DataViews\Field\Field;
 use InvalidArgumentException;
-use JsonException;
 
 /**
  * Represents a single DataView entity.
@@ -239,6 +239,7 @@ final class DataView {
 	 * @param Pagination|null $pagination  Pagination settings.
 	 *
 	 * @return array The data object.
+	 * @throws DataSourceException When the data source encounters an issue.
 	 */
 	public function get_data( ?DataSource $data_source = null, ?Pagination $pagination = null ): array {
 		$data_source ??= $this->data_source();
@@ -274,6 +275,7 @@ final class DataView {
 	 * @param string $data_id The data item ID.
 	 *
 	 * @return DataItem The data item.
+	 * @throws DataSourceException When the data source encounters an issue.
 	 */
 	public function get_view_data_item( string $data_id ): DataItem {
 		$data = $this->data_source()->get_data_by_id( $data_id );
@@ -410,6 +412,7 @@ final class DataView {
 	 * @since $ver$
 	 *
 	 * @return array The data for a WordPress DataViews component.
+	 * @throws DataSourceException When the data source encounters an issue.
 	 */
 	public function to_array(): array {
 		return [
@@ -444,8 +447,8 @@ final class DataView {
 				static fn( array $matches ): string => stripslashes( $matches[1] ),
 				json_encode( $this->to_array(), $flags ),
 			);
-		} catch ( JsonException $e ) {
-			return '';
+		} catch ( \Exception $e ) {
+			return '{}';
 		}
 	}
 
