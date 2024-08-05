@@ -5,7 +5,6 @@ namespace DataKit\DataViews\DataView;
 use DataKit\DataViews\Data\DataSource;
 use DataKit\DataViews\Data\MutableDataSource;
 use DataKit\DataViews\Field\Field;
-use DataKit\DataViews\Rest\Router;
 use InvalidArgumentException;
 use JsonException;
 
@@ -314,11 +313,10 @@ final class DataView {
 	/**
 	 * Returns the supportedLayouts object.
 	 *
-	 * @todo  Provide option to add more.
-	 *
 	 * @since $ver$
 	 *
 	 * @return string[] The supported layouts.
+	 * @todo  Provide option to add more.
 	 */
 	private function supported_layouts(): array {
 		return [ (string) $this->view ];
@@ -467,10 +465,10 @@ final class DataView {
 		$this->add_view_fields( ...$fields );
 
 		$actions       = $this->actions ? iterator_to_array( $this->actions ) : [];
-		$view_rest_url = Router::get_url( sprintf( 'views/%s/data/{id}', $this->id() ) );
+		$view_rest_url = sprintf( '{REST_ENDPOINT}/views/%s/data/{id}', $this->id() );
 
 		$view_action = Action::modal( 'view', $label, $view_rest_url, true )
-							->primary( 'info' );
+			->primary( 'info' );
 
 		$actions[] = $view_action;
 
@@ -501,13 +499,13 @@ final class DataView {
 		}
 
 		$actions         = $this->actions ? iterator_to_array( $this->actions ) : [];
-		$delete_rest_url = Router::get_url( sprintf( 'views/%s/data', $this->id() ) );
+		$delete_rest_url = sprintf( '{REST_ENDPOINT}/views/%s/data', $this->id() );
 
 		$delete_action = Action::ajax( 'delete', $label, $delete_rest_url, 'DELETE', [ 'id' => '{id}' ], true )
-								->destructive()
-								->bulk()
-								->primary( 'trash' )
-								->confirm( esc_html__( 'Are you sure you want to delete these items?', 'dk-datakit' ) );
+			->destructive()
+			->bulk()
+			->primary( 'trash' )
+			->confirm( esc_html__( 'Are you sure you want to delete these items?', 'dk-datakit' ) );
 
 		if ( $callback ) {
 			$delete_action = $callback( $delete_action );

@@ -9,6 +9,3 @@ parameters:
 
     scanDirectories:
         # - '<your-path-to-gravityforms>'
-
-    scanFiles:
-        - dataview.php

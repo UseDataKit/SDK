@@ -31,6 +31,14 @@ final class Pagination {
 	private int $per_page;
 
 	/**
+	 * The default results per page.
+	 *
+	 * @since $ver$
+	 * @var int
+	 */
+	private static int $default_per_page = 25;
+
+	/**
 	 * Creates the pagination object.
 	 *
 	 * @since $ver$
@@ -39,16 +47,7 @@ final class Pagination {
 	 * @param int|null $per_page The amount of results per page.
 	 */
 	public function __construct( int $page, ?int $per_page = null ) {
-		/**
-		 * Overwrites the default amount of results per page.
-		 *
-		 * @filter `datakit/dataview/pagination/per-page-default`
-		 *
-		 * @since  $ver$
-		 *
-		 * @param int $per_page The amount of results per page (default is 25).
-		 */
-		$per_page ??= (int) apply_filters( 'datakit/dataview/pagination/per-page-default', 25 );
+		$per_page ??= self::$default_per_page;
 
 		$this->page     = max( 1, $page );
 		$this->per_page = max( 1, $per_page );
@@ -80,6 +79,17 @@ final class Pagination {
 	 */
 	public static function default(): self {
 		return new self( 1 );
+	}
+
+	/**
+	 * Registers the default results per page.
+	 *
+	 * @since $ver$
+	 *
+	 * @param int $amount The amount of results per page.
+	 */
+	public static function default_results_per_page( int $amount ): void {
+		self::$default_per_page = max( 1, $amount );
 	}
 
 	/**

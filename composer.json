@@ -1,5 +1,5 @@
 {
-	"name": "datakit/dataviews",
+	"name": "datakit/sdk",
 	"description": "Easily create your own DataViews components with just PHP.",
 	"license": "GPL-2.0-or-later",
 	"type": "library",
@@ -41,6 +41,12 @@
 		"overtrue/phplint": "^3.4"
 	},
 	"scripts": {
+		"suite": [
+			"composer test",
+			"composer linter",
+			"composer sniffer",
+			"composer analyse"
+		],
 		"test": "./vendor/bin/phpunit",
 		"analyse": "./vendor/bin/phpstan analyse",
 		"sniffer": "./vendor/bin/phpcs",

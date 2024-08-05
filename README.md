@@ -1,4 +1,4 @@
-# DataKit
+# DataKit SDK
 
 DataKit is a PHP-based abstraction
 around [`@wordpress/dataviews`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/).
@@ -13,6 +13,7 @@ DataKit/
 ├── docs - Contains documentation for various parts of the plugin
 ├── frontend - Contains all the compilables for JavaScript & CSS
 ├── src - Contains all the PHP code and wrappers
+├── templates - Contains any default templates
 └── tests - Contains the unit tests for the PHP classes
 ```
 
@@ -48,7 +49,7 @@ DataKit provides a fluent PHP API for creating `DataView` objects. A `DataView` 
 
 1. First create a `DataSource` of your preferred type, for example a `GravityFormsDataSource`.
    ```php
-    use DataKit\DataViews\Data\GravityFormsDataSource;
+    use DataKit\Plugin\Data\GravityFormsDataSource;
    
     $datasource = new GravityFormsDataSource( 10 ); // A Gravity Forms data source for form ID 10. 
     ```
