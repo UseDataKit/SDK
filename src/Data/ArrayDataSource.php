@@ -105,7 +105,7 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 		$data = array_filter(
 			$data,
 			function ( array $item ): bool {
-				if ( $this->search && ! ArrayDataMatcher::is_data_matched_by_string( $item, $this->search ) ) {
+				if ( $this->search && ! ArrayDataMatcher::is_data_matched_by_search( $item, $this->search ) ) {
 					return false;
 				}
 

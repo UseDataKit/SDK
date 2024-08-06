@@ -91,9 +91,9 @@ final class DataView {
 	 *
 	 * @since $ver$
 	 *
-	 * @var string
+	 * @var Search|null
 	 */
-	private string $search = '';
+	private ?Search $search = null;
 
 	/**
 	 * The pagination info.
@@ -207,7 +207,7 @@ final class DataView {
 	 */
 	private function view(): array {
 		return [
-			'search'       => $this->search,
+			'search'       => (string) $this->search,
 			'type'         => (string) $this->view,
 			'filters'      => $this->filters ? $this->filters->to_array() : [],
 			'perPage'      => $this->pagination->limit(),
@@ -368,11 +368,19 @@ final class DataView {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $search The query to search.
+	 * @param string|Search $search The query to search.
 	 *
 	 * @return self The DataView.
 	 */
-	public function search( string $search = '' ): self {
+	public function search( $search = '' ): self {
+		if ( is_string( $search ) ) {
+			$search = Search::from_string( $search );
+		}
+
+		if ( ! $search instanceof Search ) {
+			throw new \InvalidArgumentException( 'Search value must either be a string or Search object.' );
+		}
+
 		$this->has_search = true;
 		$this->search     = $search;
 
@@ -388,7 +396,7 @@ final class DataView {
 	 */
 	public function disable_search(): self {
 		$this->has_search = false;
-		$this->search     = '';
+		$this->search     = null;
 
 		return $this;
 	}

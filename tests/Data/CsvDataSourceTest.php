@@ -6,6 +6,7 @@ use DataKit\DataViews\Data\CsvDataSource;
 use DataKit\DataViews\Data\Exception\DataNotFoundException;
 use DataKit\DataViews\DataView\Filter;
 use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Search;
 use DataKit\DataViews\DataView\Sort;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -85,11 +86,11 @@ final class CsvDataSourceTest extends TestCase {
 	 * @since $ver$
 	 */
 	public function test_search_by(): void {
-		$search_by_sean_penn = $this->data_source->search_by( 'Sean Penn' );
+		$search_by_sean_penn = $this->data_source->search_by( Search::from_string( 'Sean Penn' ) );
 		self::assertSame( [ '77', '82' ], $search_by_sean_penn->get_data_ids() );
 		self::assertCount( 2, $search_by_sean_penn );
 
-		$search_by_robert = $this->data_source->search_by( 'Robert' );
+		$search_by_robert = $this->data_source->search_by( Search::from_string( 'Robert' ) );
 		self::assertSame( [ '13', '42', '54', '57', '72' ], $search_by_robert->get_data_ids() );
 		self::assertCount( 5, $search_by_robert );
 	}

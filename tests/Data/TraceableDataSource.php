@@ -5,6 +5,7 @@ namespace DataKit\DataViews\Tests\Data;
 use DataKit\DataViews\Data\DataSource;
 use DataKit\DataViews\Data\MutableDataSource;
 use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Search;
 use DataKit\DataViews\DataView\Sort;
 
 /**
@@ -111,7 +112,7 @@ final class TraceableDataSource implements MutableDataSource {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function search_by( string $search ) : self {
+	public function search_by( ?Search $search ) : self {
 		$this->calls[] = [ __METHOD__, ...func_get_args() ];
 		$this->inner   = $this->inner->search_by( $search );
 

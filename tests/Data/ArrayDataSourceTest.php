@@ -6,6 +6,7 @@ use DataKit\DataViews\Data\ArrayDataSource;
 use DataKit\DataViews\Data\Exception\DataNotFoundException;
 use DataKit\DataViews\DataView\Filter;
 use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Search;
 use DataKit\DataViews\DataView\Sort;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -28,7 +29,7 @@ final class ArrayDataSourceTest extends TestCase {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected function setUp() : void {
+	protected function setUp(): void {
 		$this->source = new ArrayDataSource(
 			'test',
 			[
@@ -54,7 +55,7 @@ final class ArrayDataSourceTest extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function test_data_source() : void {
+	public function test_data_source(): void {
 		self::assertSame( 'test', $this->source->id() );
 
 		self::assertCount( 3, $this->source );
@@ -81,10 +82,10 @@ final class ArrayDataSourceTest extends TestCase {
 		self::assertSame( [ 'user::1', 'user::2' ], $not_doeke->get_data_ids() );
 		self::assertCount( 2, $not_doeke );
 
-		$search_by_vlad = $this->source->search_by( 'vlad' );
+		$search_by_vlad = $this->source->search_by( Search::from_string( 'vlad' ) );
 		self::assertSame( [ 'user::2' ], $search_by_vlad->get_data_ids() );
 
-		$search_by_zack_or_vlad = $this->source->search_by( 'vlad zack' );
+		$search_by_zack_or_vlad = $this->source->search_by( Search::from_string( 'vlad zack' ) );
 		self::assertSame( [ 'user::1', 'user::2' ], $search_by_zack_or_vlad->get_data_ids() );
 	}
 
@@ -93,7 +94,7 @@ final class ArrayDataSourceTest extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function test_not_found() : void {
+	public function test_not_found(): void {
 		$this->expectException( DataNotFoundException::class );
 		$this->source->get_data_by_id( 'invalid' );
 	}
@@ -103,7 +104,7 @@ final class ArrayDataSourceTest extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function test_delete_by_id() : void {
+	public function test_delete_by_id(): void {
 		$data = $this->source->get_data_by_id( 'user::1' );
 		self::assertSame( 'Zack', $data['name'] );
 		self::assertTrue( $this->source->can_delete() );
@@ -124,7 +125,7 @@ final class ArrayDataSourceTest extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function test_get_fields() : void {
+	public function test_get_fields(): void {
 		self::assertSame(
 			[ 'name' => 'name', 'email' => 'email', 'extra_key' => 'extra_key' ],
 			$this->source->get_fields(),

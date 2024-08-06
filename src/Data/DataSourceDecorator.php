@@ -3,6 +3,7 @@
 namespace DataKit\DataViews\Data;
 
 use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Search;
 use DataKit\DataViews\DataView\Sort;
 
 /**
@@ -75,7 +76,7 @@ abstract class DataSourceDecorator implements DataSource, MutableDataSource {
 	 *
 	 * @since $ver$
 	 */
-	public function search_by( string $search ) {
+	public function search_by( ?Search $search ) {
 		return $this->decorated_datasource()->search_by( $search );
 	}
 

@@ -3,6 +3,7 @@
 namespace DataKit\DataViews\Data;
 
 use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Search;
 use DataKit\DataViews\DataView\Sort;
 
 /**
@@ -32,13 +33,13 @@ abstract class BaseDataSource implements DataSource {
 	protected ?Sort $sort = null;
 
 	/**
-	 * The string to search by.
+	 * The query to search by.
 	 *
 	 * @since $ver$
 	 *
-	 * @var string
+	 * @var Search|null
 	 */
-	protected string $search = '';
+	protected ?Search $search = null;
 
 	/**
 	 * @inheritDoc
@@ -73,7 +74,7 @@ abstract class BaseDataSource implements DataSource {
 	 * @since $ver$
 	 * @return static
 	 */
-	public function search_by( string $search ) {
+	public function search_by( ?Search $search ) {
 		$clone         = clone $this;
 		$clone->search = $search;
 

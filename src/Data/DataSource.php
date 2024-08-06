@@ -7,6 +7,7 @@ use DataKit\DataViews\Data\Exception\DataNotFoundException;
 use DataKit\DataViews\Data\Exception\DataSourceNotFoundException;
 use DataKit\DataViews\Data\Exception\DataSourceException;
 use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Search;
 use DataKit\DataViews\DataView\Sort;
 
 /**
@@ -91,11 +92,11 @@ interface DataSource extends Countable {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $search The search query.
+	 * @param Search|null $search The search query.
 	 *
 	 * @return DataSource|static The data source.
 	 */
-	public function search_by( string $search );
+	public function search_by( ?Search $search );
 
 	/**
 	 * Sets the filters for the data source.

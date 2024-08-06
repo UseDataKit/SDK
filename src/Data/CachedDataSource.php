@@ -4,6 +4,7 @@ namespace DataKit\DataViews\Data;
 
 use DataKit\DataViews\Cache\CacheProvider;
 use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Search;
 use DataKit\DataViews\DataView\Sort;
 use InvalidArgumentException;
 use JsonException;
@@ -15,9 +16,8 @@ use RuntimeException;
  * Note: This class is used internally. When registering your data source,
  * you do not need to wrap the instance yourself. This will be done by DataKit.
  *
- * @internal This class is subject to change.
- *
  * @since    $ver$
+ * @internal This class is subject to change.
  */
 final class CachedDataSource extends BaseDataSource implements MutableDataSource {
 	/**
@@ -195,13 +195,8 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	public function search_by( string $search ): self {
-		$cached = parent::search_by( $search );
-
-		if ( ! $cached instanceof self ) {
-			throw new RuntimeException( 'Wrong data source provided' );
-		}
-
+	public function search_by( ?Search $search ): self {
+		$cached        = parent::search_by( $search );
 		$cached->inner = $this->inner->search_by( $search );
 
 		return $cached;

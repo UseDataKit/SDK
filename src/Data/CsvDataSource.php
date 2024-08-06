@@ -172,7 +172,7 @@ final class CsvDataSource extends BaseDataSource {
 					}
 
 					return strnatcmp( $a[ $field ] ?? '', $b[ $field ] ?? '' );
-				}
+				},
 			);
 		}
 
@@ -204,7 +204,7 @@ final class CsvDataSource extends BaseDataSource {
 
 		$data = $this->cleanup( $data );
 
-		if ( $this->search && ! ArrayDataMatcher::is_data_matched_by_string( $data, $this->search ) ) {
+		if ( $this->search && ! ArrayDataMatcher::is_data_matched_by_search( $data, $this->search ) ) {
 			return false;
 		}
 

@@ -7,6 +7,7 @@ use DataKit\DataViews\Data\ArrayDataSource;
 use DataKit\DataViews\Data\CachedDataSource;
 use DataKit\DataViews\DataView\Filter;
 use DataKit\DataViews\DataView\Filters;
+use DataKit\DataViews\DataView\Search;
 use DataKit\DataViews\DataView\Sort;
 use PHPUnit\Framework\TestCase;
 
@@ -28,7 +29,7 @@ final class CachedDataSourceTest extends TestCase {
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected function setUp() : void {
+	protected function setUp(): void {
 		parent::setUp();
 
 		$this->trace = new TraceableDataSource(
@@ -47,7 +48,7 @@ final class CachedDataSourceTest extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function test_caching() : void {
+	public function test_caching(): void {
 		$cache = new ArrayCacheProvider();
 		$ds    = new CachedDataSource( $this->trace, $cache );
 
@@ -101,7 +102,7 @@ final class CachedDataSourceTest extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function test_caching_with_filters() : void {
+	public function test_caching_with_filters(): void {
 		$cache = new ArrayCacheProvider();
 		$ds    = new CachedDataSource( $this->trace, $cache );
 
@@ -109,7 +110,7 @@ final class CachedDataSourceTest extends TestCase {
 		$ds->get_data_ids();
 
 		self::assertCount( 1, $this->trace->get_calls() );
-		$ds_search = $ds->search_by( 'one' );
+		$ds_search = $ds->search_by( Search::from_string( 'one' ) );
 		$ds_filter = $ds_search->filter_by( Filters::of( Filter::is( 'name', 'Person one' ) ) );
 		$ds_sort   = $ds_filter->sort_by( Sort::asc( 'name' ) );
 
@@ -145,7 +146,7 @@ final class CachedDataSourceTest extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function testCount() : void {
+	public function testCount(): void {
 		$cache = new ArrayCacheProvider();
 		$ds    = new CachedDataSource( $this->trace, $cache );
 
@@ -160,7 +161,7 @@ final class CachedDataSourceTest extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function testCanDelete() : void {
+	public function testCanDelete(): void {
 		$cache = new ArrayCacheProvider();
 		$ds    = new CachedDataSource( $this->trace, $cache );
 
@@ -176,7 +177,7 @@ final class CachedDataSourceTest extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function testDeleteById() : void {
+	public function testDeleteById(): void {
 		$cache = new ArrayCacheProvider();
 		$ds    = new CachedDataSource( $this->trace, $cache );
 
