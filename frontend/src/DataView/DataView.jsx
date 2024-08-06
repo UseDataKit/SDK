@@ -20,6 +20,7 @@ const getData = async ( request, apiUrl ) => {
 
     return res.json();
 }
+
 /**
  * Creates the DataView.
  *
@@ -36,7 +37,7 @@ export default function DataView(
     const requestState = useRequest( id, viewState );
     const { isLoading, data: view_data } = useQuery( {
         queryKey: [ 'view-data', id ],
-        queryFn: () => getData( apiUrl, requestState ),
+        queryFn: () => getData( requestState, apiUrl ),
         placeholderData: keepPreviousData,
         initialData: { data, paginationInfo },
         refetchOnMount: false,
