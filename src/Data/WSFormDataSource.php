@@ -175,8 +175,8 @@ final class WSFormDataSource extends BaseDataSource implements MutableDataSource
 			(string) Operator::is()       => '==',
 			(string) Operator::isNot()    => '!=',
 			(string) Operator::isAny()    => 'in',
-			(string) Operator::isAll()    => '==',
-			(string) Operator::isNotAll() => 'in',
+			(string) Operator::isAll()    => 'in',
+			(string) Operator::isNotAll() => 'not_in',
 			(string) Operator::isNone()   => 'not_in'
 		];
 
