@@ -55,7 +55,7 @@ final class LinkField extends Field {
 	 *
 	 * @return self
 	 */
-	public function linkToField( string $field_id ): self {
+	public function link_to_field( string $field_id ): self {
 		$clone                  = clone $this;
 		$clone->context['type'] = self::TYPE_FIELD;
 		$clone->context['link'] = $field_id;
@@ -130,7 +130,7 @@ final class LinkField extends Field {
 	 *
 	 * @return string The value.
 	 */
-	public function get_value( array $data ) {
+	public function get_value( array $data ): string {
 		$href = $this->href( $data );
 
 		if ( ! $href ) {
@@ -141,7 +141,7 @@ final class LinkField extends Field {
 			'<a href="%s" target="%s">%s</a>',
 			esc_attr( $this->href( $data ) ),
 			esc_attr( $this->target() ),
-			$this->label( $data ),
+			esc_html( $this->label( $data ) ),
 		);
 	}
 
@@ -183,7 +183,10 @@ final class LinkField extends Field {
 	 * @return string The label.
 	 */
 	private function label( array $data ): string {
-		// Todo: replace placeholders in custom label.
-		return $this->label ?? parent::get_value( $data ) ?? '';
+		if ( null === $this->label ) {
+			return parent::get_value( $data ) ?? '';
+		}
+
+		return self::apply_merge_tags( $this->label, $data );
 	}
 }

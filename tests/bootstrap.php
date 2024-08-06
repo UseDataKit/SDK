@@ -7,3 +7,9 @@ if ( ! function_exists( 'esc_attr' ) ) {
 		return $args[0];
 	}
 }
+
+if ( ! function_exists( 'esc_html' ) ) {
+	function esc_html( ...$args ) {
+		return $args[0];
+	}
+}

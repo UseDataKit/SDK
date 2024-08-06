@@ -49,7 +49,7 @@ final class LinkFieldTest extends AbstractFieldTestCase {
 			$field_none->with_label( 'Custom Label' )->without_label()->get_value( $data ),
 		);
 
-		$field_field = LinkField::create( 'name', 'Link' )->linkToField( 'link' )->on_same_window();
+		$field_field = LinkField::create( 'name', 'Link' )->link_to_field( 'link' )->on_same_window();
 		self::assertSame(
 			'<a href="https://datakit.org" target="_self">DataKit</a>',
 			$field_field->get_value( $data ),
@@ -60,5 +60,23 @@ final class LinkFieldTest extends AbstractFieldTestCase {
 		);
 
 		self::assertEmpty( $field_field->get_value( [] ) );
+	}
+
+	/**
+	 * Test case for
+	 *
+	 * @since $ver$
+	 */
+	public function test_callback(): void {
+		$link = LinkField::create( 'id', 'Edit Submission' )
+			->callback(
+				fn( string $field, array $entry ) => sprintf( 'https://mysite.test/edit/%d', $entry[ $field ] ?? '' ),
+			)
+			->with_label( 'Edit Submission #{id}' );
+
+		self::assertSame(
+			'<a href="https://mysite.test/edit/123" target="_blank">Edit Submission #123</a>',
+			$link->get_value( [ 'id' => '123' ] ),
+		);
 	}
 }

@@ -96,6 +96,24 @@ abstract class Field {
 	protected array $context = [];
 
 	/**
+	 * Replaces any merge tags on a value from the data set.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string $value The value.
+	 * @param array  $data  The data.
+	 *
+	 * @return string The value with merge tags applied.
+	 */
+	final protected static function apply_merge_tags( string $value, array $data ): string {
+		return preg_replace_callback(
+			'/(?<!{){(?<key>[^{}]+)}(?!})/i',
+			static fn( array $tag ): string => $data[ $tag['key'] ] ?? '',
+			$value,
+		);
+	}
+
+	/**
 	 * Creates the field.
 	 *
 	 * @since $ver$
