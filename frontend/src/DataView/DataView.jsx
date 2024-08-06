@@ -1,15 +1,25 @@
 import { DataViews } from '@wordpress/dataviews';
 import { RegistryProvider } from '@wordpress/data';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { stringify } from 'qs';
-
 import { useRequest } from '@src/DataView/useRequest';
-import { useRequestCallback } from '@src/DataView/useRequestCallback';
+import { useRequestCallback } from '@src/DataView/useRequestCallback.js';
+import { stringify } from 'qs';
 
 import '@wordpress/dataviews/build-style/style.css';
 import '@wordpress/components/build-style/style.css';
 import '@src/scss/fields.scss';
 
+const getData = async ( request, apiUrl ) => {
+    const { id, ...params } = request;
+    const query_params = stringify( params );
+    const append = apiUrl.indexOf( '?' ) !== -1 ? '&' : '?';
+
+    const url = new URL( `${apiUrl}/views/${id}${append}${query_params}` );
+    const res = await fetch( url );
+
+    return res.json();
+}
 /**
  * Creates the DataView.
  *
@@ -20,47 +30,19 @@ import '@src/scss/fields.scss';
  * @return {JSX.Element} The DataView object.
  */
 export default function DataView(
-    { id, view, fields, actions, data, paginationInfo, supportedLayouts, search, searchLabel, apiUrl }
+    { id, view, data, paginationInfo, apiUrl, queryClient, ...props }
 ) {
     const [ viewState, setView ] = useState( view );
-    const [ dataState, setData ] = useState( data );
-    const [ paginationState, setPagination ] = useState( paginationInfo );
-    const [ isLoading, setLoading ] = useState( false );
     const requestState = useRequest( id, viewState );
+    const { isLoading, data: view_data } = useQuery( {
+        queryKey: [ 'view-data', id ],
+        queryFn: () => getData( apiUrl, requestState ),
+        placeholderData: keepPreviousData,
+        initialData: { data, paginationInfo },
+        refetchOnMount: false,
+    }, queryClient );
 
-    /**
-     * Updates the data and pagination based on a requestState.
-     *
-     * @since $ver$
-     * @param {RequestState} request The request object.
-     * @return {void}
-     */
-    const updateData = ( request ) => {
-        setLoading( true );
-
-        const { id, ...params } = request;
-        const query_params = stringify( params );
-        const append = apiUrl.indexOf('?') !== -1 ? '&' : '?';
-        const url = new URL( `${apiUrl}/views/${id}${append}${query_params}` );
-
-        fetch( url )
-            .then( ( response ) => {
-                if ( !response.ok ) {
-                    throw new Error( 'Network response was not ok' );
-                }
-
-                return response.json();
-            } )
-            .then( ( { data, paginationInfo } ) => {
-                setData( data );
-                setPagination( paginationInfo )
-            } )
-            .finally( () => {
-                setLoading( false );
-            } )
-            .catch( ( reason => null ) );
-    }
-
+    useRequestCallback( () => queryClient.invalidateQueries( { queryKey: [ 'view-data', id ] } ), requestState );
     /**
      * API passed to the callback actions.
      *
@@ -68,28 +50,23 @@ export default function DataView(
      */
     const public_api = {
         refreshData() {
-            updateData( requestState );
+            queryClient.invalidateQueries( { queryKey: [ 'view-data', id ] } );
         }
     }
 
-    /**
-     * Update the data whenever the request state changes.
-     *
-     * THe request state is a subset of the view object, since not every change to the view warrants a data refresh.
-     *
-     * @since $ver$
-     */
-    useRequestCallback( () => updateData( requestState ), requestState );
+    if ( !view_data ) {
+        return <div>Loading ... </div>
+    }
 
     return <RegistryProvider value={public_api}>
         <DataViews
             id={id}
             view={viewState}
-            data={dataState}
-            paginationInfo={paginationState}
+            data={view_data.data}
+            paginationInfo={view_data.paginationInfo}
             onChangeView={setView}
             isLoading={isLoading}
-            {...{ fields, actions, supportedLayouts, search, searchLabel }}
+            {...props}
         />
     </RegistryProvider>;
 }

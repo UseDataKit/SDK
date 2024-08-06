@@ -6,6 +6,7 @@ import Modal from '@src/Components/Modal';
 import Text from '@src/Fields/Text';
 import Html from '@src/Fields/Html';
 import Url from '@src/Actions/Url';
+import { QueryClient } from "@tanstack/react-query";
 
 // Todo: extract window parameters somewhere outside the entry point.
 window.datakit_fields = new Proxy( {
@@ -26,6 +27,7 @@ window.datakit_dataviews_actions = {
 
 window.datakit_modal = Modal;
 
+const queryClient = new QueryClient();
 const views = document.querySelectorAll( '[data-dataview]' );
 [ ...views ].forEach( dataview => {
 
@@ -38,7 +40,8 @@ const views = document.querySelectorAll( '[data-dataview]' );
     const wrapper = createRoot( dataview );
     const dataView = createElement( DataView, {
         id: dataViewID,
-        apiUrl: datakit_dataviews_rest_endpoint, ...dataViewData
+        apiUrl: datakit_dataviews_rest_endpoint, ...dataViewData,
+        queryClient
     } );
 
     wrapper.render( dataView );

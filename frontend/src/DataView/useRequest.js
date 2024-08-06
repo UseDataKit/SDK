@@ -26,7 +26,7 @@ function requestReducer( request, new_request ) {
  *
  * @return {RequestState} The resulting object.
  */
-function generateRequestState( id, viewState ) {
+function generateRequestState( { id, viewState } ) {
     return {
         id: id,
         search: viewState.search,
@@ -44,15 +44,15 @@ function generateRequestState( id, viewState ) {
  *
  * @since $ver$
  * @param {String} id The dataview ID.
- * @param {Object} view The view object.
+ * @param {Object} viewState The view object.
  * @return {RequestState} The request object.
  */
-export function useRequest( id, view ) {
-    const [ requestState, setRequestState ] = useReducer( requestReducer, generateRequestState( id, view ) );
+export function useRequest( id, viewState ) {
+    const [ requestState, setRequestState ] = useReducer( requestReducer, { id, viewState }, generateRequestState );
 
     useEffect( () => {
-        setRequestState( generateRequestState( id, view ) );
-    }, [ view ] );
+        setRequestState( generateRequestState( { id, viewState } ) );
+    }, [ viewState ] );
 
     return requestState;
 }
