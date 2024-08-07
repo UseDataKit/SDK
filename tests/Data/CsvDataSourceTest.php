@@ -68,7 +68,7 @@ final class CsvDataSourceTest extends TestCase {
 	public function test_sort_by(): void {
 		$sort_by_age = $this->data_source->sort_by( Sort::desc( '2' ) );
 
-		self::assertSame( [ '55', '3', '43', '60' ], $sort_by_age->get_data_ids( 4 ) );
+		self::assertSame( [ '94', '55', '3', '43' ], $sort_by_age->get_data_ids( 4 ) );
 	}
 
 	/**
@@ -110,7 +110,7 @@ final class CsvDataSourceTest extends TestCase {
 	 * @since $ver$
 	 */
 	public function test_get_data_ids(): void {
-		self::assertSame( array_map( 'strval', range( 1, 89 ) ), $this->data_source->get_data_ids() );
+		self::assertSame( array_map( 'strval', range( 1, 97 ) ), $this->data_source->get_data_ids() );
 	}
 
 	/**
