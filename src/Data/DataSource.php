@@ -30,6 +30,17 @@ interface DataSource extends Countable {
 	public function id(): string;
 
 	/**
+	 * Returns the name of the data source.
+	 *
+	 * The name should be translatable, human-readable, and suitable for display ("CSV", "Gravity Forms").
+	 *
+	 * @since $ver$
+	 *
+	 * @return string The name.
+	 */
+	public function get_name(): string;
+
+	/**
 	 * Returns IDs for the data source.
 	 *
 	 * @since $ver$
