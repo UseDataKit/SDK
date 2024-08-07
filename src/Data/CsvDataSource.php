@@ -73,6 +73,15 @@ final class CsvDataSource extends BaseDataSource {
 	 *
 	 * @since $ver$
 	 */
+	public function get_name(): string {
+		return esc_html__( 'CSV', 'datakit-sdk' );
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * @since $ver$
+	 */
 	public function get_data_ids( int $limit = 100, int $offset = 0 ): array {
 		$lines = new LimitIterator( $this->data( true ), $offset, $limit );
 		$ids   = [];

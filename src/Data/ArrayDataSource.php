@@ -63,6 +63,15 @@ final class ArrayDataSource extends BaseDataSource implements MutableDataSource 
 	 *
 	 * @since $ver$
 	 */
+	public function get_name(): string {
+		return esc_html__( 'Array', 'datakit-sdk' );
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * @since $ver$
+	 */
 	public function get_data_ids( int $limit = 20, int $offset = 0 ): array {
 		return array_slice( array_keys( $this->get_data() ), $offset, $limit );
 	}

@@ -61,6 +61,15 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	}
 
 	/**
+	 * @inheritDoc
+	 *
+	 * @since $ver$
+	 */
+	public function get_name(): string {
+		return $this->inner->get_name();
+	}
+
+	/**
 	 * Returns a calculated key based on a set of arguments.
 	 *
 	 * @since $ver$
