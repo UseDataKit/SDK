@@ -16,6 +16,8 @@ use DataKit\DataViews\DataView\Sort;
  * - The data source should preferably be immutable, as {@see BaseDataSource} helper methods do.
  *
  * @since $ver$
+ *
+ * @throws DataSourceNotFoundException When the data source is not found.
  */
 interface DataSource extends Countable {
 	/**
