@@ -15,6 +15,22 @@ use JsonException;
  */
 abstract class Field {
 	/**
+	 * The field types for a grid.
+	 *
+	 * @since $ver$
+	 */
+	private const GRID_TYPE_ROW    = 'row';
+	private const GRID_TYPE_COLUMN = 'column';
+	private const GRID_TYPE_BADGE  = 'badge';
+
+	/**
+	 * The glue used to generate the UUID.
+	 *
+	 * @since $ver$
+	 */
+	public const UUID_GLUE = '--DK--';
+
+	/**
 	 * The field ID.
 	 *
 	 * @since $ver$
@@ -30,7 +46,7 @@ abstract class Field {
 	 *
 	 * @var string
 	 */
-	protected string $header;
+	protected string $label;
 
 	/**
 	 * The render function.
@@ -69,6 +85,14 @@ abstract class Field {
 	protected bool $is_hideable = true;
 
 	/**
+	 * What the field type is on a Grid layout.
+	 *
+	 * @since $ver$
+	 * @var string
+	 */
+	protected string $grid_field_type = self::GRID_TYPE_ROW;
+
+	/**
 	 * The default value to use if the value is empty.
 	 *
 	 * @since $ver$
@@ -76,7 +100,6 @@ abstract class Field {
 	 * @var string|null
 	 */
 	protected ?string $default_value = null;
-
 
 	/**
 	 * The callback to return the value.
@@ -125,8 +148,8 @@ abstract class Field {
 		string $id,
 		string $header
 	) {
-		$this->header = $header;
-		$this->id     = $id;
+		$this->label = $header;
+		$this->id    = $id;
 
 		$this->callback = static fn( string $id, array $data ) => $data[ $id ] ?? null;
 		$this->context  = $this->default_context();
@@ -141,10 +164,12 @@ abstract class Field {
 	 */
 	final public function uuid(): string {
 		try {
-			return sprintf(
-				'%s-%s',
-				$this->id(),
-				md5( json_encode( [ $this->id, $this->header ], JSON_THROW_ON_ERROR ) ),
+			return implode(
+				self::UUID_GLUE,
+				[
+					$this->id(),
+					md5( json_encode( [ $this->id, $this->label ], JSON_THROW_ON_ERROR ) ),
+				],
 			);
 		} catch ( JsonException $e ) {
 			return 'error';
@@ -185,8 +210,8 @@ abstract class Field {
 	 * @since $ver$
 	 * @return string
 	 */
-	public function header(): string {
-		return $this->header;
+	public function label(): string {
+		return $this->label;
 	}
 
 	/**
@@ -298,6 +323,48 @@ abstract class Field {
 	}
 
 	/**
+	 * Returns a new instance of the field that is a badge on Grid views.
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The badge field.
+	 */
+	public function badge() {
+		$clone                  = clone $this;
+		$clone->grid_field_type = self::GRID_TYPE_BADGE;
+
+		return $clone;
+	}
+
+	/**
+	 * Returns a new instance of the field that is a rendered as a column (vertically).
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The vertical column field.
+	 */
+	public function column() {
+		$clone                  = clone $this;
+		$clone->grid_field_type = self::GRID_TYPE_COLUMN;
+
+		return $clone;
+	}
+
+	/**
+	 * Returns a new instance of the field that is a rendered as a row (horizontally).
+	 *
+	 * @since $ver$
+	 *
+	 * @return static The horizontal row field.
+	 */
+	public function row() {
+		$clone                  = clone $this;
+		$clone->grid_field_type = self::GRID_TYPE_ROW;
+
+		return $clone;
+	}
+
+	/**
 	 * Sets the callback for the field to alter the value.
 	 *
 	 * @since    $ver$
@@ -343,6 +410,26 @@ abstract class Field {
 	}
 
 	/**
+	 * Returns whether the field is a badge (grid view only).
+	 *
+	 * @since $ver$
+	 * @return bool
+	 */
+	public function is_badge(): bool {
+		return self::GRID_TYPE_BADGE === $this->grid_field_type;
+	}
+
+	/**
+	 * Returns whether the field is a column (grid view only).
+	 *
+	 * @since $ver$
+	 * @return bool
+	 */
+	public function is_column(): bool {
+		return self::GRID_TYPE_COLUMN === $this->grid_field_type;
+	}
+
+	/**
 	 * Returns the value of the field on the provided data set.
 	 *
 	 * @since $ver$
@@ -364,8 +451,8 @@ abstract class Field {
 	 */
 	public function to_array(): array {
 		return [
-			'id'            => $this->id(),
-			'header'        => $this->header(),
+			'id'            => $this->uuid(),
+			'label'         => $this->label(),
 			'render'        => $this->render(),
 			'enableHiding'  => $this->is_hideable,
 			'enableSorting' => $this->is_sortable,

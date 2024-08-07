@@ -3,6 +3,7 @@
 namespace DataKit\DataViews\DataView;
 
 use BadMethodCallException;
+use DataKit\DataViews\Field\Field;
 use InvalidArgumentException;
 
 /**
@@ -63,9 +64,11 @@ final class Filter {
 	) {
 		$this->value    = $value;
 		$this->operator = $operator;
-		$this->field    = $field;
 
-		if ( empty( $field ) || empty( $value ) ) {
+		$field       = explode( Field::UUID_GLUE, $field )[0] ?? $field;
+		$this->field = $field;
+
+		if ( empty( $field ) ) {
 			throw new InvalidArgumentException( 'Filter needs a field, operator and value.' );
 		}
 
@@ -165,7 +168,7 @@ final class Filter {
 		return new self(
 			$filter_array['field'] ?? '',
 			$operator,
-			$filter_array['value'] ?? '',
+			$filter_array['value'] ?? ( in_array( $operator, Operator::multiCases(), false ) ? [] : '' ),
 		);
 	}
 

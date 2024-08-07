@@ -68,9 +68,8 @@ abstract class EnumObject {
 	 * @param string $method The case name.
 	 * @param array  $_      Unused arguments.
 	 *
-	 * @throws InvalidArgumentException
-	 *
 	 * @return static The Enum object.
+	 * @throws InvalidArgumentException
 	 */
 	final public static function __callStatic( string $method, array $_ ) {
 		$type = self::try_from( $method );
@@ -98,5 +97,22 @@ abstract class EnumObject {
 	 */
 	public function as_string(): string {
 		return $this->value;
+	}
+
+	/**
+	 * Whether this enum matches another given one.
+	 *
+	 * @since $ver$
+	 *
+	 * @param static $other The other value enum.
+	 *
+	 * @return bool Whether the enums match.
+	 */
+	public function equals( $other ): bool {
+		if ( ! $other instanceof static ) {
+			return false;
+		}
+
+		return $this->value === $other->value;
 	}
 }

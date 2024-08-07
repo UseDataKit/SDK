@@ -17,12 +17,12 @@ final class LinkField extends Field {
 	private const TYPE_FIELD = 'field';
 
 	/**
-	 * Contains a custom label.
+	 * Contains a custom label for the link.
 	 *
 	 * @since $ver$
 	 * @var string|null
 	 */
-	private ?string $label = null;
+	private ?string $link_label = null;
 
 	/**
 	 * @inheritDoc
@@ -96,13 +96,13 @@ final class LinkField extends Field {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $label The label.
+	 * @param string $link_label The label.
 	 *
 	 * @return self
 	 */
-	public function with_label( string $label ): self {
-		$clone        = clone $this;
-		$clone->label = $label;
+	public function with_label( string $link_label ): self {
+		$clone             = clone $this;
+		$clone->link_label = $link_label;
 
 		return $clone;
 	}
@@ -115,8 +115,8 @@ final class LinkField extends Field {
 	 * @return self
 	 */
 	public function without_label(): self {
-		$clone        = clone $this;
-		$clone->label = null;
+		$clone             = clone $this;
+		$clone->link_label = null;
 
 		return $clone;
 	}
@@ -141,7 +141,7 @@ final class LinkField extends Field {
 			'<a href="%s" target="%s">%s</a>',
 			esc_attr( $this->href( $data ) ),
 			esc_attr( $this->target() ),
-			esc_html( $this->label( $data ) ),
+			esc_html( $this->link_label( $data ) ),
 		);
 	}
 
@@ -182,11 +182,11 @@ final class LinkField extends Field {
 	 *
 	 * @return string The label.
 	 */
-	private function label( array $data ): string {
-		if ( null === $this->label ) {
+	private function link_label( array $data ): string {
+		if ( null === $this->link_label ) {
 			return parent::get_value( $data ) ?? '';
 		}
 
-		return self::apply_merge_tags( $this->label, $data );
+		return self::apply_merge_tags( $this->link_label, $data );
 	}
 }

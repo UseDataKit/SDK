@@ -46,7 +46,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 		$field = $this->createField( 'field_id', 'Field header' );
 
 		self::assertSame( 'field_id', $field->id() );
-		self::assertSame( 'Field header', $field->header() );
+		self::assertSame( 'Field header', $field->label() );
 	}
 
 	/**
@@ -58,8 +58,8 @@ abstract class AbstractFieldTestCase extends TestCase {
 		$field       = $this->createField( 'field_id', 'Field header' );
 		$field_array = $field->to_array();
 
-		self::assertSame( 'field_id', $field_array['id'] );
-		self::assertSame( 'Field header', $field_array['header'] );
+		self::assertSame( $field->uuid(), $field_array['id'] );
+		self::assertSame( 'Field header', $field_array['label'] );
 		self::assertTrue( $field_array['enableHiding'] );
 		self::assertTrue( $field_array['enableSorting'] );
 

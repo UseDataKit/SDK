@@ -1,4 +1,11 @@
-[class^='dataviews-view-'] {
-    @import 'field/image';
+[class*='dataviews-view'] {
+    *:not(.dataviews-view-grid__media) {
+        @import 'field/image';
+    }
+
     @import 'field/status-indicator';
+
+    .datakit-field {
+        display: inline;
+    }
 }

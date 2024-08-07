@@ -7,6 +7,7 @@ use DataKit\DataViews\Data\Exception\DataSourceException;
 use DataKit\DataViews\Data\MutableDataSource;
 use DataKit\DataViews\DataViewException;
 use DataKit\DataViews\Field\Field;
+use DataKit\DataViews\Field\ImageField;
 use InvalidArgumentException;
 use JsonException;
 
@@ -26,13 +27,13 @@ final class DataView {
 	private string $id;
 
 	/**
-	 * The primary view type.
+	 * The view types.
 	 *
 	 * @since $ver$
 	 *
-	 * @var View
+	 * @var View[]
 	 */
-	private View $view;
+	private array $views;
 
 	/**
 	 * The fields to show on the DataView.
@@ -118,7 +119,7 @@ final class DataView {
 	 *
 	 * @since $ver$
 	 *
-	 * @param View         $view        The View type.
+	 * @param View         $view        The View types.
 	 * @param string       $id          The DataView ID.
 	 * @param array        $fields      The fields.
 	 * @param DataSource   $data_source The data source.
@@ -135,8 +136,8 @@ final class DataView {
 		?Filters $filters = null,
 		?Actions $actions = null
 	) {
-		$this->id   = $id;
-		$this->view = $view;
+		$this->id    = $id;
+		$this->views = [ $view ];
 
 		$this->filters     = $filters;
 		$this->actions     = $actions;
@@ -179,6 +180,85 @@ final class DataView {
 	}
 
 	/**
+	 * Creates the DataView of the grid type.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string       $id          The DataView ID.
+	 * @param DataSource   $data_source The data source.
+	 * @param array        $fields      The fields.
+	 * @param Sort|null    $sort        The sorting.
+	 * @param Filters|null $filters     The filters.
+	 * @param Actions|null $actions     The actions.
+	 */
+	public static function grid(
+		string $id,
+		DataSource $data_source,
+		array $fields,
+		?Sort $sort = null,
+		?Filters $filters = null,
+		?Actions $actions = null
+	): self {
+		return new self(
+			View::Grid(),
+			$id,
+			$fields,
+			$data_source,
+			$sort,
+			$filters,
+			$actions,
+		);
+	}
+
+	/**
+	 * Creates the DataView of the list type.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string       $id          The DataView ID.
+	 * @param DataSource   $data_source The data source.
+	 * @param array        $fields      The fields.
+	 * @param Sort|null    $sort        The sorting.
+	 * @param Filters|null $filters     The filters.
+	 * @param Actions|null $actions     The actions.
+	 */
+	public static function list(
+		string $id,
+		DataSource $data_source,
+		array $fields,
+		?Sort $sort = null,
+		?Filters $filters = null,
+		?Actions $actions = null
+	): self {
+		return new self(
+			View::List(),
+			$id,
+			$fields,
+			$data_source,
+			$sort,
+			$filters,
+			$actions,
+		);
+	}
+
+	/**
+	 * Adds additional view types to support.
+	 *
+	 * Note: The first view will always be kept as the default.
+	 *
+	 * @since $ver$
+	 *
+	 * @param View ...$views The view types.
+	 *
+	 * @return self The DataView.
+	 */
+	public function supports( View ...$views ): self {
+		$this->views = array_unique( [ $this->views[0], ...$views ] );
+
+		return $this;
+	}
+
+	/**
 	 * Makes sure the fields are of the correct type.
 	 *
 	 * @since $ver$
@@ -207,14 +287,14 @@ final class DataView {
 	 */
 	private function view(): array {
 		return [
-			'search'       => (string) $this->search,
-			'type'         => (string) $this->view,
-			'filters'      => $this->filters ? $this->filters->to_array() : [],
-			'perPage'      => $this->pagination->limit(),
-			'page'         => $this->pagination->page(),
-			'sort'         => $this->sort ? $this->sort->to_array() : [],
-			'hiddenFields' => $this->hidden_fields(),
-			'layout'       => [],
+			'search'  => (string) $this->search,
+			'type'    => (string) $this->views[0],
+			'filters' => $this->filters ? $this->filters->to_array() : [],
+			'perPage' => $this->pagination->limit(),
+			'page'    => $this->pagination->page(),
+			'sort'    => $this->sort ? $this->sort->to_array() : [],
+			'fields'  => $this->get_field_ids( fn( Field $field ): bool => ! $field->is_hidden() ),
+			'layout'  => $this->layout( $this->views[0] ),
 		];
 	}
 
@@ -252,8 +332,8 @@ final class DataView {
 		foreach ( $data_source->get_data_ids( $pagination->limit(), $pagination->offset() ) as $data_id ) {
 			/**
 			 * // Todo: this is a possible breach of security as all data is passed along in the JS.
-			 * But the merge tags need access to the raw data, so the field needs to tell us which field is need,
-			 * and only disclose those values.
+			 * But the merge tags (on JS side) need access to the raw data, so the field needs to tell us
+			 * which field is need, and only disclose those values.
 			 */
 			$data = $data_source->get_data_by_id( $data_id );
 
@@ -315,33 +395,44 @@ final class DataView {
 	}
 
 	/**
-	 * Returns the supportedLayouts object.
+	 * Returns the `defaultLayouts` object.
 	 *
 	 * @since $ver$
 	 *
-	 * @return string[] The supported layouts.
-	 * @todo  Provide option to add more.
+	 * @return array<string,array{layout:array}> The supported layouts.
 	 */
-	private function supported_layouts(): array {
-		return [ (string) $this->view ];
+	private function default_layouts(): array {
+		$layouts = [];
+		foreach ( $this->views as $view ) {
+			$layouts[ (string) $view ]['layout'] = $this->layout( $view );
+		}
+
+		return $layouts;
 	}
 
 	/**
-	 * Returns the field keys that should be hidden.
+	 * Returns the field keys of (a filtered set of) the fields.
 	 *
-	 * @since $ver$
+	 * @since    $ver$
+	 *
+	 * @formatter:off
+	 *
+	 * @phpcs:ignore Squiz.Commenting.FunctionComment.ParamNameNoMatch
+	 * @param null|callable(Field $field):bool $filter A callback to filter fields.
+	 *
+	 * @formatter:on
 	 *
 	 * @return string[] The field IDs.
 	 */
-	private function hidden_fields(): array {
+	private function get_field_ids( ?callable $filter = null ): array {
 		$hidden_fields = [];
 
 		foreach ( $this->directory_fields as $field ) {
-			if ( ! $field->is_hidden() ) {
+			if ( $filter && ! $filter( $field ) ) {
 				continue;
 			}
 
-			$hidden_fields[] = $field->id();
+			$hidden_fields[] = $field->uuid();
 		}
 
 		return $hidden_fields;
@@ -426,13 +517,13 @@ final class DataView {
 	 */
 	public function to_array(): array {
 		return [
-			'search'           => $this->has_search,
-			'supportedLayouts' => $this->supported_layouts(),
-			'paginationInfo'   => $this->pagination->info( $this->data_source() ),
-			'view'             => $this->view(),
-			'fields'           => $this->dictionary_fields(),
-			'data'             => $this->get_data(),
-			'actions'          => $this->actions ? $this->actions->to_array() : [],
+			'search'         => $this->has_search,
+			'defaultLayouts' => $this->default_layouts(),
+			'paginationInfo' => $this->pagination->info( $this->data_source() ),
+			'view'           => $this->view(),
+			'fields'         => $this->dictionary_fields(),
+			'data'           => $this->get_data(),
+			'actions'        => $this->actions ? $this->actions->to_array() : [],
 		];
 	}
 
@@ -544,5 +635,30 @@ final class DataView {
 	 */
 	private function add_view_fields( Field ...$fields ): void {
 		$this->view_fields = $fields;
+	}
+
+	/**
+	 * Returns the values needed for the `layout` key of a DataViews view type.
+	 *
+	 * @since $ver$
+	 *
+	 * @param View $view The view.
+	 *
+	 * @return array<string,mixed> The layout properties for the view.
+	 */
+	private function layout( View $view ): array {
+		$output = [];
+		if ( $view->equals( View::Grid() ) ) {
+			$output['badgeFields']  = $this->get_field_ids( static fn( Field $field ): bool => $field->is_badge() );
+			$output['columnFields'] = $this->get_field_ids( static fn( Field $field ): bool => $field->is_column() );
+		}
+
+		$image_fields = $this->get_field_ids(
+			static fn( Field $field ): bool => $field instanceof ImageField,
+		);
+
+		$output['mediaField'] = reset( $image_fields );
+
+		return array_filter( $output );
 	}
 }

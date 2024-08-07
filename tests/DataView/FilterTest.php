@@ -60,10 +60,6 @@ final class FilterTest extends TestCase {
 				[ 'operator' => 'is', 'value' => 'value' ],
 				InvalidArgumentException::class,
 			],
-			'missing value'    => [
-				[ 'operator' => 'is', 'field' => 'field' ],
-				InvalidArgumentException::class,
-			],
 		];
 	}
 

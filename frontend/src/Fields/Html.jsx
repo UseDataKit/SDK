@@ -4,5 +4,5 @@
  * @since $ver$
  */
 export default function Html( { name, item } ) {
-    return <div dangerouslySetInnerHTML={{ __html: item[ name ] || '' }}></div>;
+    return <div className="datakit-field" dangerouslySetInnerHTML={{ __html: item[ name ] || '' }}></div>;
 }
