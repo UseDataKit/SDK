@@ -87,11 +87,11 @@ DataKit provides a fluent PHP API for creating `DataView` objects. A `DataView` 
 - (bulk) Actions (with View & Delete built-in)
 - Different Field types
 
-DataKit is also built to be extended by you with ease. You can [create your own `DataSource`](https://github.com/GravityKit/DataKit/blob/main/docs/Data-sources/10-create-a-data-source.md) or [invent your own `Field`](https://github.com/GravityKit/DataKit/blob/main/docs/Fields/10-using-fields.md).
+DataKit is also built to be extended by you with ease. You can [create your own `DataSource`](https://github.com/UseDataKit/SDK/blob/main/docs/Data-sources/10-create-a-data-source.md) or [invent your own `Field`](https://github.com/UseDataKit/SDK/blob/main/docs/Fields/10-using-fields.md).
 
 **Please take a look at our [Documentation](docs) to learn more.**
 
 ## Be Part of the Community
 
 As a developer we'd love to hear from you. If you have ideas for features, or you found a bug, or just want to show off
-what you've create with DataKit; [let us know](https://github.com/GravityKit/DataKit/discussions)!
+what you've create with DataKit; [let us know](https://github.com/UseDataKit/SDK/discussions)!
