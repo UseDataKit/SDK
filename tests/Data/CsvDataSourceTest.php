@@ -68,7 +68,12 @@ final class CsvDataSourceTest extends TestCase {
 	public function test_sort_by(): void {
 		$sort_by_age = $this->data_source->sort_by( Sort::desc( '2' ) );
 
-		self::assertSame( [ '94', '55', '3', '43' ], $sort_by_age->get_data_ids( 4 ) );
+		$data = array_map(
+			static fn( string $id ): array => $sort_by_age->get_data_by_id( $id ),
+			$sort_by_age->get_data_ids( 3 ),
+		);
+		$ages = array_column( $data, '2' );
+		self::assertSame( [ '83', '76', '62' ], $ages );
 	}
 
 	/**
