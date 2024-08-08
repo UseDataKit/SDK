@@ -2,6 +2,7 @@
 
 namespace DataKit\DataViews\DataView;
 
+use DataKit\DataViews\Field\Field;
 use InvalidArgumentException;
 
 /**
@@ -45,7 +46,7 @@ final class Sort {
 	 */
 	private function __construct( string $field, string $direction ) {
 		$this->direction = strtoupper( $direction );
-		$this->field     = $field;
+		$this->field     = Field::normalize( $field );
 
 		if (
 			( empty( $field ) && '0' !== $field )

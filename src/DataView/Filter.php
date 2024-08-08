@@ -64,9 +64,7 @@ final class Filter {
 	) {
 		$this->value    = $value;
 		$this->operator = $operator;
-
-		$field       = explode( Field::UUID_GLUE, $field )[0] ?? $field;
-		$this->field = $field;
+		$this->field    = Field::normalize( $field );
 
 		if ( empty( $field ) ) {
 			throw new InvalidArgumentException( 'Filter needs a field, operator and value.' );
