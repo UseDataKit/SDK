@@ -28,7 +28,7 @@ abstract class Field {
 	 *
 	 * @since $ver$
 	 */
-	public const UUID_GLUE = '--DK--';
+	private const UUID_GLUE = '--DK--';
 
 	/**
 	 * The field ID.
@@ -174,6 +174,19 @@ abstract class Field {
 		} catch ( JsonException $e ) {
 			return 'error';
 		}
+	}
+
+	/**
+	 * Returns a normalized field name from the UUID.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string $uuid The uuid.
+	 *
+	 * @return string The normalized field name.
+	 */
+	final public static function normalize( string $uuid ): string {
+		return explode( self::UUID_GLUE, $uuid )[0] ?? $uuid;
 	}
 
 	/**
@@ -427,6 +440,16 @@ abstract class Field {
 	 */
 	public function is_column(): bool {
 		return self::GRID_TYPE_COLUMN === $this->grid_field_type;
+	}
+
+	/**
+	 * Returns whether the field is a media field.
+     *
+	 * @since $ver$
+	 * @return bool
+	 */
+	public function is_media_field(): bool {
+		return false;
 	}
 
 	/**
