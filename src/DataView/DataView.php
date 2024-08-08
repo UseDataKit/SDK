@@ -7,7 +7,6 @@ use DataKit\DataViews\Data\Exception\DataSourceException;
 use DataKit\DataViews\Data\MutableDataSource;
 use DataKit\DataViews\DataViewException;
 use DataKit\DataViews\Field\Field;
-use DataKit\DataViews\Field\ImageField;
 use InvalidArgumentException;
 use JsonException;
 
@@ -654,7 +653,7 @@ final class DataView {
 		}
 
 		$image_fields = $this->get_field_ids(
-			static fn( Field $field ): bool => $field instanceof ImageField,
+			static fn( Field $field ): bool => $field->is_media_field(),
 		);
 
 		$output['mediaField'] = reset( $image_fields );

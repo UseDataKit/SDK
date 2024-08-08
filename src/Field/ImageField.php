@@ -108,4 +108,12 @@ final class ImageField extends Field {
 
 		return sprintf( '<img %s />', implode( ' ', $params ) );
 	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	public function is_media_field(): bool {
+		return true;
+	}
 }
