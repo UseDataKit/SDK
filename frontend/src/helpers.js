@@ -36,3 +36,27 @@ export function replace_tags( value, data ) {
         return val;
     } );
 }
+
+/**
+ * `fetch` wrapper that mixes in default options.
+ *
+ * @since $ver$
+ *
+ * @param {string} url The URL to call.
+ * @param {object|null} options The options to provide to the fetch call.
+ *
+ * @return {Promise<Response>} The fetch promise.
+ */
+export function datakit_fetch( url, options ) {
+    const defaults = typeof datakit_fetch_options === 'undefined' ? {} : datakit_fetch_options;
+    const merged_options = {
+        ...defaults,
+        ...options ?? {},
+        headers: {
+            ...defaults?.headers ?? {},
+            ...options?.headers ?? {},
+        }
+    };
+
+    return fetch( url, merged_options );
+}

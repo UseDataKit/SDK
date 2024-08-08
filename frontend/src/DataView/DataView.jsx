@@ -3,7 +3,8 @@ import { RegistryProvider } from '@wordpress/data';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useRequest } from '@src/DataView/useRequest';
-import { useRequestCallback } from '@src/DataView/useRequestCallback.js';
+import { useRequestCallback } from '@src/DataView/useRequestCallback';
+import { datakit_fetch } from '@src/helpers';
 import { stringify } from 'qs';
 
 import '@wordpress/dataviews/build-style/style.css';
@@ -16,7 +17,7 @@ const getData = async ( request, apiUrl ) => {
     const append = apiUrl.indexOf( '?' ) !== -1 ? '&' : '?';
 
     const url = new URL( `${apiUrl}/views/${id}${append}${query_params}` );
-    const res = await fetch( url );
+    const res = await datakit_fetch( url );
 
     return res.json();
 }
@@ -44,6 +45,7 @@ export default function DataView(
     }, queryClient );
 
     useRequestCallback( () => queryClient.invalidateQueries( { queryKey: [ 'view-data', id ] } ), requestState );
+
     /**
      * API passed to the callback actions.
      *

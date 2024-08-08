@@ -9,6 +9,7 @@ export default [
                 ...globals.browser,
                 datakit_dataviews: 'readable',
                 datakit_dataviews_rest_endpoint: 'readable',
+                datakit_fetch_options: 'readable',
             },
         },
         settings: {

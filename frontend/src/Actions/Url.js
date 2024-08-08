@@ -1,4 +1,4 @@
-import { get, replace_tags } from '@src/helpers';
+import { datakit_fetch, get, replace_tags } from '@src/helpers';
 
 /**
  * Action that takes the user to a URL.
@@ -10,13 +10,14 @@ import { get, replace_tags } from '@src/helpers';
  * @typedef Context The context object.
  *
  * @property {string} url The url to resolve.
+ * @property {?Object} headers The headers to add.
  * @property {string} type The action type.
- * @property {string} method The action method.
- * @property {Object} params The action params.
- * @property {string|null} confirm A confirm message.
- * @property {boolean} use_new_window Whether to open the url in a new window.
- * @property {boolean} use_single_request Whether to open the url in a new window.
- * @property {object|null} registry The provided registry which contains a public API for the component.
+ * @property {?string} method The action method.
+ * @property {?Object} params The action params.
+ * @property {?string} confirm A confirm message.
+ * @property {?boolean} use_new_window Whether to open the url in a new window.
+ * @property {?boolean} use_single_request Whether to open the url in a new window.
+ * @property {?object} registry The provided registry which contains a public API for the component.
  *
  * @param {Object.<string, string>[]} items The data object.
  * @param {Context} context The context object.
@@ -63,7 +64,7 @@ function handleAjax( items, context ) {
         );
 
         if ( !use_single_request ) {
-            fetch( url, {
+            datakit_fetch( url, {
                 ...options,
                 body: JSON.stringify( params ),
             } )
@@ -85,7 +86,7 @@ function handleAjax( items, context ) {
         return;
     }
 
-    fetch( context.url, {
+    datakit_fetch( context.url, {
         ...options,
         body: JSON.stringify( grouped ),
     } )

@@ -108,7 +108,7 @@ final class Action {
 	 * @see   Action::url() for an action that opens a URL.
 	 * @see   Action::ajax() for an action that is performed via an Ajax request.
 	 *
-	 * @param string $id The unique ID of the action.
+	 * @param string $id    The unique ID of the action.
 	 * @param string $label The label of the action.
 	 */
 	private function __construct( string $id, string $label ) {

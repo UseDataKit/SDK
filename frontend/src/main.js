@@ -16,7 +16,7 @@ window.datakit_fields = new Proxy( {
     get: ( fields, type ) => {
         // Force the same function signature for every object.
         return ( name, data, context = [] ) => {
-            return ( fields[type] || fields['text'] )( { name, item: data.item, context } );
+            return ( fields[ type ] || fields[ 'text' ] )( { name, item: data.item, context } );
         }
     },
 } );
@@ -31,16 +31,17 @@ const queryClient = new QueryClient();
 const views = document.querySelectorAll( '[data-dataview]' );
 [ ...views ].forEach( dataview => {
 
-    const dataViewID = dataview.dataset['dataview'] ?? null;
-    if ( !datakit_dataviews[dataViewID] ) {
+    const dataViewID = dataview.dataset[ 'dataview' ] ?? null;
+    if ( !datakit_dataviews[ dataViewID ] ) {
         return;
     }
 
-    const dataViewData = datakit_dataviews[dataViewID] ?? [];
+    const dataViewData = datakit_dataviews[ dataViewID ] ?? [];
     const wrapper = createRoot( dataview );
     const dataView = createElement( DataView, {
         id: dataViewID,
-        apiUrl: datakit_dataviews_rest_endpoint, ...dataViewData,
+        apiUrl: datakit_dataviews_rest_endpoint,
+        ...dataViewData,
         queryClient
     } );
 

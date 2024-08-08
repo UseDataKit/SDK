@@ -6,7 +6,7 @@
  *
  * @since $ver$
  */
-import { get, replace_tags } from '@src/helpers';
+import { get, replace_tags, datakit_fetch } from '@src/helpers';
 import { useState } from 'react';
 
 export default function Modal( { items, closeModal, context } ) {
@@ -33,7 +33,7 @@ export default function Modal( { items, closeModal, context } ) {
 
     if ( body === null && !busy ) {
         setBusy( true );
-        fetch( url )
+        datakit_fetch( url )
             .then( ( response ) => {
                 if ( !response.ok ) {
                     throw new Error( `Response status: ${response.status}` );

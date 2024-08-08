@@ -12,8 +12,9 @@
     <script>
         let datakit_dataviews = {};
         const datakit_dataviews_rest_endpoint = 'https://gravity-export.test/wp-json/dataviews/v1';
+        const datakit_fetch_options = { headers: { 'x-test': 'test-header' } };
 
-        datakit_dataviews["dataview-1"] = {
+        datakit_dataviews[ "dataview-1" ] = {
             "supportedLayouts": [ "table" ],
             "paginationInfo": { "totalItems": 344, "totalPages": 23 },
             "view": {
@@ -871,7 +872,7 @@
             } ]
         };
 
-        datakit_dataviews['test'] = {
+        datakit_dataviews[ 'test' ] = {
             "supportedLayouts": [ "table" ],
             "paginationInfo": { "totalItems": 3, "totalPages": 1 },
             "view": {
@@ -890,7 +891,10 @@
                     "label": "View entry",
                     "isPrimary": true,
                     "icon": "info",
-                    "RenderModal": ( props ) => datakit_modal( { ...props, context: { url: 'https://gravity-export.test/wp-json/dataviews/v1/views/test/data/{id}' } } ),
+                    "RenderModal": ( props ) => datakit_modal( {
+                        ...props,
+                        context: { url: 'https://gravity-export.test/wp-json/dataviews/v1/views/test/data/{id}' }
+                    } ),
                     "hideModalHeader": true,
                 },
                 {
