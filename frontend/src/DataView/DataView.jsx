@@ -10,6 +10,7 @@ import { stringify } from 'qs';
 import '@wordpress/dataviews/build-style/style.css';
 import '@wordpress/components/build-style/style.css';
 import '@src/scss/fields.scss';
+import '@src/scss/modal.scss';
 
 const getData = async ( request, apiUrl ) => {
     const { id, ...params } = request;

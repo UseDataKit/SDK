@@ -1,0 +1,4 @@
+// Temporary fix until modal can be scaled properly.
+.dataviews-action-modal .components-modal__frame {
+    max-width: max-content;
+}
