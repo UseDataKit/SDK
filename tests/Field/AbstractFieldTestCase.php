@@ -19,7 +19,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 	 * @since $ver$
 	 * @return string
 	 */
-	abstract protected static function fieldClass() : string;
+	abstract protected static function fieldClass(): string;
 
 	/**
 	 * Creates the field using the `::create` method.
@@ -31,7 +31,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 	 *
 	 * @return Field The field instance.
 	 */
-	protected function createField( string $id, string $header ) : Field {
+	protected function createField( string $id, string $header ): Field {
 		$field_class = static::fieldClass();
 
 		return call_user_func( [ $field_class, 'create' ], $id, $header );
@@ -42,7 +42,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function testCreate() : void {
+	public function testCreate(): void {
 		$field = $this->createField( 'field_id', 'Field header' );
 
 		self::assertSame( 'field_id', $field->id() );
@@ -54,7 +54,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function testToArray() : Field {
+	public function testToArray(): Field {
 		$field       = $this->createField( 'field_id', 'Field header' );
 		$field_array = $field->to_array();
 
@@ -71,12 +71,22 @@ abstract class AbstractFieldTestCase extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function testModifier() : void {
+	public function testModifier(): void {
 		$field        = $this->createField( 'field_id', 'Field header' );
 		$not_hideable = $field->always_visible();
 		$hideable     = $not_hideable->hideable();
 		$not_sortable = $hideable->not_sortable();
 		$sortable     = $not_sortable->sortable();
+
+		$badge  = $field->badge();
+		$column = $badge->column();
+		$row    = $badge->row();
+
+		self::assertFalse( $field->is_badge() );
+		self::assertTrue( $badge->is_badge() );
+		self::assertFalse( $column->is_badge() );
+		self::assertTrue( $column->is_column() );
+		self::assertFalse( $row->is_column() );
 
 		self::assertTrue( $field->to_array()['enableHiding'] );
 		self::assertTrue( $hideable->to_array()['enableHiding'] );
@@ -90,9 +100,9 @@ abstract class AbstractFieldTestCase extends TestCase {
 	 *
 	 * @since $ver$
 	 */
-	public function testCallback() : void {
+	public function testCallback(): void {
 		$field = $this->createField( 'email', 'Email Address' )
-			->callback( function ( string $id, array $data ) : string {
+			->callback( function ( string $id, array $data ): string {
 				$value = $data[ $id ] ?? '';
 				if ( strlen( $value ) <= 15 ) {
 					return $value;
