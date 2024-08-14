@@ -42,7 +42,8 @@ const views = document.querySelectorAll( '[data-dataview]' );
         id: dataViewID,
         apiUrl: datakit_dataviews_rest_endpoint,
         ...dataViewData,
-        queryClient
+        queryClient,
+        element: dataview
     } );
 
     wrapper.render( dataView );
