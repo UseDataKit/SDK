@@ -48,6 +48,34 @@ export default function DataView(
     useRequestCallback( () => queryClient.invalidateQueries( { queryKey: [ 'view-data', id ] } ), requestState );
 
     /**
+     * Handles the change to the view state, and dispatched events around it.
+     * @since $ver$
+     * @param new_state The new View state.
+     */
+    const onChangeView = function ( new_state ) {
+        document.dispatchEvent( new CustomEvent( 'datakit/view/change', {
+            detail: {
+                id,
+                old: { ...view }, // Send a copy.
+                new: new_state // Send real reference.
+            }
+        } ) );
+
+        setView( new_state );
+
+        document.dispatchEvent( new CustomEvent( 'datakit/view/changed', { detail: { id, view: { ...new_state } } } ) );
+    }
+
+    /**
+     * Handles the selection of items on a view and dispatches an event when the selection changes.
+     * @since $ver$
+     * @param {string[]} items The selected IDs.
+     */
+    const onChangeSelection = function ( items ) {
+        document.dispatchEvent( new CustomEvent( 'datakit/view/selected', { detail: { id, items } } ) );
+    }
+
+    /**
      * API passed to the callback actions.
      *
      * @since $ver$
@@ -68,8 +96,9 @@ export default function DataView(
             view={viewState}
             data={view_data.data}
             paginationInfo={view_data.paginationInfo}
-            onChangeView={setView}
+            onChangeView={onChangeView}
             isLoading={isLoading}
+            onChangeSelection={onChangeSelection}
             {...props}
         />
     </RegistryProvider>;
