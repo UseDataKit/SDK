@@ -1,7 +1,7 @@
 import { DataViews } from '@wordpress/dataviews';
 import { RegistryProvider } from '@wordpress/data';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRequest } from '@src/DataView/useRequest';
 import { useRequestCallback } from '@src/DataView/useRequestCallback';
 import { datakit_fetch } from '@src/helpers';
@@ -33,7 +33,7 @@ const getData = async ( request, apiUrl ) => {
  * @return {JSX.Element} The DataView object.
  */
 export default function DataView(
-    { id, view, data, paginationInfo, apiUrl, queryClient, ...props }
+    { id, view, data, paginationInfo, apiUrl, queryClient, element, ...props }
 ) {
     const [ viewState, setView ] = useState( view );
     const requestState = useRequest( id, viewState );
@@ -53,18 +53,24 @@ export default function DataView(
      * @param new_state The new View state.
      */
     const onChangeView = function ( new_state ) {
-        document.dispatchEvent( new CustomEvent( 'datakit/view/change', {
+        element.dispatchEvent( new CustomEvent( 'datakit/view/change', {
+            bubbles: true,
             detail: {
                 id,
                 old: { ...view }, // Send a copy.
                 new: new_state // Send real reference.
-            }
+            },
         } ) );
 
         setView( new_state );
-
-        document.dispatchEvent( new CustomEvent( 'datakit/view/changed', { detail: { id, view: { ...new_state } } } ) );
     }
+
+    useEffect( () => {
+        element.dispatchEvent( new CustomEvent( 'datakit/view/changed', {
+            bubbles: true,
+            detail: { id, view: { ...viewState } },
+        } ) );
+    }, [ viewState ] );
 
     /**
      * Handles the selection of items on a view and dispatches an event when the selection changes.
@@ -72,7 +78,10 @@ export default function DataView(
      * @param {string[]} items The selected IDs.
      */
     const onChangeSelection = function ( items ) {
-        document.dispatchEvent( new CustomEvent( 'datakit/view/selected', { detail: { id, items } } ) );
+        element.dispatchEvent( new CustomEvent( 'datakit/view/selected', {
+            bubbles: true,
+            detail: { id, items },
+        } ) );
     }
 
     /**
