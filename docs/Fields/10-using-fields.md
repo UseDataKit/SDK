@@ -1,6 +1,7 @@
 # Using fields
 
-A DataView consists of fields and data. The data is provided by a [DataSource](../Data-sources/10-create-a-data-source.md),
+A DataView consists of fields and data. The data is provided by
+a [DataSource](../Data-sources/10-create-a-data-source.md),
 and the fields are provided by you. In this chapter we'll explore what a field is, and how you can create your own.
 
 ## What are fields?
@@ -10,13 +11,16 @@ on a table. However, for every layout type; the registration of the fields is th
 
 Currently, DataKit provides the following field types:
 
-- `TextField`: Renders the value as plain text. Tags are stripped, and no HTML is parsed.
+- [`TextField`](./11-text-field.md): Renders the value as plain text. Tags are stripped, and no HTML is parsed.
 - `HtmlField`: Renders the value as HTML.
 - `DateTimeField`: Renders the value as a date according to a provided format.
 - [`EnumField`](./20-enum-field.md): Renders the output based on a fixed set op possible values.
-- `ImageField`: Renders the value as a `<img />` tag.
+- [`ImageField`](./25-image-field.md): Renders the value as a `<img />` tag.
+- [`GravatarField`](./26-gravatar-field.md): Renders an email address as the [Gravatar](https://gravatar.com/) avatar
+  picture.
 - `LinkField`: Renders the value as a link.
-- [`StatusIndicator`](./30-status-indicator-field.md): Renders the value as a status indicator (active/inactive, or with different states).
+- [`StatusIndicator`](./30-status-indicator-field.md): Renders the value as a status indicator (active/inactive, or with
+  different states).
 
 Every field is (and should be) extended from the abstract `Field` class. This class provides an API that is valid
 for every field type.

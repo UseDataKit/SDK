@@ -6,6 +6,7 @@ namespace DataKit\DataViews\Field;
  * A Gravatar field.
  *
  * @since $ver$
+ *
  * @mixin ImageField
  */
 final class GravatarField extends Field {
@@ -20,6 +21,7 @@ final class GravatarField extends Field {
 	 * The composed image field.
 	 *
 	 * @since $ver$
+	 *
 	 * @var ImageField
 	 */
 	private ImageField $image;
@@ -28,6 +30,7 @@ final class GravatarField extends Field {
 	 * The image size.
 	 *
 	 * @since $ver$
+	 *
 	 * @var int
 	 */
 	private int $size = 80;
@@ -36,14 +39,16 @@ final class GravatarField extends Field {
 	 * The default image to use.
 	 *
 	 * @since $ver$
+	 *
 	 * @var string
 	 */
 	private string $default_image = 'mp';
 
 	/**
 	 * Returns the callback used on the image field.
-     *
+	 *
 	 * @since $ver$
+	 *
 	 * @return callable The callable.
 	 */
 	private function generate_callback(): callable {
