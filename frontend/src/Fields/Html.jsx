@@ -7,7 +7,8 @@ import { get } from '@src/helpers.js';
  * @since $ver$
  */
 
-const regex = /(?:\r\n)*<script[^>]*>(.*?)<\/[\r\n\s]*script>(?:\r\n)*/isg;
+const script_tag_regex = /(?:\r\n)*<script[^>]*>(.*?)<\/[\r\n\s]*script>(?:\r\n)*/isg;
+const script_inline_regex = /\s(on\w+\s*=\s*".*?"|href\s*=\s*"\s*javascript:.*?")/isg;
 
 export default function Html( { name, item, context } ) {
     const is_script_allowed = get( context, 'is_scripts_allowed', false );
@@ -16,15 +17,15 @@ export default function Html( { name, item, context } ) {
 
     if ( is_script_allowed ) {
         // Record all scripts from the tags
-        const scripts = content.match( regex );
+        const scripts = content.match( script_tag_regex );
         if ( scripts ) {
             for ( const script of scripts ) {
-                script_body += script.replace( regex, '$1' );
+                script_body += script.replace( script_tag_regex, '$1' );
             }
         }
     } else {
         // Remove script tags from the html.
-        content = content.replace( regex, '' );
+        content = content.replace( script_tag_regex, '' ).replace( script_inline_regex, '' );
     }
 
     useEffect( () => {
