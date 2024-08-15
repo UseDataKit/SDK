@@ -11,13 +11,13 @@ const config = {
 	tagline: 'DataViews for all.',
 	url: 'https://www.datakit.org/',
 	baseUrl: '/docs',
-	deploymentBranch: 'main',
+	deploymentBranch: 'gh-pages',
 	onBrokenLinks: 'ignore',
 	onBrokenMarkdownLinks: 'warn',
 	trailingSlash: false,
 	favicon: 'img/favicon.png',
-	organizationName: 'datakit',
-	projectName: 'datakit-sdk', // Usually your repo name.
+	organizationName: 'UseDataKit',
+	projectName: 'SDK',
 
 	presets: [
 		[
