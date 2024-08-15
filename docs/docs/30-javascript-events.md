@@ -1,3 +1,8 @@
+---
+title: JavaScript events
+sidebar: auto
+---
+
 # JavaScript events
 
 During the interaction you have with a DataView, there are various JavaScript events being dispatched. These events are

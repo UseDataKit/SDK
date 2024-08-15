@@ -1,3 +1,6 @@
+---
+title: Using fields
+---
 # Using fields
 
 A DataView consists of fields and data. The data is provided by

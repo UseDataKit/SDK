@@ -1,3 +1,8 @@
+---
+title: ArrayDataSource
+sidebar: auto
+---
+
 # ArrayDataSource
 
 The `ArrayDataSource` is an very simple in-memory data source that is highly useful for rapid development and testing

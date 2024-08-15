@@ -1,3 +1,8 @@
+---
+title: Filters
+sidebar: auto
+---
+
 # Filters
 
 When creating a `DataView` you can apply a set of default filters. These filters will pre-fill the UI and are also used
