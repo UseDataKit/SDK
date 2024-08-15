@@ -36,10 +36,23 @@ final class HtmlField extends Field {
 	 * @since $ver$
 	 * @return self The field.
 	 */
-	public function remove_scripts(): self {
+	public function deny_scripts(): self {
 		$clone                                = clone $this;
 		$clone->context['is_scripts_allowed'] = false;
 
 		return $clone;
+	}
+
+	/**
+	 * @inheritDoc
+	 * @since $ver$
+	 */
+	protected function default_context(): array {
+		return array_merge(
+			parent::default_context(),
+			[
+				'is_scripts_allowed' => false,
+			]
+		);
 	}
 }
