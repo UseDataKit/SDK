@@ -76,6 +76,17 @@ final class TextField extends Field {
 	}
 
 	/**
+	 * Returns an instance which is roman.
+	 *
+	 * @since $ver$
+	 *
+	 * @return self The field.
+	 */
+	public function roman(): self {
+		return $this->italic( false );
+	}
+
+	/**
 	 * @inheritDoc
 	 * @since $ver$
 	 */
