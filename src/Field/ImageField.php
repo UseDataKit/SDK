@@ -95,9 +95,10 @@ final class ImageField extends Field {
 		}
 
 		$attributes = array_merge(
-			$this->context(),
+			$this->context,
 			[
 				'src' => $src,
+				'alt' => self::apply_merge_tags( $this->context['alt'] ?? '', $data ),
 			],
 		);
 
