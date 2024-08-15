@@ -13,7 +13,7 @@ Currently, DataKit provides the following field types:
 
 - [`TextField`](./11-text-field.md): Renders the value as plain text. Tags are stripped, and no HTML is parsed.
 - [`HtmlField`](./15-html-field.md): Renders the value as HTML.
-- `DateTimeField`: Renders the value as a date according to a provided format.
+- [`DateTimeField`](./18-datetime-field.md): Renders the value as a date according to a provided format.
 - [`EnumField`](./20-enum-field.md): Renders the output based on a fixed set op possible values.
 - [`ImageField`](./25-image-field.md): Renders the value as a `<img />` tag.
 - [`GravatarField`](./26-gravatar-field.md): Renders an email address as the [Gravatar](https://gravatar.com/) avatar
