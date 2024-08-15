@@ -20,7 +20,7 @@ A full example of this field:
 use DataKit\DataViews\Field\GravatarField;
 
 GravatarField::create( 'email', 'Picture' )
-    ->resolution( 200 ) // Creates an image that is 400x400
+    ->resolution( 200 ) // Creates an image that is 200x200
     ->default_image( 'retro' ) // Sets the images default to `retro` for a missing Gravatar picture.
     ->size( 100 ) // Adds a `width="100"` attribute to the image tag
     ->alt( 'Profile picture for {name}' );
