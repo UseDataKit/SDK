@@ -9,7 +9,7 @@ parameter. This parameter should receive a key => value array where the key is t
 ```php
 use DataKit\DataViews\Field\EnumField;
 
-$status = EnumField::create( 'status', 'Status', [
+EnumField::create( 'status', 'Status', [
     'active' => 'Active',
     'disabled' => 'Disabled',
 ]);
