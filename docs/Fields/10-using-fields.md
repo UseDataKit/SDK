@@ -29,7 +29,7 @@ for every field type.
 
 *In this example we'll focus on a `TextField` as it is the most basic field, but it should be valid for most fields.*
 
-To provide a fluent API, a field is created by the named constructor `Field::create(string $id, string $label)`. You
+To provide a fluent API, a field is created by the named constructor `Field::create( string $id, string $label )`. You
 need to call this method on the specific field class; calling `Field::create` will result in an error, as the `Field`
 class is abstract and cannot be instantiated.
 
@@ -46,7 +46,7 @@ $name = TextField::create( 'name', 'Full name' );
 This will create a field for the `name` field, with a label of `Full name`.
 
 > *Note:* Please see the documentation for the specific field types, as for some fields there are more required
-> parameters on the `create` method.
+> parameters on the `create` method (e.g. the `EnumField`).
 
 ## Applying field settings
 
