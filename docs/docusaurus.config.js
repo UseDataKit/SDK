@@ -27,7 +27,7 @@ const config = {
 				docs: {
 					routeBasePath: '/',
 					sidebarPath: require.resolve( './sidebars.js' ),
-					editUrl: 'https://github.com/UseDataKit/SDK/edit/main',
+					editUrl: 'https://github.com/UseDataKit/SDK/edit/main/docs',
 				},
 				theme: {
 					customCss: require.resolve( './src/css/custom.css' ),
