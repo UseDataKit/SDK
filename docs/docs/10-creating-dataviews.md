@@ -6,8 +6,12 @@ To create a `DataView` you need to call any of the named constructors available:
 - `DataView::list()` - (Not available yet) Creates a DataView with a `list` view type.
 - `DataView::grid()` - (Not available yet) Creates a DataView with a `grid` view type.
 
-> Note: Since every view type has different required parameters, the `new DataView()` creation is *not* available. The
-> named constructors will have all the required parameters, and make for a fluent and expressive API.
+:::note
+
+Since every view type has different required parameters, the `new DataView()` creation is *not* available. The
+named constructors will have all the required parameters, and make for a fluent and expressive API.
+
+:::
 
 ## Apply settings
 
@@ -106,9 +110,13 @@ inspiration.
 In some situations, you might want to be able to delete a result from the list. For this we introduced
 the `->deletable( string $label, ?callable $callback = null)` method on the DataView.
 
-> Please note that this functionality requires the DataView to have a `MutableDataSource` which `can_delete()`. This
-> data source is responsible for deleting the results. If the data source can not delete results, calling
-> the `deleteable()` method will not do anything.
+:::note
+
+This functionality requires the DataView to have a `MutableDataSource` which `can_delete()`. This data source is 
+responsible for deleting the results. If the data source can not delete results, calling the `deleteable()` method will 
+not do anything.
+
+:::
 
 Once the method is called, it will add a primary, destructive "Delete" bulk-action on the results. Clicking this will
 perform an AJAX call to the REST API, which in turn will instruct the data source to delete the results by their IDs.
@@ -131,6 +139,10 @@ $dataview = DataView::table( ... )
     });
 ```
 
-> *Note:* An `Action` object is immutable. Any method call will return a new instance with the changes applied. This is
-> why we return the result of the `confirm()` method, instead of calling the methods and then return the `$action`
-> variable. That would return the exact instance that was provided, causing no changes to be applied.
+:::note
+
+An `Action` object is immutable. Any method call will return a new instance with the changes applied. This is
+why we return the result of the `confirm()` method, instead of calling the methods and then return the `$action`
+variable. That would return the exact instance that was provided, causing no changes to be applied.
+
+:::

@@ -28,5 +28,9 @@ GravatarField::create( 'email', 'Picture' )
 
 In this example you can notice that we also call the `size()` and `alt()` modifiers from an `ImageField`.
 
-> Note: The `resolution` and `size` are not the same thing. The `resolution` is the size of the image that is used;
-> while the `size` sets the `width` (and `height`) of the actual `<img />` tag that is being rendered. 
+:::info
+
+The `resolution` and `size` are not the same thing. The `resolution` is the size of the image that is used; while the 
+`size` sets the `width` (and `height`) of the actual `<img />` tag that is being rendered.
+
+:::

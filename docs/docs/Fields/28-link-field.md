@@ -12,7 +12,7 @@ the [default modifiers](./10-using-fields.md#applying-field-settings).
 - `->on_new_window()` Will open the link on a new window by adding `target="_blank"` to the `<a>` tag.
 - `->on_same_window()` Will open the link in the current window (default).
 - `->with_label( string $label )` Will set the label for the link (supports merge tags).
-- `->withtout_label ()` Will use the value as the label (default).
+- `->withtout_label()` Will use the value as the label (default).
 
 Let's look a few examples:
 

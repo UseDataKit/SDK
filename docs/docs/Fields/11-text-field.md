@@ -29,5 +29,9 @@ TextField::create( 'field', 'Label' )
     ->break(); // Adds a `white-spice:pre-line` style.
 ```
 
-> Note: `->italic()` also has an optional `bool $is_italic` parameter. So instead of `->roman()` you can also
-> use `->italic( false )`, if that feels more intuitive to you.
+:::note
+
+`->italic()` also has an optional `bool $is_italic` parameter. So instead of `->roman()` you can also
+use `->italic( false )`, if that feels more intuitive to you.
+
+:::

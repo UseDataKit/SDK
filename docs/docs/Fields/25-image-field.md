@@ -22,5 +22,9 @@ ImageField::create( 'image', 'Image label' )
     ->class( 'custom-class-1 custom-class-2'); // Adds `class="custom-class-1 custom-class-2" to the tag.
 ```
 
-> Note: The `alt` text can reference the value of another field, by use of "merge tags". In this example we reference
-> the `name` field by adding `{name}` to the tag. This tag will be replaced by the value from the `name` field. 
+:::tip
+
+The `alt` text can reference the value of another field, by use of "merge tags". In this example we reference
+the `name` field by adding `{name}` to the tag. This tag will be replaced by the value from the `name` field.
+
+:::
