@@ -10,7 +10,7 @@ const config = {
 	title: 'DataKit Developer Docs',
 	tagline: 'DataViews for all.',
 	url: 'https://www.datakit.org/',
-	baseUrl: '/docs',
+	baseUrl: '/',
 	deploymentBranch: 'gh-pages',
 	onBrokenLinks: 'ignore',
 	onBrokenMarkdownLinks: 'warn',
