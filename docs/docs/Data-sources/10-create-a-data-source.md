@@ -1,3 +1,7 @@
+---
+title: Create a data source
+sidebar: auto
+---
 # Create a data source
 
 DataKit supports different data sources. Out of the box it provides sources for different form plugins like Gravity

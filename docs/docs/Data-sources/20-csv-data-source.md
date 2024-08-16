@@ -1,3 +1,7 @@
+---
+title: CsvDataSource
+sidebar: auto
+---
 # CsvDataSource
 
 DataKit comes with a `CsvDataSource` that reads a CSV or TSV file. You can provide the separator, enclosure and escape
