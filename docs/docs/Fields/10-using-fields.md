@@ -1,5 +1,5 @@
 ---
-title: Using fields
+title: Introduction to fields
 ---
 # Using fields
 
@@ -48,8 +48,10 @@ $name = TextField::create( 'name', 'Full name' );
 
 This will create a field for the `name` field, with a label of `Full name`.
 
-> *Note:* Please see the documentation for the specific field types, as for some fields there are more required
-> parameters on the `create` method (e.g. the `EnumField`).
+:::note
+Please see the documentation for the specific field types, as for some fields there are more required parameters 
+on the `create` method (e.g. the `EnumField`).
+:::
 
 ## Applying field settings
 
@@ -105,8 +107,10 @@ $email = TextField::create( 'email', 'Email address' )
     } );
 ```
 
-> *Note:* The callback function requires a `callable`. This means you can also provide a callable as an array notation,
-> e.g. `[ $this, 'my_callback' ]` or even an invokable class instance.
+:::note
+The callback function requires a `callable`. This means you can also provide a callable as an array notation, e.g. 
+`[ $this, 'my_callback' ]` or even an invokable class instance.
+:::
 
 You can even create "fake" fields by combining multiple fields into one.
 
