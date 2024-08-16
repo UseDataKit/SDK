@@ -5,7 +5,7 @@ sidebar: auto
 # Create a data source
 
 DataKit supports different data sources. Out of the box it provides sources for different form plugins like Gravity
-Forms, a [CSV data source](./20-csv-data-source.md) and an [in-memory array data source](./15-array-data-source.md). But
+Forms, a [CSV data source](20-csv-data-source.md) and an [in-memory array data source](15-array-data-source.md). But
 you can also create your own data source, and hook it up to a DataView.
 
 ## Read-only data source

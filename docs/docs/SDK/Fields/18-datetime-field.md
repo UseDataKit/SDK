@@ -6,7 +6,7 @@ read, and the format the value should be displayed in. For both you can also pro
 ## Applying field settings
 
 The `DateTimeField` has a few other settings modifiers on top of
-the [default modifiers](./10-using-fields.md#applying-field-settings).
+the [default modifiers](10-using-fields.md#applying-field-settings).
 
 - `->from_format( string $format, ?DateTimeZone $timezone = null)` Makes sure to interpret the value correctly.
 - `->to_format( string $format, ?DateTimeZone $timezone = null)` Sets the format to display the datetime in.

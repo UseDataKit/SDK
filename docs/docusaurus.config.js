@@ -42,13 +42,13 @@ const config = {
 				items: [
 					{
 						type: 'doc',
-						label: 'Data Sources',
+						label: 'SDK',
 						position: 'left',
-						docId: 'Data-sources/create-a-data-source',
+						docId: 'SDK/creating-dataviews',
 					}, {
 						type: 'doc',
 						label: 'Fields',
-						docId: 'Fields/using-fields',
+						docId: 'Plugin/getting-started',
 					},
 				],
 			},

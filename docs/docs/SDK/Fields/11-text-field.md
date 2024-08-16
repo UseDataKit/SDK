@@ -12,7 +12,7 @@ TextField::create( 'field', 'Label' );
 ## Applying field settings
 
 Although the field does not support HTML, you can influence the way the value is displayed. The following modifiers are
-available for a text field, on top of the [default modifiers](./10-using-fields.md#applying-field-settings).
+available for a text field, on top of the [default modifiers](10-using-fields.md#applying-field-settings).
 
 - `->break()` Makes the content break on new lines. It does so through CSS instead of adding `<br/>` tags.
 - `->inline()` Displays the content without any breaks (inverse of `break()`).

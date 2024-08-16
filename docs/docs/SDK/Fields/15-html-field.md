@@ -1,7 +1,7 @@
 # HtmlField
 
 The `HtmlField` is a really powerful field, as it renders any content given as pure HTML. Especially in combination
-with a custom [`callback()`](./10-using-fields.md#change-value-before-rendering) method; there is little this field
+with a custom [`callback()`](10-using-fields.md#change-value-before-rendering) method; there is little this field
 cannot do.
 
 ## Security
@@ -13,7 +13,7 @@ from the content, before adding it to the page.
 ## Applying field settings
 
 While an `HtmlField` is a real power house, it does come with some custom modifiers, on top of on top of
-the [default modifiers](./10-using-fields.md#applying-field-settings).
+the [default modifiers](10-using-fields.md#applying-field-settings).
 
 - `->allow_scripts()` Includes all `<script>` tags and executes their content.
 - `->deny_scripts()` Removes all `<scripts>` tags from the content (default).

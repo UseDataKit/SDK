@@ -5,7 +5,7 @@ The `ImageField` renders the value of a data source as an `<img />` tag.
 ## Applying field settings
 
 The `ImageField` has a few other settings modifiers on top of
-the [default modifiers](./10-using-fields.md#applying-field-settings).
+the [default modifiers](10-using-fields.md#applying-field-settings).
 
 - `->size( int width, ?int height = null )` Adds a `width=""` and `height=""` attribute on the tag.
 - `->class( string $class )` Adds the provided classes on the `class=""` attribute.

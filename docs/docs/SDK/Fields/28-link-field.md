@@ -6,7 +6,7 @@ label, or use the value as the label; and link to a different field.
 ## Applying field settings
 
 The `LinkField` has a few other settings modifiers on top of
-the [default modifiers](./10-using-fields.md#applying-field-settings).
+the [default modifiers](10-using-fields.md#applying-field-settings).
 
 - `->link_to_field( string $field_id )` Will use the current value as a label, and link to the value of another field.
 - `->on_new_window()` Will open the link on a new window by adding `target="_blank"` to the `<a>` tag.

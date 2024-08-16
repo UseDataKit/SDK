@@ -5,7 +5,7 @@ The `GravatarField` renders a [Gravatar](https://gravatar.com) image for an emai
 ## Applying field settings
 
 Under the hood, a `GravatarField` renders like an `ImageField`. This means it has all
-the [same image modifiers](./25-image-field.md#applying-field-settings) as an `ImageField`.
+the [same image modifiers](25-image-field.md#applying-field-settings) as an `ImageField`.
 
 In addition to those modifiers, the `GravatarField` also provides some modifiers of its own:
 

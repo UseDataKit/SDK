@@ -6,7 +6,7 @@ sidebar: auto
 # ArrayDataSource
 
 The `ArrayDataSource` is an very simple in-memory data source that is highly useful for rapid development and testing
-purposes. It can also be used for composition when [creating a new data source](./10-create-a-data-source.md).
+purposes. It can also be used for composition when [creating a new data source](10-create-a-data-source.md).
 
 ## Example usage
 
@@ -29,4 +29,4 @@ U can use the data source as a stand-in data source for development purposes, wh
 developed.
 
 Another use case is to use the `ArrayDataSource`
-when [composing a new data source](./10-create-a-data-source.md#composing-a-data-source). 
+when [composing a new data source](10-create-a-data-source.md#composing-a-data-source). 

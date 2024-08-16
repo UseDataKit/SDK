@@ -21,7 +21,7 @@ the `status` key.
 ## Applying field settings
 
 The `EnumField` has a few other settings modifiers on top of
-the [default modifiers](./10-using-fields.md#applying-field-settings).
+the [default modifiers](10-using-fields.md#applying-field-settings).
 
 - `->filterable_by( Operator ... $operators )` Makes the field filterable. [Read more about operators](#operators)
 - `->primary()` Makes the field filterable as a primary filter, which is always
