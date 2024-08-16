@@ -47,7 +47,7 @@ const config = {
 						docId: 'SDK/creating-dataviews',
 					}, {
 						type: 'doc',
-						label: 'Fields',
+						label: 'WordPress Plugin',
 						docId: 'Plugin/getting-started',
 					},
 				],
