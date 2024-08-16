@@ -10,12 +10,12 @@ const config = {
 	title: 'DataKit Developer Docs',
 	tagline: 'DataViews for all.',
 	url: 'https://www.datakit.org/',
-	baseUrl: '/docs',
+	baseUrl: '/',
 	deploymentBranch: 'gh-pages',
 	onBrokenLinks: 'ignore',
 	onBrokenMarkdownLinks: 'warn',
 	trailingSlash: false,
-	favicon: 'img/favicon.png',
+	favicon: 'img/favicon.png', // TODO: Add favicon
 	organizationName: 'UseDataKit',
 	projectName: 'SDK',
 
@@ -38,7 +38,7 @@ const config = {
 	themeConfig: /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
 			navbar: {
-				title: 'Docs Home',
+				title: 'DataKit Docs',
 				items: [
 					{
 						type: 'doc',
@@ -55,7 +55,7 @@ const config = {
 			prism: {
 				theme: lightCodeTheme,
 				darkTheme: darkCodeTheme,
-				additionalLanguages: [ 'php', 'bash' ]
+				additionalLanguages: [ 'php' ]
 			},
 		}),
 };
