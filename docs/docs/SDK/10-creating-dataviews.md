@@ -3,8 +3,16 @@
 To create a `DataView` you need to call any of the named constructors available:
 
 - `DataView::table()` - Creates a DataView with a `table` view type.
-- `DataView::list()` - (Not available yet) Creates a DataView with a `list` view type.
-- `DataView::grid()` - (Not available yet) Creates a DataView with a `grid` view type.
+- `DataView::list()` - Creates a DataView with a `list` view type.
+- `DataView::grid()` - Creates a DataView with a `grid` view type.
+
+The view type used will be the default view type, but you can add support for other view types by declaring the other view types that are supported:
+
+```php
+$dataview = DataView::table( ... )->supports( View::Grid(), View::List() );
+```
+
+The order in which support is added is the order that the view types will appear in the view type switcher.
 
 :::note
 
