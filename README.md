@@ -1,11 +1,11 @@
-# DataKit SDK
+# 🧰 DataKit SDK
 
 DataKit is a PHP-based abstraction
 around [`@wordpress/dataviews`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/).
 It provides an easy-to-understand way of composing `DataViews`-based applications, with a set of default field types and
 rendering.
 
-## Folder Structure
+## 🗂 Folder Structure
 
 ```
 DataKit/
@@ -17,23 +17,20 @@ DataKit/
 └── tests - Contains the unit tests for the PHP classes
 ```
 
-## Learn More
+## 📖 Check out our docs!
 
-`DataViews` are very powerful out-of-the box. They feature:
+DataKit is also built to be extended by you with ease. You can [create your own `DataSource`](https://docs.datakit.org/SDK/Data-sources/create-a-data-source) or [invent your own `Field`](https://docs.datakit.org/SDK/Fields/using-fields).
 
-- [A variety of view types](https://docs.datakit.org/creating-dataviews)
-- [Different field types](https://docs.datakit.org/Fields/using-fields)
-- [Filtering](https://docs.datakit.org/filters)
-- [Sorting](https://docs.datakit.org/Data-sources/create-a-data-source#filtering--sorting-results)
-- Searching
-- (fast) Pagination
-- (bulk) Actions (with View & Delete built-in)
+We have _many_ docs available, including:
 
-DataKit is also built to be extended by you with ease. You can [create your own `DataSource`](https://github.com/UseDataKit/SDK/blob/main/docs/Data-sources/10-create-a-data-source.md) or [invent your own `Field`](https://github.com/UseDataKit/SDK/blob/main/docs/Fields/10-using-fields.md).
+- [Creating DataViews](https://docs.datakit.org/SDK/creating-dataviews)
+- [Creating a data source](https://docs.datakit.org/SDK/Data-sources/create-a-data-source)
+- [Using fields](https://docs.datakit.org/SDK/Fields/using-fields)
+- [Filtering results](https://docs.datakit.org/SDK/filters)
 
-**Please take a look at our [Documentation](docs) to learn more.**
+**[Visit docs.datakit.org](https://docs.datakit.org)** for a whole lot more docs!
 
-## Be Part of the Community
+## 🤝 Be Part of the Community
 
 As a developer we'd love to hear from you. If you have ideas for features, or you found a bug, or just want to show off
 what you've create with DataKit; [let us know](https://github.com/UseDataKit/SDK/discussions)!
