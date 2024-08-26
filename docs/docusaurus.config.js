@@ -38,7 +38,12 @@ const config = {
 	themeConfig: /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
 			navbar: {
-				title: 'Docs Home',
+				title: 'Home',
+				logo: {
+					alt: 'DataKit Logo',
+					src: 'img/logo.svg',
+					srcDark: 'img/logo-dark.svg',
+				},
 				items: [
 					{
 						type: 'doc',
@@ -51,6 +56,38 @@ const config = {
 						docId: 'Plugin/getting-started',
 					},
 				],
+			},
+			footer: {
+				style: 'dark',
+				links: [
+					{
+						title: 'Docs',
+						items: [
+							{
+								label: 'SDK',
+								to: '/SDK/creating-dataviews',
+							}, {
+								label: 'WordPress Plugin',
+								to: '/Plugin/getting-started',
+							},
+						],
+					}, {
+						title: 'More',
+						items: [
+							{
+								label: 'DataKit.org',
+								href: 'https://www.datakit.org',
+							}, {
+								label: 'Email',
+								href: 'mailto:admin@datakit.org',
+							}, {
+								label: 'GitHub',
+								href: 'https://github.com/UseDataKit/',
+							},
+						],
+					},
+				],
+				copyright: `Copyright © ${new Date().getFullYear()} Katz Web Services, Inc.`,
 			},
 			prism: {
 				theme: lightCodeTheme,
