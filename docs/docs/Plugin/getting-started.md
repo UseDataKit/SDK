@@ -14,7 +14,7 @@ To install the WordPress plugin, follow these instructions:
     ```bash
     git clone git@github.com:GravityKit/DataKit.git DataKit
     ```
-   
+
 2. Symlink your repository to your WordPress' `wp-content/plugins` folder (Not required if you cloned it there directly)
 
    ```bash
@@ -24,12 +24,21 @@ To install the WordPress plugin, follow these instructions:
 
 3. Go into the folder and perform a Composer install
    ```bash
-   composer install --no-dev -o
+   composer install --no-dev
    ```
 
 4. Go to your WordPress installation, and activate the DataKit plugin.
 
 ## Creating a DataView
+
+In order to register the DataView, you need to wait until the `datakit/loaded` action hook was dispatched. After this,
+you can be certain DataKit was loaded and the default data sources and fields are available to use.
+
+```php
+add_action( 'datakit/loaded', function () {
+    // Create your DataView here.
+} );
+```
 
 DataKit provides a fluent PHP API for creating `DataView` objects. A `DataView` consists of a `DataSource` and a set of
 `Fields`. To learn more about the different field types, please see our [Documentation](SDK/Fields/using-fields).
@@ -61,4 +70,5 @@ DataKit provides a fluent PHP API for creating `DataView` objects. A `DataView` 
     ```php
     do_action( 'datakit/dataview/register', $dataview );
     ```
-4. Show off your `DataView`! You can use the `[dataview id="my-dataview"]` shortcode to display your `DataView` anywhere.
+4. Show off your `DataView`! You can use the `[dataview id="my-dataview"]` shortcode to display your `DataView`
+   anywhere.
