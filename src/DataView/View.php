@@ -2,6 +2,8 @@
 
 namespace DataKit\DataViews\DataView;
 
+use DataKit\DataViews\EnumObject;
+
 /**
  * Represents the valid view types.
  *
