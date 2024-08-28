@@ -12,7 +12,7 @@ To install the WordPress plugin, follow these instructions:
    folder, or somewhere else and symlink the folder.
 
     ```bash
-    git clone git@github.com:GravityKit/DataKit.git DataKit
+    git clone git@github.com:UseDataKit/DataKit.git DataKit
     ```
 
 2. Symlink your repository to your WordPress' `wp-content/plugins` folder (Not required if you cloned it there directly)
