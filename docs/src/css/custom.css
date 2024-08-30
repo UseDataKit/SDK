@@ -96,3 +96,21 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
   font-weight: var(--ifm-font-weight-normal);
   margin: var( --ifm-list-item-margin );
 }
+
+.responsive-iframe-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  margin: 0 auto; /* Optional: to center the iframe */
+}
+
+.responsive-iframe-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
