@@ -18,6 +18,13 @@ final class GravatarField extends Field {
 	private const FALLBACK_TYPES = [ '404', 'mp', 'identicon', 'monsterid', 'wavatar', 'retro', 'robohash', 'blank' ];
 
 	/**
+	 * Ratings for the gravatar.
+	 *
+	 * @since $ver$
+	 */
+	private const RATING_TYPES = [ 'g', 'pg', 'r', 'x' ];
+
+	/**
 	 * The composed image field.
 	 *
 	 * @since $ver$
@@ -45,6 +52,15 @@ final class GravatarField extends Field {
 	private string $default_image = 'mp';
 
 	/**
+	 * The rating to use.
+	 *
+	 * @since $ver$
+	 *
+	 * @var string
+	 */
+	private string $rating = 'g';
+
+	/**
 	 * Returns the callback used on the image field.
 	 *
 	 * @since $ver$
@@ -54,10 +70,11 @@ final class GravatarField extends Field {
 	private function generate_callback(): callable {
 		return fn( string $id, array $data ) => ( $data[ $id ] ?? null )
 			? sprintf(
-				'https://gravatar.com/avatar/%s?size=%d&default=%s',
+				'https://gravatar.com/avatar/%1$s?size=%2$d&default=%3$s&rating=%4$s',
 				md5( $data[ $id ] ),
 				$this->size,
 				$this->default_image,
+				$this->rating
 			)
 			: '';
 	}
@@ -98,15 +115,29 @@ final class GravatarField extends Field {
 	}
 
 	/**
-	 * Returns an instance of the field with a specific default image fallback
+	 * Sets the default image fallback.
 	 *
 	 * @since $ver$
 	 *
-	 * @return self A field instance with the provided default image.
+	 * @return self A field instance with the provided default image. Default is 'mp' ("mystery person").
 	 */
 	public function default_image( string $type ): self {
 		$clone                = clone $this;
 		$clone->default_image = in_array( $type, self::FALLBACK_TYPES, true ) ? $type : 'mp';
+
+		return $clone;
+	}
+
+	/**
+	 * Sets the rating for the gravatar.
+	 *
+	 * @since $ver$
+	 *
+	 * @return self A field instance with the provided rating. Default is 'g'.
+	 */
+	public function rating( string $type ): self {
+		$clone         = clone $this;
+		$clone->rating = in_array( $type, self::RATING_TYPES, true ) ? $type : 'g';
 
 		return $clone;
 	}
