@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import postcssPresetEnv from 'postcss-preset-env';
+import postcssImport from 'postcss-import';
 
 const assetName = 'dataview';
 const isProduction = process.env.NODE_ENV === 'production';
@@ -27,6 +29,19 @@ export default defineConfig( {
         alias: {
             '@src': path.resolve( process.cwd(), './src' ),
             '@node_modules': path.resolve( process.cwd(), './node_modules' )
+        },
+    },
+    css: {
+        postcss: {
+            plugins: [
+                postcssImport(),
+                postcssPresetEnv({
+                    stage: 0, // Enable all modern CSS features
+                    features: {
+                        'custom-media-queries': true
+                    },
+                }),
+            ],
         },
     },
     build: {
