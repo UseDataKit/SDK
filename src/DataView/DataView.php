@@ -3,7 +3,7 @@
 namespace DataKit\DataViews\DataView;
 
 use DataKit\DataViews\ACL\AccessControlManager;
-use DataKit\DataViews\ACL\Capability;
+use DataKit\DataViews\ACL\Capability\ViewField;
 use DataKit\DataViews\Data\DataSource;
 use DataKit\DataViews\Data\Exception\DataSourceException;
 use DataKit\DataViews\Data\MutableDataSource;
@@ -749,9 +749,7 @@ final class DataView {
 		return array_filter(
 			$fields,
 			fn( Field $field ) => AccessControlManager::current()->can(
-				Capability::view_dataview_field(),
-				$this,
-				$field
+				new ViewField( $this, $field )
 			)
 		);
 	}

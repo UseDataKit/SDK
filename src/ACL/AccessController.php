@@ -2,6 +2,7 @@
 
 namespace DataKit\DataViews\ACL;
 
+use DataKit\DataViews\ACL\Capability\Capability;
 use DataKit\DataViews\DataView\DataView;
 use DataKit\DataViews\Field\Field;
 
@@ -17,9 +18,8 @@ interface AccessController {
 	 * @since $ver$
 	 *
 	 * @param Capability $capability The capability to test.
-	 * @param mixed      ...$context The available context for the test.
 	 *
 	 * @return bool Whether the user has the capability.
 	 */
-	public function can( Capability $capability, ...$context ): bool;
+	public function can( Capability $capability ): bool;
 }

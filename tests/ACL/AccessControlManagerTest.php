@@ -4,7 +4,7 @@ namespace DataKit\DataViews\Tests\ACL;
 
 use DataKit\DataViews\ACL\AccessController;
 use DataKit\DataViews\ACL\AccessControlManager;
-use DataKit\DataViews\ACL\Capability;
+use DataKit\DataViews\ACL\Capability\Capability;
 use DataKit\DataViews\ACL\ReadOnlyAccessController;
 use PHPUnit\Framework\TestCase;
 
