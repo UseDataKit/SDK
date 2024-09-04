@@ -3,6 +3,7 @@
 namespace DataKit\DataViews\Data\Exception;
 
 use DataKit\DataViews\Data\DataSource;
+use DataKit\DataViews\Translation\Translator;
 use Throwable;
 
 /**
@@ -19,6 +20,15 @@ final class ActionForbiddenException extends DataSourceException {
 	 * @var DataSource
 	 */
 	private DataSource $data_source;
+
+	/**
+	 * The ID of the DataSet.
+	 *
+	 * @since $ve$
+	 *
+	 * @var string
+	 */
+	private string $id;
 
 	/**
 	 * @inheritDoc
@@ -47,7 +57,10 @@ final class ActionForbiddenException extends DataSourceException {
 	 * @return self The exception.
 	 */
 	public static function with_id( DataSource $data_source, string $id ): self {
-		return new self( $data_source, sprintf( 'This action is forbidden for data set with id "%s".', $id ) );
+		$exception     = new self( $data_source );
+		$exception->id = $id;
+
+		return $exception;
 	}
 
 	/**
@@ -59,5 +72,18 @@ final class ActionForbiddenException extends DataSourceException {
 	 */
 	public function data_source(): DataSource {
 		return $this->data_source;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since $ver$
+	 */
+	public function translate( Translator $translator ): string {
+		if ( ! isset( $this->id ) ) {
+			return parent::translate( $translator );
+		}
+
+		return $translator->translate( 'This action is forbidden for data set with id "%s".', $this->id );
 	}
 }
