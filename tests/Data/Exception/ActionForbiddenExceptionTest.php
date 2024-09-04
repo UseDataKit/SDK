@@ -4,7 +4,7 @@ namespace DataKit\DataViews\Tests\Data\Exception;
 
 use DataKit\DataViews\Data\ArrayDataSource;
 use DataKit\DataViews\Data\Exception\ActionForbiddenException;
-use DataKit\DataViews\Translation\NoopTranslator;
+use DataKit\DataViews\Translation\ReplaceParameters;
 use DataKit\DataViews\Translation\Translator;
 use PHPUnit\Framework\TestCase;
 
@@ -21,8 +21,10 @@ final class ActionForbiddenExceptionTest extends TestCase {
 	 */
 	public function test_exception(): void {
 		$translator = new class implements Translator {
-			public function translate( string $message, ...$values ): string {
-				return sprintf( $message, ...$values );
+			use ReplaceParameters;
+
+			public function translate( string $message, array $parameters = [] ): string {
+				return $this->replace_parameters( $message, $parameters );
 			}
 		};
 
@@ -34,9 +36,6 @@ final class ActionForbiddenExceptionTest extends TestCase {
 		self::assertSame( $data_source, $with_id->data_source() );
 
 		self::assertSame( 'some message', $custom_message->translate( $translator ) );
-		self::assertSame(
-			'This action is forbidden for data set with id "test-id".',
-			$with_id->translate( $translator )
-		);
+		self::assertSame( 'datakit.action.forbidden.with_id', $with_id->translate( $translator ) );
 	}
 }

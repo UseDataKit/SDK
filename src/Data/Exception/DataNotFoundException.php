@@ -37,7 +37,7 @@ final class DataNotFoundException extends DataSourceException {
 	 */
 	public function __construct(
 		DataSource $data_source,
-		$message = 'Dataset for id not found.',
+		$message = 'datakit.data.not_found',
 		$code = 404,
 		Throwable $previous = null
 	) {
@@ -84,6 +84,6 @@ final class DataNotFoundException extends DataSourceException {
 			return parent::translate( $translator );
 		}
 
-		return $translator->translate( 'Data set with id "%s" not found.', $this->id );
+		return $translator->translate( 'datakit.data.not_found.with_id', [ 'id' => $this->id ] );
 	}
 }

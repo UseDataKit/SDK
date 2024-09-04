@@ -17,7 +17,7 @@ final class DataSourceNotFoundException extends DataSourceException {
 	 *
 	 * @phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
 	 */
-	public function __construct( $message = 'Data source not found.', $code = 404, Throwable $previous = null ) {
+	public function __construct( $message = 'datakit.data_source.not_found', $code = 404, Throwable $previous = null ) {
 		parent::__construct( $message, $code, $previous );
 	}
 }

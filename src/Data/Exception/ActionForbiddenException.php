@@ -37,7 +37,7 @@ final class ActionForbiddenException extends DataSourceException {
 	 */
 	public function __construct(
 		DataSource $data_source,
-		$message = 'Action is forbidden.',
+		$message = 'datakit.action.forbidden',
 		$code = 403,
 		Throwable $previous = null
 	) {
@@ -84,6 +84,6 @@ final class ActionForbiddenException extends DataSourceException {
 			return parent::translate( $translator );
 		}
 
-		return $translator->translate( 'This action is forbidden for data set with id "%s".', $this->id );
+		return $translator->translate( 'datakit.action.forbidden.with_id', [ 'id' => $this->id ] );
 	}
 }

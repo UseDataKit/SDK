@@ -3,7 +3,7 @@
 namespace DataKit\DataViews\Translation;
 
 /**
- * Represents a translator that can translate and format a message based on how `sprintf` would work.
+ * Represents a translator that can translate a message and replace placeholders.
  *
  * @since $ver$
  */
@@ -13,10 +13,10 @@ interface Translator {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $message   The message to translate.
-	 * @param mixed  ...$values The context needed to complete the translation.
+	 * @param string $message    The message to translate.
+	 * @param array  $parameters An array of parameters for the message.
 	 *
 	 * @return string The translated message with the
 	 */
-	public function translate( string $message, ...$values ): string;
+	public function translate( string $message, array $parameters = [] ): string;
 }

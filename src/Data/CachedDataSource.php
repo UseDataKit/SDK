@@ -76,7 +76,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 			return md5( json_encode( $arguments, JSON_THROW_ON_ERROR ) );
 		} catch ( JsonException $e ) {
 			throw new InvalidArgumentException(
-				'The cache key could not be generated based on the provide arguments',
+				'The cache key could not be generated based on the provided arguments.',
 				$e->getCode(),
 				$e,
 			);
