@@ -1,5 +1,11 @@
 # Creating DataViews
 
+<div class="responsive-iframe-container">
+    <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/IjqWRIL9i6A?si=ZrqXKemGLN1G4caq" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+
+## Start with the default view type
+
 To create a `DataView` you need to call any of the named constructors available:
 
 - `DataView::table()` - Creates a DataView with a `table` view type.

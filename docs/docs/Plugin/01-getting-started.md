@@ -1,9 +1,15 @@
 ---
-title: WordPress Plugin
+title: Getting Started
 sidebar: auto
 ---
 
-## Getting Started with the DataKit WordPress Plugin
+## Getting started with the DataKit WordPress plugin
+
+<div class="responsive-iframe-container">
+    <iframe src="https://www.youtube-nocookie.com/embed/BoCtYkv7QY8?si=CgJPFewh4zMoJ1x1" title="Introduction to DataKit" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+
+### Installing from source
 
 To install the WordPress plugin, follow these instructions:
 
