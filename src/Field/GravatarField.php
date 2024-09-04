@@ -11,11 +11,18 @@ namespace DataKit\DataViews\Field;
  */
 final class GravatarField extends Field {
 	/**
-	 * The fallback image types.
+	 * The default image types.
 	 *
 	 * @since $ver$
 	 */
-	private const FALLBACK_TYPES = [ '404', 'mp', 'identicon', 'monsterid', 'wavatar', 'retro', 'robohash', 'blank' ];
+	private const DEFAULT_TYPES = [ '404', 'mp', 'identicon', 'monsterid', 'wavatar', 'retro', 'robohash', 'blank' ];
+
+	/**
+	 * The rating types.
+	 *
+	 * @since $ver$
+	 */
+	private const RATING_TYPES = [ 'g', 'pg', 'r', 'x' ];
 
 	/**
 	 * The composed image field.
@@ -45,6 +52,15 @@ final class GravatarField extends Field {
 	private string $default_image = 'mp';
 
 	/**
+	 * The default rating to use.
+	 *
+	 * @since $ver$
+	 *
+	 * @var string
+	 */
+	private string $rating = 'g';
+
+	/**
 	 * Returns the callback used on the image field.
 	 *
 	 * @since $ver$
@@ -54,10 +70,11 @@ final class GravatarField extends Field {
 	private function generate_callback(): callable {
 		return fn( string $id, array $data ) => ( $data[ $id ] ?? null )
 			? sprintf(
-				'https://gravatar.com/avatar/%s?size=%d&default=%s',
+				'https://gravatar.com/avatar/%s?size=%d&default=%s&rating=%s',
 				md5( $data[ $id ] ),
 				$this->size,
 				$this->default_image,
+				$this->rating,
 			)
 			: '';
 	}
@@ -106,7 +123,21 @@ final class GravatarField extends Field {
 	 */
 	public function default_image( string $type ): self {
 		$clone                = clone $this;
-		$clone->default_image = in_array( $type, self::FALLBACK_TYPES, true ) ? $type : 'mp';
+		$clone->default_image = in_array( $type, self::DEFAULT_TYPES, true ) ? $type : 'mp';
+
+		return $clone;
+	}
+
+	/**
+	 * Returns an instance of the field with a specific rating
+	 *
+	 * @since $ver$
+	 *
+	 * @return self A field instance with the provided rating.
+	 */
+	public function rating( string $rating ): self {
+		$clone         = clone $this;
+		$clone->rating = in_array( $rating, self::RATING_TYPES, true ) ? $rating : 'g';
 
 		return $clone;
 	}

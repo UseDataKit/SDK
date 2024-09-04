@@ -147,7 +147,7 @@ final class Search {
 			return;
 		}
 
-		foreach ( $matches['part'] ?? [] as $i => $match ) {
+		foreach ( $matches['part'] as $i => $match ) {
 			$precision                = $matches['precision'][ $i ] ?? '';
 			$scope                    = $this->scope_lookup[ $precision ];
 			$this->scopes[ $scope ][] = trim( $match, '"' );
