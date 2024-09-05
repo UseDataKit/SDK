@@ -401,6 +401,10 @@ final class DataView {
 	 * @return array<string,array{layout:array}> The supported layouts.
 	 */
 	private function default_layouts(): array {
+		if ( count( $this->views ) < 2 ) {
+			return [];
+		}
+
 		$layouts = [];
 		foreach ( $this->views as $view ) {
 			$layouts[ (string) $view ]['layout'] = $this->layout( $view );
