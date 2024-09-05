@@ -12,7 +12,8 @@ To create a `DataView` you need to call any of the named constructors available:
 - `DataView::list()` - Creates a DataView with a `list` view type.
 - `DataView::grid()` - Creates a DataView with a `grid` view type.
 
-The view type used will be the default view type, but you can add support for other view types by declaring the other view types that are supported:
+The view type used will be the default view type, but you can add support for other view types by declaring the other
+view types that are supported:
 
 ```php
 $dataview = DataView::table( ... )->supports( View::Grid(), View::List() );
@@ -30,6 +31,32 @@ named constructors will have all the required parameters, and make for a fluent 
 ## Apply settings
 
 A DataView has a public API for applying some default settings to the component.
+
+### Primary Field
+
+A DataView can have a primary field. This field is highlighted in each layout type; and can not be hidden. To set this
+primary field, you call the `primary_field( Field $field )` method on the instance, and reference the field object you
+want to use.
+
+```php
+$fields = [
+    TextField::create( 'author' , 'Author' ),
+    $title_field => TextField( 'title', 'Title' ), // Store the field instance in a separate variable.
+];
+
+$dataview = DataView::table( 'table', $data_source, $fields )
+    ->primary_field( $title_field ); // Set the reference to the field instance.
+```
+
+### Media Field
+
+Both the `Grid` and `List` layout try to show a media object for every result. By default, it will look for the first 
+media field available on the fields; but you can also specify a specific field in case you have multiple images.
+
+```php
+$dataview = DataView::table( ... )
+    ->media_field( $media_field ); // Set the reference to the field instance.
+```
 
 ### Searching
 
@@ -126,8 +153,8 @@ the `->deletable( string $label, ?callable $callback = null)` method on the Data
 
 :::note
 
-This functionality requires the DataView to have a `MutableDataSource` which `can_delete()`. This data source is 
-responsible for deleting the results. If the data source can not delete results, calling the `deleteable()` method will 
+This functionality requires the DataView to have a `MutableDataSource` which `can_delete()`. This data source is
+responsible for deleting the results. If the data source can not delete results, calling the `deleteable()` method will
 not do anything.
 
 :::

@@ -105,6 +105,24 @@ final class DataView {
 	private Pagination $pagination;
 
 	/**
+	 * The field used as a media field.
+	 *
+	 * @since $ver$
+	 *
+	 * @var Field|null
+	 */
+	private ?Field $media_field = null;
+
+	/**
+	 * The field used as the primary field.
+	 *
+	 * @since $ver$
+	 *
+	 * @var Field|null
+	 */
+	private ?Field $primary_field = null;
+
+	/**
 	 * Whether the DataView supports searching.
 	 *
 	 * @since $ver$
@@ -428,17 +446,17 @@ final class DataView {
 	 * @return string[] The field IDs.
 	 */
 	private function get_field_ids( ?callable $filter = null ): array {
-		$hidden_fields = [];
+		$field_ids = [];
 
 		foreach ( $this->directory_fields as $field ) {
 			if ( $filter && ! $filter( $field ) ) {
 				continue;
 			}
 
-			$hidden_fields[] = $field->uuid();
+			$field_ids[] = $field->uuid();
 		}
 
-		return $hidden_fields;
+		return $field_ids;
 	}
 
 	/**
@@ -651,17 +669,69 @@ final class DataView {
 	 */
 	private function layout( View $view ): array {
 		$output = [];
+
+		if ( $this->primary_field ) {
+			$output['primaryField'] = $this->primary_field->uuid();
+		}
+
 		if ( $view->equals( View::Grid() ) ) {
 			$output['badgeFields']  = $this->get_field_ids( static fn( Field $field ): bool => $field->is_badge() );
 			$output['columnFields'] = $this->get_field_ids( static fn( Field $field ): bool => $field->is_column() );
+		}
+
+		if ( ! $view->equals( View::Table() ) ) {
+			$output['mediaField'] = $this->get_media_field_id();
+		}
+
+		return array_filter( $output );
+	}
+
+	/**
+	 * Returns an instance of the DataView with a primary field.
+	 *
+	 * @since $ver$
+	 *
+	 * @param Field|null $field The primary field.
+	 *
+	 * @return self The DataView.
+	 */
+	public function primary_field( ?Field $field ): self {
+		$this->primary_field = $field;
+
+		return $this;
+	}
+
+	/**
+	 * Returns an instance of the DataView with a media field.
+	 *
+	 * @since $ver$
+	 *
+	 * @param Field|null $field The media field.
+	 *
+	 * @return self The DataView.
+	 */
+	public function media_field( ?Field $field ): self {
+		$this->media_field = $field && $field->is_media_field() ? $field : null;
+
+		return $this;
+	}
+
+	/**
+	 * Returns the id of the media field.
+	 *
+	 * If no media field is provided, it will assume the first media field it comes across.
+	 *
+	 * @return string The media field id.
+	 */
+	private function get_media_field_id(): string {
+		if ( $this->media_field ) {
+			return $this->media_field->uuid();
 		}
 
 		$image_fields = $this->get_field_ids(
 			static fn( Field $field ): bool => $field->is_media_field(),
 		);
 
-		$output['mediaField'] = reset( $image_fields );
-
-		return array_filter( $output );
+		return $image_fields ? reset( $image_fields ) : '';
 	}
 }
