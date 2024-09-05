@@ -32,7 +32,5 @@ final class GravatarFieldTest extends TestCase {
 			'src="https://gravatar.com/avatar/' . md5( 'doeke@datakit.org' ) . '?size=200&default=wavatar&rating=pg',
 			$html,
 		);
-
-		echo $html;
 	}
 }
