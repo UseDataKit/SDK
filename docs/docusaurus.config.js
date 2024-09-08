@@ -9,7 +9,7 @@ const darkCodeTheme = themes.dracula;
 const config = {
 	title: 'DataKit Developer Docs',
 	tagline: 'DataViews for all.',
-	url: 'https://www.datakit.org/',
+	url: 'https://docs.datakit.org/',
 	baseUrl: '/',
 	deploymentBranch: 'gh-pages',
 	onBrokenLinks: 'ignore',
