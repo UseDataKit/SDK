@@ -39,13 +39,6 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	private CacheProvider $cache;
 
 	/**
-	 * Used to mark cache entries that are tags.
-	 *
-	 * @since $ver$
-	 */
-	private const CACHE_TAG_PREFIX = 'DATAKIT_DATASOURCE_TAG_';
-
-	/**
 	 * Creates a cached data source decorator.
 	 *
 	 * @since $ver$
@@ -75,7 +68,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @return string[] The tags.
 	 */
 	private function get_tag_keys(): array {
-		return [ self::CACHE_TAG_PREFIX . $this->get_cache_key() ];
+		return [ 'DATASOURCE_' . $this->get_cache_key() ];
 	}
 
 	/**

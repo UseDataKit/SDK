@@ -40,6 +40,9 @@
 		"phpcompatibility/phpcompatibility-wp": "^2.1",
 		"overtrue/phplint": "^3.4"
 	},
+	"suggest": {
+		"ext-pdo": "PDO is required to use the SQLite cache provider"
+	},
 	"scripts": {
 		"suite": [
 			"composer test",

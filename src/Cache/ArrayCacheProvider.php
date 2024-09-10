@@ -14,7 +14,7 @@ use Exception;
  *
  * @since $ver$
  */
-final class ArrayCacheProvider implements CacheProvider {
+final class ArrayCacheProvider extends BaseCacheProvider {
 	/**
 	 * The cached items.
 	 *
@@ -22,7 +22,7 @@ final class ArrayCacheProvider implements CacheProvider {
 	 *
 	 * @var CacheItem[]
 	 */
-	private array $items;
+	private array $items = [];
 
 	/**
 	 * Contains the reference to the tags with their tagged cache keys.
@@ -34,25 +34,16 @@ final class ArrayCacheProvider implements CacheProvider {
 	private array $tags = [];
 
 	/**
-	 * The clock instance.
-	 *
-	 * @since $ver$
-	 *
-	 * @var Clock
-	 */
-	private Clock $clock;
-
-	/**
 	 * Creates an Array cache provider.
 	 *
 	 * @since $ver$
 	 *
-	 * @param Clock|null  $clock The clock instance.
-	 * @param CacheItem[] $items The pre-filled cache items.
+	 * @param Clock|null $clock The clock instance.
 	 */
-	public function __construct( ?Clock $clock = null, array $items = [] ) {
+	public function __construct( ?Clock $clock = null ) {
+		parent::__construct( $clock );
+
 		$this->clock = $clock ?? new SystemClock();
-		$this->items = $items;
 	}
 
 	/**
@@ -72,41 +63,6 @@ final class ArrayCacheProvider implements CacheProvider {
 		$this->items[ $key ] = new CacheItem( $key, $value, $time, $tags );
 
 		$this->add_tags( $key, $tags );
-	}
-
-	/**
-	 * @inheritDoc
-	 *
-	 * @since $ver$
-	 */
-	public function get( string $key, $fallback = null ) {
-		$item = $this->items[ $key ] ?? null;
-
-		if ( ! $item || $item->is_expired( $this->clock ) ) {
-			unset( $this->items[ $key ] );
-
-			return $fallback;
-		}
-
-		return $item->value();
-	}
-
-	/**
-	 * @inheritDoc
-	 *
-	 * @since $ver$
-	 */
-	public function has( string $key ): bool {
-		if (
-			isset( $this->items[ $key ] )
-			&& ! $this->items[ $key ]->is_expired( $this->clock )
-		) {
-			return true;
-		}
-
-		unset( $this->items[ $key ] );
-
-		return false;
 	}
 
 	/**
@@ -167,5 +123,14 @@ final class ArrayCacheProvider implements CacheProvider {
 
 			$this->tags[ $tag ] = array_unique( array_merge( $this->tags[ $tag ], [ $key ] ) );
 		}
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * @since $ver$
+	 */
+	protected function doGet( string $key ): ?CacheItem {
+		return $this->items[ $key ] ?? null;
 	}
 }

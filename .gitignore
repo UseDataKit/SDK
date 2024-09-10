@@ -21,3 +21,6 @@ phpcs.xml
 .idea/**/.name
 .idea/**/codeStyles
 .idea/**/php.xml
+
+## Tests
+tests/assets/test-sqlite.db

@@ -2,8 +2,7 @@
 
 namespace DataKit\DataViews\Cache;
 
-use DataKit\DataViews\Clock\Clock;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 
 /**
@@ -119,16 +118,16 @@ final class CacheItem {
 	/**
 	 * Returns whether the cache item is expired.
 	 *
-	 * @param Clock $clock The clock to test expiration.
+	 * @param DateTimeImmutable $now The date time to test against.
 	 *
 	 * @return bool Whether the cache item is expired.
 	 */
-	public function is_expired( Clock $clock ): bool {
+	public function is_expired( DateTimeImmutable $now ): bool {
 		if ( null === $this->expires_at ) {
 			return false;
 		}
 
-		return $clock->now() > $this->expires_at;
+		return $now > $this->expires_at;
 	}
 
 	/**

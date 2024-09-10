@@ -28,8 +28,8 @@ final class CacheItemTest extends TestCase {
 		self::assertSame( 'value-1', $item->value() );
 		self::assertSame( [ 'tag_1', 'tag_2' ], $item->tags() );
 
-		self::assertFalse( $item->is_expired( $clock ) );
+		self::assertFalse( $item->is_expired( $clock->now() ) );
 		$clock->travel_to( '2024-09-10 10:36:00' );
-		self::assertTrue( $item->is_expired( $clock ) );
+		self::assertTrue( $item->is_expired( $clock->now() ) );
 	}
 }
