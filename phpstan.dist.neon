@@ -2,6 +2,7 @@ includes:
         - vendor/szepeviktor/phpstan-wordpress/extension.neon
 
 parameters:
+    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
     level: 5
     paths:
         - src

@@ -2,7 +2,7 @@
 
 namespace DataKit\DataViews\Clock;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 
 /**
  * Object that represents a clock.
@@ -15,5 +15,5 @@ interface Clock {
 	 *
 	 * @since $ver$
 	 */
-	public function now(): DateTimeInterface;
+	public function now(): DateTimeImmutable;
 }

@@ -2,6 +2,7 @@
 
 namespace DataKit\DataViews\Tests\Data;
 
+use Closure;
 use DataKit\DataViews\Cache\ArrayCacheProvider;
 use DataKit\DataViews\Data\ArrayDataSource;
 use DataKit\DataViews\Data\CachedDataSource;
@@ -91,8 +92,26 @@ final class CachedDataSourceTest extends TestCase {
 		// Get fields is always piped through.
 		self::assertCount( 6, $this->trace->get_calls() );
 
+		$ds_2 = new CachedDataSource(
+			new ArrayDataSource( 'second-source', [ 'three' => [ 'name' => 'Person 3' ] ] ),
+			$cache
+		);
+
+		// Helper method to inspect the private $items variable.
+		$get_items_count = Closure::fromCallable( function () {
+			return count( $this->items ); // @phpstan-ignore property.notFound
+		} )->bindTo( $cache, $cache );
+
+		// Trigger caching for second data source.
+		self::assertSame( [ 'three' ], $ds_2->get_data_ids() );
+		self::assertSame( 2, $get_items_count() );
+		// Clear cache for this data source only.
 		$ds->clear_cache();
+
+		self::assertSame( 1, $get_items_count() );
 		$ds->get_data_ids();
+
+		self::assertSame( 2, $get_items_count() );
 		// Cache cleared.
 		self::assertCount( 7, $this->trace->get_calls() );
 	}

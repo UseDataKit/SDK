@@ -39,6 +39,13 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	private CacheProvider $cache;
 
 	/**
+	 * Used to mark cache entries that are tags.
+	 *
+	 * @since $ver$
+	 */
+	private const CACHE_TAG_PREFIX = 'DATAKIT_DATASOURCE_TAG_';
+
+	/**
 	 * Creates a cached data source decorator.
 	 *
 	 * @since $ver$
@@ -58,6 +65,17 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 */
 	public function id(): string {
 		return $this->inner->id();
+	}
+
+	/**
+	 * Returns the tags used for this data source.
+	 *
+	 * @since $ver$
+	 *
+	 * @return string[] The tags.
+	 */
+	private function get_tag_keys(): array {
+		return [ self::CACHE_TAG_PREFIX . $this->get_cache_key() ];
 	}
 
 	/**
@@ -119,8 +137,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 		$result = $retrieve_result();
 
-		// Todo: record this key on a group cache, so we can invalidate all cached keys in one swoop.
-		$this->cache->set( $cache_key, $result );
+		$this->cache->set( $cache_key, $result, null, $this->get_tag_keys() );
 
 		return $result;
 	}
@@ -254,7 +271,6 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @return bool Whether the cache was cleared.
 	 */
 	public function clear_cache(): bool {
-		// Todo: only clear the cache for the keys for this data source.
-		return $this->cache->clear();
+		return $this->cache->delete_by_tags( $this->get_tag_keys() );
 	}
 }

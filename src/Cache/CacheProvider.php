@@ -17,7 +17,7 @@ interface CacheProvider {
 	 * @param mixed    $value The value to cache.
 	 * @param int|null $ttl   The time to live in seconds.
 	 */
-	public function set( string $key, $value, ?int $ttl = null ): void;
+	public function set( string $key, $value, ?int $ttl = null, array $tags = [] ): void;
 
 	/**
 	 * Retrieves the value from the cache, or the default if no value is stored.
@@ -55,6 +55,17 @@ interface CacheProvider {
 	 * @return bool Whether the value was deleted.
 	 */
 	public function delete( string $key ): bool;
+
+	/**
+	 * .Deletes any entries tagged with one of the provided tags.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string[] $tags The tags to clear.
+	 *
+	 * @return bool Whether the deletion of the cache items was successful.
+	 */
+	public function delete_by_tags( array $tags ): bool;
 
 	/**
 	 * Clears the entire cache.
