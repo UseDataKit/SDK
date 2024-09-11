@@ -84,7 +84,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 		$arguments[] = $this->inner->id();
 
 		try {
-			return md5( json_encode( $arguments, JSON_THROW_ON_ERROR ) );
+			return md5( json_encode( array_values( array_filter( $arguments ) ), JSON_THROW_ON_ERROR ) );
 		} catch ( JsonException $e ) {
 			throw new InvalidArgumentException(
 				'The cache key could not be generated based on the provide arguments',
@@ -105,8 +105,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 */
 	private function get_filter_aware_cache_key( ...$arguments ): string {
 		$arguments[] = $this->filters ? $this->filters->to_array() : null;
-		$arguments[] = $this->sort ? $this->sort->to_array() : null;
-		$arguments[] = $this->search;
+		$arguments[] = (string) $this->search;
 
 		return $this->get_cache_key( ...$arguments );
 	}
@@ -141,7 +140,12 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @since $ver$
 	 */
 	public function get_data_ids( int $limit = 20, int $offset = 0 ): array {
-		$key = $this->get_filter_aware_cache_key( __FUNCTION__, $limit, $offset );
+		$key = $this->get_filter_aware_cache_key(
+			__FUNCTION__,
+			$this->sort ? $this->sort->to_array() : null,
+			$limit,
+			$offset
+		);
 
 		return $this->fetch(
 			$key,

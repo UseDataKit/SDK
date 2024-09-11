@@ -16,7 +16,6 @@ use DataKit\DataViews\DataView\Sort;
  * @since $ver$
  */
 final class TraceableDataSource implements MutableDataSource {
-
 	/**
 	 * The decorated data source.
 	 *
@@ -59,7 +58,7 @@ final class TraceableDataSource implements MutableDataSource {
 	 * @since $ver$
 	 */
 	public function get_data_by_id( string $id ) : array {
-		$this->calls[] = [ __METHOD__, ...func_get_args() ];
+		$this->calls[] = [ __FUNCTION__, ...func_get_args() ];
 
 		return $this->inner->get_data_by_id( $id );
 	}
@@ -69,7 +68,7 @@ final class TraceableDataSource implements MutableDataSource {
 	 * @since $ver$
 	 */
 	public function get_fields() : array {
-		$this->calls[] = [ __METHOD__ ];
+		$this->calls[] = [ __FUNCTION__ ];
 
 		return $this->inner->get_fields();
 	}
@@ -79,7 +78,7 @@ final class TraceableDataSource implements MutableDataSource {
 	 * @since $ver$
 	 */
 	public function get_data_ids( int $limit = 20, int $offset = 0 ) : array {
-		$this->calls[] = [ __METHOD__, ...func_get_args() ];
+		$this->calls[] = [ __FUNCTION__, ...func_get_args() ];
 
 		return $this->inner->get_data_ids( $limit, $offset );
 	}
@@ -89,7 +88,7 @@ final class TraceableDataSource implements MutableDataSource {
 	 * @since $ver$
 	 */
 	public function filter_by( ?Filters $filters ) : self {
-		$this->calls[] = [ __METHOD__, ...func_get_args() ];
+		$this->calls[] = [ __FUNCTION__, ...func_get_args() ];
 
 		$this->inner = $this->inner->filter_by( $filters );
 
@@ -101,7 +100,7 @@ final class TraceableDataSource implements MutableDataSource {
 	 * @since $ver$
 	 */
 	public function sort_by( ?Sort $sort ) : self {
-		$this->calls[] = [ __METHOD__, ...func_get_args() ];
+		$this->calls[] = [ __FUNCTION__, ...func_get_args() ];
 
 		$this->inner = $this->inner->sort_by( $sort );
 
@@ -113,7 +112,7 @@ final class TraceableDataSource implements MutableDataSource {
 	 * @since $ver$
 	 */
 	public function search_by( ?Search $search ) : self {
-		$this->calls[] = [ __METHOD__, ...func_get_args() ];
+		$this->calls[] = [ __FUNCTION__, ...func_get_args() ];
 		$this->inner   = $this->inner->search_by( $search );
 
 		return $this;
@@ -143,7 +142,7 @@ final class TraceableDataSource implements MutableDataSource {
 	 * @since $ver$
 	 */
 	public function count() : int {
-		$this->calls[] = [ __METHOD__ ];
+		$this->calls[] = [ __FUNCTION__ ];
 
 		return $this->inner->count();
 	}
@@ -156,7 +155,7 @@ final class TraceableDataSource implements MutableDataSource {
 		if ( ! $this->inner instanceof MutableDataSource ) {
 			return false;
 		}
-		$this->calls[] = [ __METHOD__ ];
+		$this->calls[] = [ __FUNCTION__ ];
 
 		return $this->inner->can_delete();
 	}
@@ -170,7 +169,7 @@ final class TraceableDataSource implements MutableDataSource {
 			return;
 		}
 
-		$this->calls[] = [ __METHOD__ ];
+		$this->calls[] = [ __FUNCTION__ ];
 
 		$this->inner->delete_data_by_id( ...$ids );
 	}

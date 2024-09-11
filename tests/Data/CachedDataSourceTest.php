@@ -172,7 +172,17 @@ final class CachedDataSourceTest extends TestCase {
 		self::assertCount( 2, $ds );
 		self::assertSame( 2, $ds->count() ); // second call
 
-		self::assertCount( 1, $this->trace->get_calls() );
+		$asc_sort = $ds->sort_by( Sort::asc( 'name' ) );
+		self::assertSame( 2, $asc_sort->count() );
+
+		$desc_sort = $ds->sort_by( Sort::desc( 'name' ) );
+		self::assertSame( 2, $desc_sort->count() );
+
+		// Count should be called only once on the trace, as the sorting does not influence the cache key.
+		self::assertSame(
+			[ 'count', 'sort_by', 'sort_by' ],
+			array_column( $this->trace->get_calls(), 0 )
+		);
 	}
 
 	/**
