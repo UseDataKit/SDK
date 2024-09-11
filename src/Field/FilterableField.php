@@ -35,7 +35,7 @@ abstract class FilterableField extends Field {
 	 *
 	 * @param Operator ...$operators The operators.
 	 *
-	 * @return self A new instance with the filters applied.
+	 * @return static A new instance with the filters applied.
 	 */
 	public function filterable_by( Operator ...$operators ) {
 		$clone            = clone $this;

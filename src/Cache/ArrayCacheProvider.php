@@ -4,6 +4,8 @@ namespace DataKit\DataViews\Cache;
 
 use DataKit\DataViews\Clock\Clock;
 use DataKit\DataViews\Clock\SystemClock;
+use DateInterval;
+use Exception;
 
 /**
  * Cache provider backed by an array.
@@ -12,24 +14,24 @@ use DataKit\DataViews\Clock\SystemClock;
  *
  * @since $ver$
  */
-final class ArrayCacheProvider implements CacheProvider {
+final class ArrayCacheProvider extends BaseCacheProvider {
 	/**
 	 * The cached items.
 	 *
 	 * @since $ver$
 	 *
-	 * @var array
+	 * @var CacheItem[]
 	 */
-	private array $items;
+	private array $items = [];
 
 	/**
-	 * The clock instance.
+	 * Contains the reference to the tags with their tagged cache keys.
 	 *
 	 * @since $ver$
 	 *
-	 * @var Clock
+	 * @var array<string, string[]>
 	 */
-	private Clock $clock;
+	private array $tags = [];
 
 	/**
 	 * Creates an Array cache provider.
@@ -37,11 +39,11 @@ final class ArrayCacheProvider implements CacheProvider {
 	 * @since $ver$
 	 *
 	 * @param Clock|null $clock The clock instance.
-	 * @param array      $items The pre-filled cache items.
 	 */
-	public function __construct( ?Clock $clock = null, array $items = [] ) {
+	public function __construct( ?Clock $clock = null ) {
+		parent::__construct( $clock );
+
 		$this->clock = $clock ?? new SystemClock();
-		$this->items = $items;
 	}
 
 	/**
@@ -49,47 +51,18 @@ final class ArrayCacheProvider implements CacheProvider {
 	 *
 	 * @since $ver$
 	 */
-	public function set( string $key, $value, ?int $ttl = null ): void {
-		$time = $ttl
-			? ( $this->clock->now()->getTimestamp() + $ttl )
-			: null;
-
-		$this->items[ $key ] = compact( 'value', 'time' );
-	}
-
-	/**
-	 * @inheritDoc
-	 *
-	 * @since $ver$
-	 */
-	public function get( string $key, $fallback = null ) {
-		$item = $this->items[ $key ] ?? [];
-
-		if ( $this->is_expired( $item ) ) {
-			unset( $this->items[ $key ] );
-
-			return $fallback;
+	public function set( string $key, $value, ?int $ttl = null, array $tags = [] ): void {
+		try {
+			$time = (int) $ttl > 0
+				? ( $this->clock->now()->add( new DateInterval( 'PT' . $ttl . 'S' ) ) )
+				: null;
+		} catch ( Exception $e ) {
+			throw new \InvalidArgumentException( $e->getMessage(), $e->getCode(), $e );
 		}
 
-		return $item['value'] ?? $fallback;
-	}
+		$this->items[ $key ] = new CacheItem( $key, $value, $time, $tags );
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @since $ver$
-	 */
-	public function has( string $key ): bool {
-		if (
-			isset( $this->items[ $key ] )
-			&& ! $this->is_expired( $this->items[ $key ] )
-		) {
-			return true;
-		}
-
-		unset( $this->items[ $key ] );
-
-		return false;
+		$this->add_tags( $key, $tags );
 	}
 
 	/**
@@ -108,25 +81,56 @@ final class ArrayCacheProvider implements CacheProvider {
 	 *
 	 * @since $ver$
 	 */
-	public function clear(): bool {
-		$this->items = [];
+	public function delete_by_tags( array $tags ): bool {
+		foreach ( $tags as $tag ) {
+			foreach ( $this->tags[ $tag ] ?? [] as $key ) {
+				$this->delete( $key );
+			}
+
+			unset( $this->tags[ $tag ] );
+		}
 
 		return true;
 	}
 
 	/**
-	 * Returns whether the provided cache item is expired.
+	 * @inheritDoc
+	 *
+	 * @since $ver$
+	 */
+	public function clear(): bool {
+		$this->items = [];
+		$this->tags  = [];
+
+		return true;
+	}
+
+	/**
+	 * Records a key for all provided tags.
 	 *
 	 * @since $ver$
 	 *
-	 * @param array $item The cache item.
-	 *
-	 * @return bool Whether the cache is expired.
+	 * @param string $key  The key to tag.
+	 * @param array  $tags The tags.
 	 */
-	private function is_expired( array $item ): bool {
-		return (
-			( $item['time'] ?? null )
-			&& $this->clock->now()->getTimestamp() > $item['time']
-		);
+	private function add_tags( string $key, array $tags ): void {
+		foreach ( $tags as $tag ) {
+			if ( ! is_string( $tag ) ) {
+				throw new \InvalidArgumentException( 'A tag must be a string.' );
+			}
+
+			$this->tags[ $tag ] ??= [];
+
+			$this->tags[ $tag ] = array_unique( array_merge( $this->tags[ $tag ], [ $key ] ) );
+		}
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * @since $ver$
+	 */
+	protected function doGet( string $key ): ?CacheItem {
+		return $this->items[ $key ] ?? null;
 	}
 }

@@ -61,6 +61,17 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	}
 
 	/**
+	 * Returns the tags used for this data source.
+	 *
+	 * @since $ver$
+	 *
+	 * @return string[] The tags.
+	 */
+	private function get_tag_keys(): array {
+		return [ 'DATASOURCE_' . $this->get_cache_key() ];
+	}
+
+	/**
 	 * Returns a calculated key based on a set of arguments.
 	 *
 	 * @since $ver$
@@ -73,7 +84,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 		$arguments[] = $this->inner->id();
 
 		try {
-			return md5( json_encode( $arguments, JSON_THROW_ON_ERROR ) );
+			return md5( json_encode( array_values( array_filter( $arguments ) ), JSON_THROW_ON_ERROR ) );
 		} catch ( JsonException $e ) {
 			throw new InvalidArgumentException(
 				'The cache key could not be generated based on the provided arguments.',
@@ -94,8 +105,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 */
 	private function get_filter_aware_cache_key( ...$arguments ): string {
 		$arguments[] = $this->filters ? $this->filters->to_array() : null;
-		$arguments[] = $this->sort ? $this->sort->to_array() : null;
-		$arguments[] = $this->search;
+		$arguments[] = (string) $this->search;
 
 		return $this->get_cache_key( ...$arguments );
 	}
@@ -119,8 +129,7 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 
 		$result = $retrieve_result();
 
-		// Todo: record this key on a group cache, so we can invalidate all cached keys in one swoop.
-		$this->cache->set( $cache_key, $result );
+		$this->cache->set( $cache_key, $result, null, $this->get_tag_keys() );
 
 		return $result;
 	}
@@ -131,7 +140,12 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @since $ver$
 	 */
 	public function get_data_ids( int $limit = 20, int $offset = 0 ): array {
-		$key = $this->get_filter_aware_cache_key( __FUNCTION__, $limit, $offset );
+		$key = $this->get_filter_aware_cache_key(
+			__FUNCTION__,
+			$this->sort ? $this->sort->to_array() : null,
+			$limit,
+			$offset
+		);
 
 		return $this->fetch(
 			$key,
@@ -254,7 +268,6 @@ final class CachedDataSource extends BaseDataSource implements MutableDataSource
 	 * @return bool Whether the cache was cleared.
 	 */
 	public function clear_cache(): bool {
-		// Todo: only clear the cache for the keys for this data source.
-		return $this->cache->clear();
+		return $this->cache->delete_by_tags( $this->get_tag_keys() );
 	}
 }
