@@ -7,8 +7,8 @@ use CallbackFilterIterator;
 use Closure;
 use DataKit\DataViews\Data\DataMatcher\ArrayDataMatcher;
 use DataKit\DataViews\Data\Exception\DataNotFoundException;
+use DataKit\DataViews\Data\Exception\DataSourceNotFoundException;
 use DataKit\DataViews\DataView\Sort;
-use InvalidArgumentException;
 use Iterator;
 use LimitIterator;
 use SplFileObject;
@@ -34,6 +34,8 @@ final class CsvDataSource extends BaseDataSource {
 	 * @since $ver$
 	 *
 	 * @param string $file_path The file path to the CSV file.
+	 *
+	 * @throws DataSourceNotFoundException When file is not readable.
 	 */
 	public function __construct(
 		string $file_path,
@@ -44,7 +46,7 @@ final class CsvDataSource extends BaseDataSource {
 		if (
 			! file_exists( $file_path )
 			|| ! is_readable( $file_path ) ) {
-			throw new InvalidArgumentException( 'The CSV data source file is not found or readable.' );
+			throw new DataSourceNotFoundException();
 		}
 
 		$this->file = new SplFileObject( $file_path, 'rb' );
@@ -100,7 +102,6 @@ final class CsvDataSource extends BaseDataSource {
 
 		throw DataNotFoundException::with_id( $this, $id );
 	}
-
 
 	/**
 	 * Cleans CSV data.

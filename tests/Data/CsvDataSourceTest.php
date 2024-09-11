@@ -4,11 +4,11 @@ namespace DataKit\DataViews\Tests\Data;
 
 use DataKit\DataViews\Data\CsvDataSource;
 use DataKit\DataViews\Data\Exception\DataNotFoundException;
+use DataKit\DataViews\Data\Exception\DataSourceNotFoundException;
 use DataKit\DataViews\DataView\Filter;
 use DataKit\DataViews\DataView\Filters;
 use DataKit\DataViews\DataView\Search;
 use DataKit\DataViews\DataView\Sort;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -34,14 +34,13 @@ final class CsvDataSourceTest extends TestCase {
 		$this->data_source = new CsvDataSource( __DIR__ . '/../assets/oscar-example-data.csv' );
 	}
 
-
 	/**
 	 * Test case for missing or unreadable path.
 	 *
 	 * @since $ver$
 	 */
 	public function test_invalid_path(): void {
-		$this->expectException( InvalidArgumentException::class );
+		$this->expectException( DataSourceNotFoundException::class );
 		new CsvDataSource( 'invalid-path' );
 	}
 
