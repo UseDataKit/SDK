@@ -1,6 +1,6 @@
 <?php
 
-namespace DataKit\DataViews\ACL\Capability;
+namespace DataKit\DataViews\AccessControl\Capability;
 
 /**
  * Represents a capability a user can have.

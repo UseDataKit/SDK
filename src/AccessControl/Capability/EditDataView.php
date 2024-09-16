@@ -1,6 +1,6 @@
 <?php
 
-namespace DataKit\DataViews\ACL\Capability;
+namespace DataKit\DataViews\AccessControl\Capability;
 
 /**
  * A capability representing a user can edit a DataView.

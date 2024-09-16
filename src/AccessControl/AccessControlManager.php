@@ -1,6 +1,6 @@
 <?php
 
-namespace DataKit\DataViews\ACL;
+namespace DataKit\DataViews\AccessControl;
 
 use SplStack;
 

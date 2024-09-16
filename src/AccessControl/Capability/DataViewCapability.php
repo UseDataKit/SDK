@@ -1,6 +1,6 @@
 <?php
 
-namespace DataKit\DataViews\ACL\Capability;
+namespace DataKit\DataViews\AccessControl\Capability;
 
 use DataKit\DataViews\DataView\DataView;
 

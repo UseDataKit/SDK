@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataViews\ACL;
+namespace DataKit\DataViews\AccessControl;
 
-use DataKit\DataViews\ACL\Capability\Capability;
+use DataKit\DataViews\AccessControl\Capability\Capability;
 use DataKit\DataViews\DataView\DataView;
 use DataKit\DataViews\Field\Field;
 

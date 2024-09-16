@@ -1,12 +1,12 @@
 <?php
 
-namespace DataKit\DataViews\Tests\ACL;
+namespace DataKit\DataViews\Tests\AccessControl;
 
-use DataKit\DataViews\ACL\Capability\DeleteDataView;
-use DataKit\DataViews\ACL\Capability\EditDataView;
-use DataKit\DataViews\ACL\Capability\ViewDataView;
-use DataKit\DataViews\ACL\Capability\ViewField;
-use DataKit\DataViews\ACL\ReadOnlyAccessController;
+use DataKit\DataViews\AccessControl\Capability\DeleteDataView;
+use DataKit\DataViews\AccessControl\Capability\EditDataView;
+use DataKit\DataViews\AccessControl\Capability\ViewDataView;
+use DataKit\DataViews\AccessControl\Capability\ViewField;
+use DataKit\DataViews\AccessControl\ReadOnlyAccessController;
 use DataKit\DataViews\Data\ArrayDataSource;
 use DataKit\DataViews\DataView\DataView;
 use DataKit\DataViews\Field\TextField;

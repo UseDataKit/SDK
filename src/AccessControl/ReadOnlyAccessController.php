@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataViews\ACL;
+namespace DataKit\DataViews\AccessControl;
 
-use DataKit\DataViews\ACL\Capability\Capability;
+use DataKit\DataViews\AccessControl\Capability\Capability;
 
 /**
  * AccessControlManager that allows read access to anyone.

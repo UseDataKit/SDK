@@ -1,11 +1,11 @@
 <?php
 
-namespace DataKit\DataViews\Tests\ACL;
+namespace DataKit\DataViews\Tests\AccessControl;
 
-use DataKit\DataViews\ACL\AccessController;
-use DataKit\DataViews\ACL\AccessControlManager;
-use DataKit\DataViews\ACL\Capability\Capability;
-use DataKit\DataViews\ACL\ReadOnlyAccessController;
+use DataKit\DataViews\AccessControl\AccessController;
+use DataKit\DataViews\AccessControl\AccessControlManager;
+use DataKit\DataViews\AccessControl\Capability\Capability;
+use DataKit\DataViews\AccessControl\ReadOnlyAccessController;
 use PHPUnit\Framework\TestCase;
 
 /**

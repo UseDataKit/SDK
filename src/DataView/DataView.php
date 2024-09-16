@@ -2,8 +2,8 @@
 
 namespace DataKit\DataViews\DataView;
 
-use DataKit\DataViews\ACL\AccessControlManager;
-use DataKit\DataViews\ACL\Capability\ViewField;
+use DataKit\DataViews\AccessControl\AccessControlManager;
+use DataKit\DataViews\AccessControl\Capability\ViewField;
 use DataKit\DataViews\Data\DataSource;
 use DataKit\DataViews\Data\Exception\DataSourceException;
 use DataKit\DataViews\Data\MutableDataSource;
