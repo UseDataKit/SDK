@@ -1,8 +1,8 @@
 <?php
 
-namespace DataKit\DataViews\Tests\DataView;
+namespace DataKit\DataViews\Tests;
 
-use DataKit\DataViews\DataView\EnumObject;
+use DataKit\DataViews\EnumObject;
 use PHPUnit\Framework\TestCase;
 
 /**

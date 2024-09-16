@@ -2,6 +2,8 @@
 
 namespace DataKit\DataViews\DataView;
 
+use DataKit\DataViews\AccessControl\AccessControlManager;
+use DataKit\DataViews\AccessControl\Capability\ViewField;
 use DataKit\DataViews\Data\DataSource;
 use DataKit\DataViews\Data\Exception\DataSourceException;
 use DataKit\DataViews\Data\MutableDataSource;
@@ -354,7 +356,7 @@ final class DataView {
 			 */
 			$data = $data_source->get_data_by_id( $data_id );
 
-			foreach ( $this->directory_fields as $field ) {
+			foreach ( $this->allowed_fields( $this->directory_fields ) as $field ) {
 				$data[ $field->uuid() ] = $field->get_value( $data );
 			}
 
@@ -377,31 +379,32 @@ final class DataView {
 	 * @throws DataSourceException When the data source encounters an issue.
 	 */
 	public function get_view_data_item( string $data_id ): DataItem {
-		$data = $this->data_source()->get_data_by_id( $data_id );
+		$data   = $this->data_source()->get_data_by_id( $data_id );
+		$fields = $this->allowed_fields( $this->view_fields );
 
-		foreach ( $this->view_fields as $field ) {
+		foreach ( $fields as $field ) {
 			$data[ $field->uuid() ] = $field->get_value( $data );
 		}
 
 		return DataItem::from_array(
 			[
-				'fields' => $this->view_fields,
+				'fields' => $fields,
 				'data'   => $data,
 			],
 		);
 	}
 
 	/**
-	 * Returns all the fields for the dictionary view.
+	 * Returns all the fields for the directory view.
 	 *
 	 * @since $ver$
 	 *
 	 * @return array[] The fields as arrays.
 	 */
-	private function dictionary_fields(): array {
+	private function directory_fields_for_json(): array {
 		$fields = [];
 
-		foreach ( $this->directory_fields as $field ) {
+		foreach ( $this->allowed_fields( $this->directory_fields ) as $field ) {
 			$fields[] = array_filter(
 				$field->to_array(),
 				static fn( $value ) => ! is_null( $value ),
@@ -448,7 +451,7 @@ final class DataView {
 	private function get_field_ids( ?callable $filter = null ): array {
 		$field_ids = [];
 
-		foreach ( $this->directory_fields as $field ) {
+		foreach ( $this->allowed_fields( $this->directory_fields ) as $field ) {
 			if ( $filter && ! $filter( $field ) ) {
 				continue;
 			}
@@ -542,7 +545,7 @@ final class DataView {
 			'defaultLayouts' => $this->default_layouts(),
 			'paginationInfo' => $this->pagination->info( $this->data_source() ),
 			'view'           => $this->view(),
-			'fields'         => $this->dictionary_fields(),
+			'fields'         => $this->directory_fields_for_json(),
 			'data'           => $this->get_data(),
 			'actions'        => $this->actions ? $this->actions->to_array() : [],
 		];
@@ -733,5 +736,21 @@ final class DataView {
 		);
 
 		return $image_fields ? reset( $image_fields ) : '';
+	}
+
+	/**
+	 * Filters out the fields the current user cannot view.
+	 *
+	 * @since $ver$
+	 *
+	 * @return Field[] The fields.
+	 */
+	private function allowed_fields( array $fields ): array {
+		return array_filter(
+			$fields,
+			fn( Field $field ) => AccessControlManager::current()->can(
+				new ViewField( $this, $field )
+			)
+		);
 	}
 }
