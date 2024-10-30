@@ -60,3 +60,43 @@ export function datakit_fetch( url, options ) {
 
     return fetch( url, merged_options );
 }
+
+const script_tag_regex = /(?:\r\n)*<script[^>]*>(.*?)<\/[\r\n\s]*script>(?:\r\n)*/isg;
+const script_inline_regex = /\s(on\w+\s*=\s*".*?"|href\s*=\s*"\s*javascript:.*?")/isg;
+
+/**
+ * Returns a custom function containing the javascript from the content.
+ *
+ * @since $ver$
+ *
+ * @param {String} content The HTML content.
+ *
+ * @return {Function|null} The function or null.
+ */
+export function extract_javascript_fn( content ) {
+    let script_body = '';
+    const scripts = content.match( script_tag_regex );
+    if ( scripts ) {
+        for ( const script of scripts ) {
+            script_body += script.replace( script_tag_regex, '$1' );
+        }
+    }
+
+    if ( !script_body ) {
+        return null;
+    }
+    return new Function( script_body );
+}
+
+/**
+ * Returns the content stripped of JavaScripts.
+ *
+ * @since $ver$
+ *
+ * @param {String} content The HTML content.
+ *
+ * @return {String} The cleaned content.
+ */
+export function strip_javascript( content ) {
+    return content.replace( script_tag_regex, '' ).replace( script_inline_regex, '' );
+}

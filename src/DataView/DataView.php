@@ -585,12 +585,13 @@ final class DataView {
 	 *
 	 * @since $ver$
 	 *
-	 * @param array  $fields The fields to show.
-	 * @param string $label  The label to call the action.
+	 * @param array         $fields   The fields to show.
+	 * @param string        $label    The label to call the action.
+	 * @param callable|null $callback Callback that receives the action as the single argument to perform changes on.
 	 *
 	 * @return self The DataView with the view action.
 	 */
-	public function viewable( array $fields, string $label = 'View' ): self {
+	public function viewable( array $fields, string $label = 'View', ?callable $callback = null ): self {
 		$this->add_view_fields( ...$fields );
 
 		$actions       = $this->actions ? iterator_to_array( $this->actions ) : [];
@@ -598,6 +599,13 @@ final class DataView {
 
 		$view_action = Action::modal( 'view', $label, $view_rest_url, true )
 			->primary( 'info' );
+
+		if ( $callback ) {
+			$view_action = $callback( $view_action );
+			if ( ! $view_action instanceof Action ) {
+				throw new InvalidArgumentException( 'The provided callback should return an Action object.' );
+			}
+		}
 
 		$actions[] = $view_action;
 

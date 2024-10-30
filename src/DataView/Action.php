@@ -285,6 +285,32 @@ final class Action {
 	}
 
 	/**
+	 * Returns an instance that allows scripts to be executed.
+	 *
+	 * @since $ver$
+	 * @return self The action.
+	 */
+	public function allow_scripts(): self {
+		$clone                                = clone $this;
+		$clone->context['is_scripts_allowed'] = true;
+
+		return $clone;
+	}
+
+	/**
+	 * Returns an instance that removes scripts from the content.
+	 *
+	 * @since $ver$
+	 * @return self The action.
+	 */
+	public function deny_scripts(): self {
+		$clone                                = clone $this;
+		$clone->context['is_scripts_allowed'] = false;
+
+		return $clone;
+	}
+
+	/**
 	 * Returns an action that can be performed one item at a time.
 	 *
 	 * @since $ver$
