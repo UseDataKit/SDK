@@ -143,17 +143,19 @@ final class Action {
 	 *
 	 * @since $ver$
 	 *
-	 * @param string $id    The unique ID of the action.
-	 * @param string $label The label of the action.
-	 * @param string $url   The URL to open.
+	 * @param string $id             The unique ID of the action.
+	 * @param string $label          The label of the action.
+	 * @param string $url            The URL to open.
+	 * @param bool   $in_same_window Whether to op the url in the same window.
 	 *
 	 * @return self The action instance.
 	 */
-	public static function url( string $id, string $label, string $url ): self {
+	public static function url( string $id, string $label, string $url, bool $in_same_window = false ): self {
 		$action       = new self( $id, $label );
 		$action->type = self::TYPE_URL;
 
-		$action->context['url'] = $url;
+		$action->context['url']            = $url;
+		$action->context['use_new_window'] = ! $in_same_window;
 
 		return $action;
 	}
