@@ -1,4 +1,15 @@
 // Temporary fix until modal can be scaled properly.
-.dataviews-action-modal .components-modal__frame {
-    max-width: max-content;
+.dataviews-action-modal {
+    .components-modal__frame {
+        max-width: max-content;
+    }
+
+    img {
+        max-width: 600px;
+        max-height: 200px;
+    }
+}
+
+body.gravityview-template-default .components-modal__screen-overlay {
+    z-index: 1000; // Still high.
 }
