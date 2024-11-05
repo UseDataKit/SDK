@@ -10,6 +10,6 @@
     }
 }
 
-body.gravityview-template-default .components-modal__screen-overlay {
-    z-index: 1000; // Still high.
+.fancybox__container {
+    z-index: 1000002 !important; // DataViews uses a very high number for z-index unfortunately.
 }
