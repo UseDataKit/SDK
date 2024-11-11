@@ -548,7 +548,7 @@ final class DataView {
 			'view'           => $this->view(),
 			'fields'         => $this->directory_fields_for_json(),
 			'data'           => $this->get_data(),
-			'actions'        => $this->actions ? $this->actions->to_array() : [],
+			'actions'        => array_values( $this->actions ? $this->actions->to_array() : [] ),
 		];
 	}
 
