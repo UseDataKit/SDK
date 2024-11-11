@@ -158,8 +158,9 @@ final class DataView {
 		$this->id    = $id;
 		$this->views = [ $view ];
 
-		$this->filters     = $filters;
-		$this->actions     = $actions;
+		$this->filters( $filters );
+		$this->actions( $actions );
+
 		$this->sort        = $sort;
 		$this->data_source = $data_source;
 		$this->pagination  = Pagination::default();
@@ -581,7 +582,7 @@ final class DataView {
 	/**
 	 * Makes a single result of a DataView visible within a modal.
 	 *
-	 * Note: This method adds a primary action to open a single entry template in a modal.
+	 * Note: This method prepends a primary action to open a single entry template in a modal.
 	 *
 	 * @since $ver$
 	 *
@@ -594,7 +595,6 @@ final class DataView {
 	public function viewable( array $fields, string $label = 'View', ?callable $callback = null ): self {
 		$this->add_view_fields( ...$fields );
 
-		$actions       = $this->actions ? iterator_to_array( $this->actions ) : [];
 		$view_rest_url = sprintf( '{REST_ENDPOINT}/views/%s/data/{id}', $this->id() );
 
 		$view_action = Action::modal( 'view', $label, $view_rest_url, true )
@@ -607,9 +607,9 @@ final class DataView {
 			}
 		}
 
-		$actions[] = $view_action;
-
-		$this->actions = Actions::of( ...$actions );
+		$this->actions = $this->actions
+			? $this->actions->prepend( $view_action )
+			: Actions::of( $view_action );
 
 		return $this;
 	}
@@ -635,7 +635,6 @@ final class DataView {
 			return $this;
 		}
 
-		$actions         = $this->actions ? iterator_to_array( $this->actions ) : [];
 		$delete_rest_url = sprintf( '{REST_ENDPOINT}/views/%s/data', $this->id() );
 
 		$delete_action = Action::ajax( 'delete', $label, $delete_rest_url, 'DELETE', [ 'id' => '{id}' ], true )
@@ -651,9 +650,9 @@ final class DataView {
 			}
 		}
 
-		$actions[] = $delete_action;
-
-		$this->actions = Actions::of( ...$actions );
+		$this->actions = $this->actions
+			? $this->actions->append( $delete_action )
+			: Actions::of( $delete_action );
 
 		return $this;
 	}
@@ -760,5 +759,37 @@ final class DataView {
 				new ViewField( $this, $field )
 			)
 		);
+	}
+
+	/**
+	 * Sets the filters for this view.
+	 *
+	 * @since $ver$
+	 *
+	 * @param Filters|null $filters The filters.
+	 */
+	public function filters( ?Filters $filters ): self {
+		$this->filters = $filters;
+
+		return $this;
+	}
+
+	/**
+	 * Sets the actions for this view.
+	 *
+	 * @since $ver$
+	 *
+	 * @param Actions|callable|null $actions The actions.
+	 */
+	public function actions( $actions ): self {
+		if ( is_callable( $actions ) ) {
+			$actions = $actions( $this->actions ); // Provides the old actions.
+		}
+
+		if ( null === $actions || $actions instanceof Actions ) {
+			$this->actions = $actions;
+		}
+
+		return $this;
 	}
 }

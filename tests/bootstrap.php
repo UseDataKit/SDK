@@ -13,3 +13,9 @@ if ( ! function_exists( 'esc_html' ) ) {
 		return $args[0];
 	}
 }
+
+if ( ! function_exists( 'esc_html__' ) ) {
+	function esc_html__( ...$args ) {
+		return $args[0];
+	}
+}

@@ -3,6 +3,8 @@
 namespace DataKit\DataViews\Tests\DataView;
 
 use DataKit\DataViews\Data\ArrayDataSource;
+use DataKit\DataViews\DataView\Action;
+use DataKit\DataViews\DataView\Actions;
 use DataKit\DataViews\DataView\DataView;
 use DataKit\DataViews\Field\EnumField;
 use DataKit\DataViews\Field\ImageField;
@@ -71,5 +73,38 @@ TEXT;
 
 		self::assertSame( $image_field->uuid(), $grid->to_array()['view']['layout']['mediaField'] );
 		self::assertSame( $media_field->uuid(), $grid_2->to_array()['view']['layout']['mediaField'] );
+	}
+
+	/**
+	 * Test case for {@see DataView::viewable()} and {@see DataView::deletable()}.
+	 *
+	 * @since $ver$
+	 */
+	public function testViewableDeletable(): void {
+		$data_source = new ArrayDataSource( 'array', [] );
+		$fields      = [
+			TextField::create( 'primary', 'Primary' ),
+		];
+
+		$empty        = DataView::table( 'empty', $data_source, $fields );
+		$with_actions = DataView::table( 'empty', $data_source, $fields );
+		$with_actions->actions( Actions::of( Action::url( 'action', 'Label', 'url' ) ) );
+
+		$empty->viewable( $fields )->deletable();
+		$with_actions->viewable( $fields )->deletable();
+
+		$empty->actions( static function ( Actions $actions ): Actions {
+			self::assertCount( 2, $actions );
+			self::assertSame( [ 'view', 'delete' ], array_keys( $actions->to_array() ) );
+
+			return $actions;
+		} );
+
+		$with_actions->actions( static function ( Actions $actions ): Actions {
+			self::assertCount( 3, $actions );
+			self::assertSame( [ 'view', 'action', 'delete' ], array_keys( $actions->to_array() ) );
+
+			return $actions;
+		} );
 	}
 }
