@@ -98,6 +98,15 @@ final class Action {
 	private array $context = [];
 
 	/**
+	 * Field IDs that are required to be present for the action to be eligible.
+	 *
+	 * @since $ver$
+	 *
+	 * @var string[]
+	 */
+	private array $required = [];
+
+	/**
 	 * Creates an action.
 	 *
 	 * Note: the constructor is private as there are multiple named constructors available.
@@ -327,6 +336,21 @@ final class Action {
 	}
 
 	/**
+	 * Returns an action that can requires certain values to be present.
+	 *
+	 * @since $ver$
+	 *
+	 * @return self The action instance.
+	 */
+	public function requires( array $required_ids ): self {
+		$action = clone $this;
+
+		$action->required = array_filter( $required_ids, 'is_string' );
+
+		return $action;
+	}
+
+	/**
 	 * Returns a serialized state of the action.
 	 *
 	 * @since $ver$
@@ -339,6 +363,7 @@ final class Action {
 			'label'         => $this->label,
 			'isPrimary'     => '' !== $this->icon,
 			'isDestructive' => $this->is_destructive,
+			'isEligible'    => $this->js_eligible(),
 			'icon'          => $this->icon,
 			'callback'      => $this->js_callback(),
 			'supportsBulk'  => $this->is_bulk,
@@ -373,6 +398,30 @@ final class Action {
 				'( data, { registry } ) => datakit_dataviews_actions.%s(data, {registry, ... %s})',
 				'url',
 				json_encode( $this->context(), JSON_THROW_ON_ERROR ),
+			);
+		} catch ( JsonException $e ) {
+			return '';
+		}
+
+		return '__RAW__' . $callback . '__ENDRAW__';
+	}
+
+	/**
+	 * Returns the JavaScript `isEligible` callback for this action.
+	 *
+	 * @since $ver$
+	 *
+	 * @return string|null The JavaScript callback.
+	 */
+	private function js_eligible(): ?string {
+		if ( [] === $this->required ) {
+			return null;
+		}
+
+		try {
+			$callback = sprintf(
+				'item => %s.every( (key) => null !== (item[key] || null) )',
+				json_encode( $this->required, JSON_THROW_ON_ERROR ),
 			);
 		} catch ( JsonException $e ) {
 			return '';

@@ -89,7 +89,8 @@ final class ActionsTest extends TestCase {
 	 *
 	 * @param bool $is_prepend Whether the method to be called is `prepend()`.
 	 *
-	 * @testWith [false, true]
+	 * @testWith [false]
+	 *                [true]
 	 */
 	public function testAppendPrependException( bool $is_prepend ): void {
 		$actions = Actions::of(
