@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
  * This class contains tests that should pass for all field types.
  *
  * @since $ver$
+ *
+ * @template T of Field The field type.
  */
 abstract class AbstractFieldTestCase extends TestCase {
 	/**
@@ -29,7 +31,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 	 * @param string $id     The field id.
 	 * @param string $header the field header.
 	 *
-	 * @return Field The field instance.
+	 * @return T The field.
 	 */
 	protected function createField( string $id, string $header ): Field {
 		$field_class = static::fieldClass();
@@ -53,6 +55,7 @@ abstract class AbstractFieldTestCase extends TestCase {
 	 * Test case for {@see Field::to_array()}.
 	 *
 	 * @since $ver$
+	 * @return T The field.
 	 */
 	public function testToArray(): Field {
 		$field       = $this->createField( 'field_id', 'Field header' );

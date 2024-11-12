@@ -11,22 +11,27 @@ use PHPUnit\Framework\Exception;
  * Unit tests for {@see EnumField}.
  *
  * @since $ver$
+ *
+ * @template T of EnumField
+ *
+ * @extends AbstractFieldTestCase<T>
  */
 final class EnumFieldTest extends AbstractFieldTestCase {
 	/**
 	 * @inheritDoc
 	 * @since $ver$
 	 */
-	protected static function fieldClass() : string {
+	protected static function fieldClass(): string {
 		return EnumField::class;
 	}
 
 	/**
 	 * @inheritDoc
 	 * @since $ver$
+	 * @return T
 	 */
-	protected function createField( string $id, string $header ) : Field {
-		$field_class = static::fieldClass();
+	protected function createField( string $id, string $header ): Field {
+		$field_class = self::fieldClass();
 
 		return call_user_func( [ $field_class, 'create' ], $id, $header, [
 			'active'   => 'Active',
@@ -40,8 +45,9 @@ final class EnumFieldTest extends AbstractFieldTestCase {
 	 * Adds specific tests for EnumField.
 	 *
 	 * @since $ver$
+	 * @return T
 	 */
-	public function testToArray() : Field {
+	public function testToArray(): Field {
 		$field       = parent::testToArray();
 		$field_array = $field->to_array();
 

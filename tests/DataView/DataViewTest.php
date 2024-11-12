@@ -38,10 +38,10 @@ final class DataViewTest extends TestCase {
 
 		$uuid     = $field->uuid();
 		$expected = <<<TEXT
-"render":( data ) => datakit_fields.html("$uuid", data, []),
+"render": ( data ) => datakit_fields.html("$uuid", data, []),
 TEXT;
 
-		self::assertStringContainsString( $expected, $view->to_js() );
+		self::assertStringContainsString( $expected, $view->to_js( true ) );
 	}
 
 	/**
