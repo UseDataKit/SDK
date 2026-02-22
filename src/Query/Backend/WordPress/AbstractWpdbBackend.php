@@ -1,0 +1,401 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DataKit\DataViews\Query\Backend\WordPress;
+
+use DataKit\DataViews\Query\AggregateField;
+use DataKit\DataViews\Query\ColumnType;
+use DataKit\DataViews\Query\Engine\BackendSchema;
+use DataKit\DataViews\Query\Engine\Capability;
+use DataKit\DataViews\Query\Engine\CompiledQuery;
+use DataKit\DataViews\Query\Engine\CostEstimate;
+use DataKit\DataViews\Query\Engine\QueryBackend;
+use DataKit\DataViews\Query\Engine\Result;
+use DataKit\DataViews\Query\OrderBy;
+use DataKit\DataViews\Query\Query;
+use DataKit\DataViews\Query\QueryType;
+use DataKit\DataViews\Query\SelectField;
+use DataKit\DataViews\Query\SortDirection;
+
+/**
+ * Abstract base for WordPress SQL backends.
+ *
+ * Provides shared compilation logic (filters, aggregates, time bucketing, ordering).
+ * Subclasses provide: base table, system columns, JOIN construction, scope filtering.
+ *
+ * @since $ver$
+ */
+abstract class AbstractWpdbBackend implements QueryBackend
+{
+    protected readonly SqlFilterCompiler $filterCompiler;
+    protected readonly SqlTimeBucketCompiler $timeBucketCompiler;
+    protected readonly SqlAggregateCompiler $aggregateCompiler;
+    protected readonly WpdbExecutor $executor;
+
+    protected int $joinCounter = 0;
+
+    public function __construct()
+    {
+        $this->filterCompiler = new SqlFilterCompiler();
+        $this->timeBucketCompiler = new SqlTimeBucketCompiler();
+        $this->aggregateCompiler = new SqlAggregateCompiler();
+        $this->executor = new WpdbExecutor();
+    }
+
+    public function supports(Capability $cap): bool
+    {
+        return in_array($cap, $this->capabilities(), true);
+    }
+
+    public function schemaVersion(): int
+    {
+        return 1;
+    }
+
+    public function estimate(Query $query): ?CostEstimate
+    {
+        $rowCount = $this->estimateRowCount($query);
+
+        if ($rowCount === null) {
+            return null;
+        }
+
+        $joinCount = count($query->dimensions) + count($query->metrics);
+        $unnestFactor = count($query->unnest) > 0 ? 2 : 1;
+        $cost = $rowCount * max(1, $joinCount) * $unnestFactor;
+        $score = min(1.0, $cost / 1_000_000);
+
+        $suggestions = [];
+        if ($rowCount > 10000 && $query->time === null) {
+            $suggestions[] = 'Add a time filter to reduce the data scanned.';
+        }
+        if ($joinCount > 5) {
+            $suggestions[] = 'Reduce the number of dimensions to lower query complexity.';
+        }
+
+        return new CostEstimate($score, $score > 0.5, [
+            'entry_count' => $rowCount,
+            'join_count' => $joinCount,
+            'unnest_factor' => $unnestFactor,
+        ], $suggestions);
+    }
+
+    public function compile(Query $query, BackendSchema $schema): CompiledQuery
+    {
+        $this->joinCounter = 0;
+
+        // Build column map: field_key => SQL expression
+        $columnMap = $this->buildColumnMap($query, $schema);
+
+        // SELECT
+        $select = $this->compileSelect($query, $columnMap);
+
+        // FROM
+        $from = $this->getFrom($query);
+
+        // JOINs
+        $joins = $this->getJoins();
+
+        // WHERE
+        [$whereClause, $whereParams] = $this->compileWhere($query, $columnMap);
+
+        // GROUP BY
+        $groupBy = $this->compileGroupBy($query, $columnMap);
+
+        // HAVING
+        [$havingClause, $havingParams] = $this->compileHaving($query, $columnMap);
+
+        // ORDER BY
+        $orderBy = $this->compileOrderBy($query, $columnMap);
+
+        // LIMIT
+        $limit = $query->limit?->limit;
+        $offset = $query->limit?->offset ?? 0;
+
+        return new WpdbCompiledQuery(
+            select: $select,
+            from: $from,
+            joins: $joins,
+            where: $whereClause,
+            groupBy: $groupBy,
+            orderBy: $orderBy,
+            having: $havingClause,
+            limit: $limit,
+            offset: $offset,
+            params: array_merge($whereParams, $havingParams),
+            columnMap: $columnMap,
+        );
+    }
+
+    public function execute(CompiledQuery $compiled): Result
+    {
+        if (!$compiled instanceof WpdbCompiledQuery) {
+            throw new \InvalidArgumentException('Expected WpdbCompiledQuery.');
+        }
+
+        return $this->executor->execute($compiled, $this->getResultSchema($compiled));
+    }
+
+    // --- Abstract methods for subclasses ---
+
+    /**
+     * Build the column map for this query. Maps field keys to SQL expressions.
+     * Subclasses construct JOINs during this phase via addJoin().
+     *
+     * @return array<string, string>
+     */
+    abstract protected function buildColumnMap(Query $query, BackendSchema $schema): array;
+
+    /**
+     * Get the FROM clause (e.g., "wp_gf_entry AS e").
+     */
+    abstract protected function getFrom(Query $query): string;
+
+    /**
+     * Get accumulated JOIN clauses.
+     *
+     * @return string[]
+     */
+    abstract protected function getJoins(): array;
+
+    /**
+     * Estimate the row count for cost calculation.
+     */
+    abstract protected function estimateRowCount(Query $query): ?int;
+
+    /**
+     * Get the result schema (column name => ColumnType) from the compiled query.
+     *
+     * @return array<string, ColumnType>
+     */
+    abstract protected function getResultSchema(WpdbCompiledQuery $compiled): array;
+
+    // --- Shared compilation methods ---
+
+    /**
+     * @return string[] SELECT expressions.
+     */
+    protected function compileSelect(Query $query, array $columnMap): array
+    {
+        $select = [];
+
+        // Dimensions
+        foreach ($query->dimensions as $dim) {
+            $colExpr = $columnMap[$dim->field] ?? $dim->field;
+            $alias = $dim->outputName();
+            $select[] = "{$colExpr} AS `{$alias}`";
+        }
+
+        // Time bucket
+        if ($query->time?->grain !== null) {
+            $colExpr = $columnMap[$query->time->field] ?? $query->time->field;
+            $bucketExpr = $this->timeBucketCompiler->compile($colExpr, $query->time->grain);
+            $bucketAlias = $query->time->field . '_bucket';
+            $select[] = "{$bucketExpr} AS `{$bucketAlias}`";
+        }
+
+        // Metrics
+        foreach ($query->metrics as $metric) {
+            $colExpr = $metric->field !== null ? ($columnMap[$metric->field] ?? $metric->field) : null;
+            $select[] = $this->aggregateCompiler->compile($metric, $colExpr);
+        }
+
+        // Browse mode — select all mapped fields if no explicit dimensions
+        if ($query->type === QueryType::Browse && $select === []) {
+            foreach ($columnMap as $key => $expr) {
+                $select[] = "{$expr} AS `{$key}`";
+            }
+        }
+
+        return $select;
+    }
+
+    /**
+     * @return array{0: string[], 1: array} WHERE clauses and params.
+     */
+    protected function compileWhere(Query $query, array $columnMap): array
+    {
+        $clauses = [];
+        $params = [];
+
+        // Scope filters (subclass may override)
+        $scopeResult = $this->compileScopeWhere($query);
+        if ($scopeResult['clause'] !== '') {
+            $clauses[] = $scopeResult['clause'];
+            $params = array_merge($params, $scopeResult['params']);
+        }
+
+        // Time range filter
+        if ($query->time !== null) {
+            $range = $query->time->resolveRange();
+            $colExpr = $columnMap[$query->time->field] ?? $query->time->field;
+
+            if ($range['start'] !== null) {
+                $clauses[] = "{$colExpr} >= %s";
+                $params[] = $range['start'];
+            }
+
+            if ($range['end'] !== null) {
+                $clauses[] = "{$colExpr} <= %s";
+                $params[] = $range['end'];
+            }
+        }
+
+        // User conditions
+        if ($query->where !== null) {
+            $filterResult = $this->filterCompiler->compile($query->where, $columnMap);
+
+            if ($filterResult['clause'] !== '') {
+                $clauses[] = $filterResult['clause'];
+                $params = array_merge($params, $filterResult['params']);
+            }
+        }
+
+        // Search
+        if ($query->search !== null) {
+            $searchResult = $this->compileSearch($query->search, $columnMap);
+
+            if ($searchResult['clause'] !== '') {
+                $clauses[] = $searchResult['clause'];
+                $params = array_merge($params, $searchResult['params']);
+            }
+        }
+
+        return [$clauses, $params];
+    }
+
+    /**
+     * Compile scope-specific WHERE conditions.
+     *
+     * @return array{clause: string, params: array}
+     */
+    protected function compileScopeWhere(Query $query): array
+    {
+        return ['clause' => '', 'params' => []];
+    }
+
+    /**
+     * Compile search to LIKE conditions on all string fields.
+     *
+     * @return array{clause: string, params: array}
+     */
+    protected function compileSearch(string $search, array $columnMap): array
+    {
+        $clauses = [];
+        $params = [];
+        $escaped = '%' . SqlFilterCompiler::escapeLike($search) . '%';
+
+        foreach ($columnMap as $colExpr) {
+            $clauses[] = "{$colExpr} LIKE %s";
+            $params[] = $escaped;
+        }
+
+        if ($clauses === []) {
+            return ['clause' => '', 'params' => []];
+        }
+
+        return [
+            'clause' => '(' . implode(' OR ', $clauses) . ')',
+            'params' => $params,
+        ];
+    }
+
+    /**
+     * @return string[] GROUP BY expressions.
+     */
+    protected function compileGroupBy(Query $query, array $columnMap): array
+    {
+        if ($query->type !== QueryType::Aggregate) {
+            return [];
+        }
+
+        $groupBy = [];
+
+        foreach ($query->dimensions as $dim) {
+            $groupBy[] = $columnMap[$dim->field] ?? $dim->field;
+        }
+
+        if ($query->time?->grain !== null) {
+            $colExpr = $columnMap[$query->time->field] ?? $query->time->field;
+            $groupBy[] = $this->timeBucketCompiler->compile($colExpr, $query->time->grain);
+        }
+
+        return $groupBy;
+    }
+
+    /**
+     * @return array{0: string[], 1: array} HAVING clauses and params.
+     */
+    protected function compileHaving(Query $query, array $columnMap): array
+    {
+        if ($query->having === null) {
+            return [[], []];
+        }
+
+        // For HAVING, we need output alias mapping
+        $outputMap = [];
+        foreach ($query->metrics as $metric) {
+            $colExpr = $metric->field !== null ? ($columnMap[$metric->field] ?? $metric->field) : null;
+            $outputMap[$metric->outputName()] = $this->aggregateCompiler->compile($metric, $colExpr);
+            // Strip the alias for HAVING clause
+            $outputMap[$metric->outputName()] = preg_replace('/ AS `.+`$/', '', $outputMap[$metric->outputName()]);
+        }
+
+        $filterResult = $this->filterCompiler->compile($query->having, $outputMap);
+
+        if ($filterResult['clause'] === '') {
+            return [[], []];
+        }
+
+        return [[$filterResult['clause']], $filterResult['params']];
+    }
+
+    /**
+     * @return string[] ORDER BY expressions.
+     */
+    protected function compileOrderBy(Query $query, array $columnMap): array
+    {
+        $orderBy = [];
+
+        // Build output alias map for aggregate queries
+        $outputAliases = [];
+        if ($query->type === QueryType::Aggregate) {
+            foreach ($query->metrics as $metric) {
+                $outputAliases[] = $metric->outputName();
+            }
+            foreach ($query->dimensions as $dim) {
+                if ($dim->alias !== null) {
+                    $outputAliases[] = $dim->alias;
+                }
+            }
+            if ($query->time?->grain !== null) {
+                $outputAliases[] = $query->time->field . '_bucket';
+            }
+        }
+
+        foreach ($query->orderBy as $order) {
+            $dir = $order->direction === SortDirection::Desc ? 'DESC' : 'ASC';
+
+            // Use backtick-quoted alias for output names
+            if (in_array($order->field, $outputAliases, true)) {
+                $orderBy[] = "`{$order->field}` {$dir}";
+            } else {
+                $colExpr = $columnMap[$order->field] ?? $order->field;
+                $orderBy[] = "{$colExpr} {$dir}";
+            }
+        }
+
+        return $orderBy;
+    }
+
+    /**
+     * Get next JOIN alias counter.
+     */
+    protected function nextJoinAlias(string $prefix = 'm'): string
+    {
+        $this->joinCounter++;
+
+        return $prefix . $this->joinCounter;
+    }
+}
