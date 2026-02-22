@@ -213,7 +213,10 @@ final class QueryEngine
     }
 
     /**
-     * Collect all field names referenced by the query.
+     * Collect all source field names referenced by the query.
+     *
+     * Output aliases (metric aliases, dimension aliases, bucket columns)
+     * are excluded since they don't exist in the source schema.
      *
      * @return string[]
      */
@@ -221,26 +224,39 @@ final class QueryEngine
     {
         $fields = [];
 
+        // Build set of output aliases that are NOT source fields
+        $outputAliases = [];
         foreach ($query->dimensions as $dim) {
             $fields[] = $dim->field;
+            if ($dim->alias !== null) {
+                $outputAliases[] = $dim->alias;
+            }
         }
 
         foreach ($query->metrics as $metric) {
             if ($metric->field !== null) {
                 $fields[] = $metric->field;
             }
+            $outputAliases[] = $metric->outputName();
+        }
+
+        // Time bucket column is an output alias
+        if ($query->time?->grain !== null) {
+            $outputAliases[] = $query->time->field . '_bucket';
         }
 
         if ($query->where !== null) {
             $this->collectConditionFields($query->where, $fields);
         }
 
-        if ($query->having !== null) {
-            $this->collectConditionFields($query->having, $fields);
-        }
+        // HAVING references output aliases, not source fields — skip validation
+        // (having conditions reference aggregated column names)
 
+        // ORDER BY can reference either source fields or output aliases
         foreach ($query->orderBy as $order) {
-            $fields[] = $order->field;
+            if (!in_array($order->field, $outputAliases, true)) {
+                $fields[] = $order->field;
+            }
         }
 
         if ($query->time !== null) {
