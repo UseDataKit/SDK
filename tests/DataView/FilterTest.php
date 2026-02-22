@@ -194,6 +194,34 @@ final class FilterTest extends TestCase {
 
 
 	/**
+	 * Data Provider for {@see FilterTest::test_matches_falsy_values}.
+	 * @since $ver$
+	 * @return array[]
+	 */
+	public static function falsy_value_provider() : array {
+		return [
+			'zero integer'    => [ Filter::is( 'count', 0 ), [ 'count' => 0 ], true ],
+			'zero string'     => [ Filter::is( 'count', '0' ), [ 'count' => '0' ], true ],
+			'empty string'    => [ Filter::is( 'name', '' ), [ 'name' => '' ], true ],
+			'false value'     => [ Filter::is( 'active', false ), [ 'active' => false ], true ],
+			'isNot zero'      => [ Filter::isNot( 'count', 1 ), [ 'count' => 0 ], true ],
+			'isAny with zero' => [ Filter::isAny( 'count', [ 0, 1 ] ), [ 'count' => 0 ], true ],
+		];
+	}
+
+	/**
+	 * Test case for {@see Filter::matches()} with falsy field values.
+	 *
+	 * Ensures that falsy values (0, "0", "", false) are not treated as missing fields.
+	 *
+	 * @since $ver$
+	 * @dataProvider falsy_value_provider
+	 */
+	public function test_matches_falsy_values( Filter $filter, array $data, bool $expected_result ) : void {
+		self::assertSame( $expected_result, $filter->matches( $data ) );
+	}
+
+	/**
 	 * Test case for
 	 * @since $ver$
 	 */

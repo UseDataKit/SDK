@@ -208,7 +208,7 @@ final class Filter {
 	public function matches( array $data ): bool {
 		$value = $data[ $this->field ] ?? null;
 
-		if ( ! $value ) {
+		if ( null === $value ) {
 			return false;
 		}
 
