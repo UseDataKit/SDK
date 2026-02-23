@@ -50,7 +50,7 @@ final class DefaultResultHydrator implements ResultHydrator
         return ['rows' => $rows, 'warnings' => $warnings];
     }
 
-    private function castInteger(mixed $value, string $column, int $rowIndex, array &$warnings): int|string
+    private function castInteger(mixed $value, string $column, int|string $rowIndex, array &$warnings): int|string
     {
         if (is_int($value)) {
             return $value;
@@ -61,7 +61,8 @@ final class DefaultResultHydrator implements ResultHydrator
         }
 
         if ($this->strict) {
-            $warnings[] = sprintf('Row %d: cannot cast "%s" to integer for column "%s".', $rowIndex, $value, $column);
+            $display = is_scalar($value) ? (string) $value : get_debug_type($value);
+            $warnings[] = sprintf('Row %s: cannot cast "%s" to integer for column "%s".', $rowIndex, $display, $column);
 
             return (string) $value;
         }
@@ -69,7 +70,7 @@ final class DefaultResultHydrator implements ResultHydrator
         return (int) $value;
     }
 
-    private function castFloat(mixed $value, string $column, int $rowIndex, array &$warnings): float|string
+    private function castFloat(mixed $value, string $column, int|string $rowIndex, array &$warnings): float|string
     {
         if (is_float($value) || is_int($value)) {
             return (float) $value;
@@ -80,7 +81,8 @@ final class DefaultResultHydrator implements ResultHydrator
         }
 
         if ($this->strict) {
-            $warnings[] = sprintf('Row %d: cannot cast "%s" to float for column "%s".', $rowIndex, $value, $column);
+            $display = is_scalar($value) ? (string) $value : get_debug_type($value);
+            $warnings[] = sprintf('Row %s: cannot cast "%s" to float for column "%s".', $rowIndex, $display, $column);
 
             return (string) $value;
         }

@@ -39,56 +39,56 @@ enum TimePreset: string
 
         return match ($this) {
             self::Today => [
-                $now->setTime(0, 0),
-                $now->setTime(23, 59, 59),
+                $now->setTime(0, 0, 0, 0),
+                $now->setTime(23, 59, 59, 999999),
             ],
             self::Yesterday => [
-                $now->modify('-1 day')->setTime(0, 0),
-                $now->modify('-1 day')->setTime(23, 59, 59),
+                $now->modify('-1 day')->setTime(0, 0, 0, 0),
+                $now->modify('-1 day')->setTime(23, 59, 59, 999999),
             ],
             self::Last7Days => [
-                $now->modify('-6 days')->setTime(0, 0),
-                $now->setTime(23, 59, 59),
+                $now->modify('-6 days')->setTime(0, 0, 0, 0),
+                $now->setTime(23, 59, 59, 999999),
             ],
             self::Last30Days => [
-                $now->modify('-29 days')->setTime(0, 0),
-                $now->setTime(23, 59, 59),
+                $now->modify('-29 days')->setTime(0, 0, 0, 0),
+                $now->setTime(23, 59, 59, 999999),
             ],
             self::Last90Days => [
-                $now->modify('-89 days')->setTime(0, 0),
-                $now->setTime(23, 59, 59),
+                $now->modify('-89 days')->setTime(0, 0, 0, 0),
+                $now->setTime(23, 59, 59, 999999),
             ],
             self::ThisMonth => [
-                $now->modify('first day of this month')->setTime(0, 0),
-                $now->setTime(23, 59, 59),
+                $now->modify('first day of this month')->setTime(0, 0, 0, 0),
+                $now->setTime(23, 59, 59, 999999),
             ],
             self::LastMonth => [
-                $now->modify('first day of last month')->setTime(0, 0),
-                $now->modify('last day of last month')->setTime(23, 59, 59),
+                $now->modify('first day of last month')->setTime(0, 0, 0, 0),
+                $now->modify('last day of last month')->setTime(23, 59, 59, 999999),
             ],
             self::ThisYear => [
                 new \DateTimeImmutable($now->format('Y') . '-01-01 00:00:00', $utc),
-                $now->setTime(23, 59, 59),
+                $now->setTime(23, 59, 59, 999999),
             ],
             self::LastYear => [
                 new \DateTimeImmutable(($now->format('Y') - 1) . '-01-01 00:00:00', $utc),
-                new \DateTimeImmutable(($now->format('Y') - 1) . '-12-31 23:59:59', $utc),
+                new \DateTimeImmutable(($now->format('Y') - 1) . '-12-31 23:59:59.999999', $utc),
             ],
             self::Last1Year => [
-                $now->modify('-1 year')->setTime(0, 0),
-                $now->setTime(23, 59, 59),
+                $now->modify('-1 year')->setTime(0, 0, 0, 0),
+                $now->setTime(23, 59, 59, 999999),
             ],
             self::Last2Years => [
-                $now->modify('-2 years')->setTime(0, 0),
-                $now->setTime(23, 59, 59),
+                $now->modify('-2 years')->setTime(0, 0, 0, 0),
+                $now->setTime(23, 59, 59, 999999),
             ],
             self::ThisQuarter => [
                 self::quarterStart($now, $utc),
-                $now->setTime(23, 59, 59),
+                $now->setTime(23, 59, 59, 999999),
             ],
             self::LastQuarter => [
                 self::quarterStart($now->modify('-3 months'), $utc),
-                self::quarterStart($now, $utc)->modify('-1 day')->setTime(23, 59, 59),
+                self::quarterStart($now, $utc)->modify('-1 day')->setTime(23, 59, 59, 999999),
             ],
         };
     }

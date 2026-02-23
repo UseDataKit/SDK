@@ -97,7 +97,7 @@ final class Result implements \Countable, \IteratorAggregate
         foreach (array_keys($this->schema) as $column) {
             $values = array_column($this->rows, $column);
             $unique = array_count_values(
-                array_map('strval', array_filter($values, static fn ($v) => $v !== null)),
+                array_map('strval', array_filter($values, static fn ($v) => $v !== null && is_scalar($v))),
             );
 
             if (count($unique) > 0 && count($unique) <= 20) {
