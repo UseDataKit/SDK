@@ -22,6 +22,8 @@ enum TimePreset: string
     case LastYear = 'last_year';
     case Last1Year = 'last_1_year';
     case Last2Years = 'last_2_years';
+    case ThisQuarter = 'this_quarter';
+    case LastQuarter = 'last_quarter';
 
     /**
      * Resolves this preset to a concrete start/end DateTimeImmutable pair.
@@ -80,6 +82,28 @@ enum TimePreset: string
                 $now->modify('-2 years')->setTime(0, 0),
                 $now->setTime(23, 59, 59),
             ],
+            self::ThisQuarter => [
+                self::quarterStart($now, $utc),
+                $now->setTime(23, 59, 59),
+            ],
+            self::LastQuarter => [
+                self::quarterStart($now->modify('-3 months'), $utc),
+                self::quarterStart($now, $utc)->modify('-1 day')->setTime(23, 59, 59),
+            ],
         };
+    }
+
+    /**
+     * Returns the first day of the quarter containing the given date.
+     */
+    private static function quarterStart(\DateTimeImmutable $date, \DateTimeZone $utc): \DateTimeImmutable
+    {
+        $month = (int) $date->format('n');
+        $quarterMonth = (int) (floor(($month - 1) / 3) * 3 + 1);
+
+        return new \DateTimeImmutable(
+            sprintf('%s-%02d-01 00:00:00', $date->format('Y'), $quarterMonth),
+            $utc,
+        );
     }
 }
