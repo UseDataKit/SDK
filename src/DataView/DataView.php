@@ -96,6 +96,15 @@ final class DataView {
 	private ?Search $search = null;
 
 	/**
+	 * The primary field (used as the main clickable title in table/grid layouts).
+	 *
+	 * @since $ver$
+	 *
+	 * @var Field|null
+	 */
+	private ?Field $primary_field = null;
+
+	/**
 	 * The pagination info.
 	 *
 	 * @since $ver$
@@ -492,6 +501,23 @@ final class DataView {
 	}
 
 	/**
+	 * Sets the primary field for the DataView layout.
+	 *
+	 * The primary field is displayed as the main clickable title in table and grid layouts.
+	 *
+	 * @since $ver$
+	 *
+	 * @param Field $field The field to use as primary.
+	 *
+	 * @return self The DataView.
+	 */
+	public function primary_field( Field $field ): self {
+		$this->primary_field = $field;
+
+		return $this;
+	}
+
+	/**
 	 * Returns an instance of the DataView with a particular sorting applied.
 	 *
 	 * @since $ver$
@@ -657,6 +683,10 @@ final class DataView {
 		);
 
 		$output['mediaField'] = reset( $image_fields );
+
+		if ( $this->primary_field !== null ) {
+			$output['primaryField'] = $this->primary_field->uuid();
+		}
 
 		return array_filter( $output );
 	}
