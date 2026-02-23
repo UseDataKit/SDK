@@ -72,6 +72,22 @@ final class GravityFormsSchemaProvider
             new FieldSchema('created_by', 'Created By (User ID)', ColumnType::Integer, $allOps),
             new FieldSchema('is_starred', 'Starred', ColumnType::Boolean, $allOps),
             new FieldSchema('is_read', 'Read', ColumnType::Boolean, $allOps),
+            new FieldSchema('user_agent', 'User Agent', ColumnType::String, $allOps, sortable: false),
+            new FieldSchema('transaction_type', 'Transaction Type', ColumnType::String, $allOps),
+            new FieldSchema('post_id', 'Post ID', ColumnType::Integer, $allOps),
+            new FieldSchema('is_fulfilled', 'Fulfilled', ColumnType::Boolean, $allOps),
+            new FieldSchema('form_title', 'Form Title', ColumnType::String, $allOps,
+                description: 'Title of the form (joined from wp_gf_form).',
+            ),
+            // Semantic aliases — resolve to the same SQL columns as the canonical names.
+            new FieldSchema('created_at', 'Created At', ColumnType::Datetime, $allOps,
+                aggregatable: true, timezone: 'utc',
+                description: 'Alias for date_created.',
+            ),
+            new FieldSchema('updated_at', 'Updated At', ColumnType::Datetime, $allOps,
+                timezone: 'utc',
+                description: 'Alias for date_updated.',
+            ),
         ];
     }
 
