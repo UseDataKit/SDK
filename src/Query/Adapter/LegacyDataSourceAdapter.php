@@ -58,6 +58,11 @@ final class LegacyDataSourceAdapter implements QueryBackend
         ];
     }
 
+    public static function isAvailable(): bool
+    {
+        return true;
+    }
+
     public function sourceType(): string
     {
         return 'legacy_' . $this->dataSource->id();

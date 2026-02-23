@@ -40,6 +40,11 @@ final class EngineTest extends TestCase
     private function makeBackend(): QueryBackend
     {
         return new class implements QueryBackend {
+            public static function isAvailable(): bool
+            {
+                return true;
+            }
+
             public function sourceType(): string
             {
                 return 'test';
@@ -209,6 +214,7 @@ final class EngineTest extends TestCase
     public function test_cost_enforcement_blocks_expensive(): void
     {
         $expensiveBackend = new class implements QueryBackend {
+            public static function isAvailable(): bool { return true; }
             public function sourceType(): string { return 'expensive'; }
             public function capabilities(): array { return Capability::cases(); }
             public function supports(Capability $cap): bool { return true; }
@@ -268,6 +274,7 @@ final class EngineTest extends TestCase
     public function test_unsupported_capability_throws(): void
     {
         $limitedBackend = new class implements QueryBackend {
+            public static function isAvailable(): bool { return true; }
             public function sourceType(): string { return 'limited'; }
             public function capabilities(): array { return [Capability::FilterEq, Capability::LimitOffset]; }
             public function supports(Capability $cap): bool { return in_array($cap, $this->capabilities(), true); }
