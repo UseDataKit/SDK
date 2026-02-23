@@ -35,9 +35,12 @@ final class WpdbExecutor
         $sql = $compiled->toSql();
         $params = $compiled->getParams();
 
-        // Prepare SQL if there are parameters
+        // Prepare SQL if there are parameters.
+        // When there are no params, unescape %% → % since wpdb::prepare() won't do it.
         if ($params !== []) {
             $sql = $wpdb->prepare($sql, $params);
+        } else {
+            $sql = str_replace('%%', '%', $sql);
         }
 
         // Set session timeout
@@ -100,6 +103,8 @@ final class WpdbExecutor
 
         if ($params !== []) {
             $countSql = $wpdb->prepare($countSql, $params);
+        } else {
+            $countSql = str_replace('%%', '%', $countSql);
         }
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
