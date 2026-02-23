@@ -64,4 +64,12 @@ class QueryValidationException extends QueryException
 
         return $e;
     }
+
+    public static function invalidStructure(string $detail, ?\Throwable $previous = null): self
+    {
+        $e = new self(sprintf('Invalid query structure: %s', $detail), 0, $previous);
+        $e->context = ['error' => 'invalid_structure', 'detail' => $detail];
+
+        return $e;
+    }
 }

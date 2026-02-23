@@ -89,6 +89,14 @@ final readonly class Condition
 
     public static function fromArray(array $data): self
     {
+        if (!isset($data['field'])) {
+            throw new \InvalidArgumentException("Missing required key 'field' for Condition.");
+        }
+
+        if (!isset($data['operator'])) {
+            throw new \InvalidArgumentException("Missing required key 'operator' for Condition.");
+        }
+
         return new self(
             field: $data['field'],
             operator: ComparisonOperator::from($data['operator']),

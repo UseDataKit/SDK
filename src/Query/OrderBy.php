@@ -27,6 +27,10 @@ final readonly class OrderBy
 
     public static function fromArray(array $data): self
     {
+        if (!isset($data['field'])) {
+            throw new \InvalidArgumentException("Missing required key 'field' for OrderBy.");
+        }
+
         return new self(
             field: $data['field'],
             direction: SortDirection::from($data['direction'] ?? 'asc'),

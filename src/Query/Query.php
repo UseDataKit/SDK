@@ -137,28 +137,32 @@ final readonly class Query
             throw QueryValidationException::missingRequiredField('source');
         }
 
-        $query = new self(
-            source: Source::fromArray($data['source']),
-            type: isset($data['type']) ? QueryType::from($data['type']) : QueryType::Aggregate,
-            time: isset($data['time']) ? TimeRange::fromArray($data['time']) : null,
-            dimensions: array_map(
-                static fn (array $d) => SelectField::fromArray($d),
-                $data['dimensions'] ?? [],
-            ),
-            metrics: array_map(
-                static fn (array $m) => AggregateField::fromArray($m),
-                $data['metrics'] ?? [],
-            ),
-            where: isset($data['where']) ? ConditionGroup::fromArray($data['where']) : null,
-            having: isset($data['having']) ? ConditionGroup::fromArray($data['having']) : null,
-            orderBy: array_map(
-                static fn (array $o) => OrderBy::fromArray($o),
-                $data['orderBy'] ?? [],
-            ),
-            limit: isset($data['limit']) ? Limit::fromArray($data['limit']) : null,
-            unnest: $data['unnest'] ?? [],
-            search: $data['search'] ?? null,
-        );
+        try {
+            $query = new self(
+                source: Source::fromArray($data['source']),
+                type: isset($data['type']) ? QueryType::from($data['type']) : QueryType::Aggregate,
+                time: isset($data['time']) ? TimeRange::fromArray($data['time']) : null,
+                dimensions: array_map(
+                    static fn (array $d) => SelectField::fromArray($d),
+                    $data['dimensions'] ?? [],
+                ),
+                metrics: array_map(
+                    static fn (array $m) => AggregateField::fromArray($m),
+                    $data['metrics'] ?? [],
+                ),
+                where: isset($data['where']) ? ConditionGroup::fromArray($data['where']) : null,
+                having: isset($data['having']) ? ConditionGroup::fromArray($data['having']) : null,
+                orderBy: array_map(
+                    static fn (array $o) => OrderBy::fromArray($o),
+                    $data['orderBy'] ?? [],
+                ),
+                limit: isset($data['limit']) ? Limit::fromArray($data['limit']) : null,
+                unnest: $data['unnest'] ?? [],
+                search: $data['search'] ?? null,
+            );
+        } catch (\TypeError $e) {
+            throw QueryValidationException::invalidStructure($e->getMessage(), $e);
+        }
 
         $query->validate();
 

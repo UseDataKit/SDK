@@ -40,8 +40,12 @@ final readonly class Source
 
     public static function fromArray(array $data): self
     {
+        if (!isset($data['type'])) {
+            throw new \InvalidArgumentException("Missing required key 'type' for Source.");
+        }
+
         return new self(
-            type: $data['type'] ?? '',
+            type: $data['type'],
             entity: $data['entity'] ?? '',
             scope: $data['scope'] ?? [],
         );
