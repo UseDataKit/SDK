@@ -385,6 +385,32 @@ final class QueryEngine
     }
 
     /**
+     * Invalidate the cached result for a specific query.
+     *
+     * Resolves the backend, computes the cache key using the same logic as
+     * execute(), and deletes the entry. Silently returns if no cache is
+     * configured or the backend is unknown.
+     */
+    public function invalidate(Query $query): void
+    {
+        if ($this->cache === null) {
+            return;
+        }
+
+        $backend = $this->backends->get($query->source->type);
+
+        if ($backend === null) {
+            return;
+        }
+
+        $cacheKey = $this->cacheKey($backend, $query);
+
+        if ($cacheKey !== null) {
+            $this->cache->delete($cacheKey);
+        }
+    }
+
+    /**
      * Build a versioned cache key.
      */
     private function cacheKey(QueryBackend $backend, Query $query): ?string
