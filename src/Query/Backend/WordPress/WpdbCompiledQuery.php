@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DataKit\DataViews\Query\Backend\WordPress;
 
+use DataKit\DataViews\Query\ColumnType;
 use DataKit\DataViews\Query\Engine\CompiledQuery;
 
 /**
@@ -27,6 +28,7 @@ final class WpdbCompiledQuery extends CompiledQuery
      * @param int      $offset   OFFSET value.
      * @param array    $params   Bound parameters for wpdb->prepare().
      * @param array<string, string> $columnMap Field key => SQL expression mapping.
+     * @param array<string, ColumnType> $outputSchema Output column name => type (all SELECT aliases).
      */
     public function __construct(
         public readonly array $select = [],
@@ -40,6 +42,7 @@ final class WpdbCompiledQuery extends CompiledQuery
         public readonly int $offset = 0,
         public readonly array $params = [],
         public readonly array $columnMap = [],
+        public readonly array $outputSchema = [],
     ) {
         parent::__construct($this, $this->toSql());
     }
@@ -89,5 +92,28 @@ final class WpdbCompiledQuery extends CompiledQuery
     public function getParams(): array
     {
         return $this->params;
+    }
+
+    /**
+     * Creates a new instance with the given output schema.
+     *
+     * @param array<string, ColumnType> $outputSchema
+     */
+    public function withOutputSchema(array $outputSchema): self
+    {
+        return new self(
+            $this->select,
+            $this->from,
+            $this->joins,
+            $this->where,
+            $this->groupBy,
+            $this->orderBy,
+            $this->having,
+            $this->limit,
+            $this->offset,
+            $this->params,
+            $this->columnMap,
+            $outputSchema,
+        );
     }
 }

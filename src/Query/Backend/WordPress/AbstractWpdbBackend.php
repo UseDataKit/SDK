@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DataKit\DataViews\Query\Backend\WordPress;
 
 use DataKit\DataViews\Query\AggregateField;
+use DataKit\DataViews\Query\AggregateFunction;
 use DataKit\DataViews\Query\ColumnType;
 use DataKit\DataViews\Query\Engine\BackendSchema;
 use DataKit\DataViews\Query\Engine\Capability;
@@ -113,7 +114,7 @@ abstract class AbstractWpdbBackend implements QueryBackend
         $limit = $query->limit?->limit;
         $offset = $query->limit?->offset ?? 0;
 
-        return new WpdbCompiledQuery(
+        $compiled = new WpdbCompiledQuery(
             select: $select,
             from: $from,
             joins: $joins,
@@ -126,6 +127,11 @@ abstract class AbstractWpdbBackend implements QueryBackend
             params: array_merge($whereParams, $havingParams),
             columnMap: $columnMap,
         );
+
+        // Augment with output schema derived from query structure + subclass types.
+        $outputSchema = $this->buildOutputSchema($query, $compiled);
+
+        return $outputSchema !== [] ? $compiled->withOutputSchema($outputSchema) : $compiled;
     }
 
     public function execute(CompiledQuery $compiled): Result
@@ -134,7 +140,11 @@ abstract class AbstractWpdbBackend implements QueryBackend
             throw new \InvalidArgumentException('Expected WpdbCompiledQuery.');
         }
 
-        return $this->executor->execute($compiled, $this->getResultSchema($compiled));
+        // Use the output schema built during compile() if available,
+        // falling back to the subclass schema for backward compatibility.
+        $schema = $compiled->outputSchema !== [] ? $compiled->outputSchema : $this->getResultSchema($compiled);
+
+        return $this->executor->execute($compiled, $schema);
     }
 
     // --- Abstract methods for subclasses ---
@@ -387,6 +397,51 @@ abstract class AbstractWpdbBackend implements QueryBackend
         }
 
         return $orderBy;
+    }
+
+    /**
+     * Build the complete output schema from the Query structure.
+     *
+     * The subclass-provided {@see getResultSchema()} only knows about raw column
+     * map entries. This method augments it with computed output columns: time bucket
+     * aliases and aggregate metric aliases that appear in the SELECT but not in the
+     * column map.
+     *
+     * @param Query             $query    The original query.
+     * @param WpdbCompiledQuery $compiled The compiled query (for subclass type resolution).
+     *
+     * @return array<string, ColumnType>
+     */
+    protected function buildOutputSchema(Query $query, WpdbCompiledQuery $compiled): array
+    {
+        if ($query->type === QueryType::Browse) {
+            // Browse mode — subclass schema covers all output columns.
+            return [];
+        }
+
+        // Start with the subclass-derived types for raw column map fields.
+        $baseTypes = $this->getResultSchema($compiled);
+        $schema = [];
+
+        // Dimensions — use the subclass type for the underlying field.
+        foreach ($query->dimensions as $dim) {
+            $schema[$dim->outputName()] = $baseTypes[$dim->field] ?? ColumnType::String;
+        }
+
+        // Time bucket alias (e.g. "created_at_bucket").
+        if ($query->time?->grain !== null) {
+            $schema[$query->time->field . '_bucket'] = ColumnType::Datetime;
+        }
+
+        // Metric aliases (e.g. "count_*", "sum_payment_amount").
+        foreach ($query->metrics as $metric) {
+            $schema[$metric->outputName()] = match ($metric->function) {
+                AggregateFunction::Count, AggregateFunction::CountDistinct => ColumnType::Integer,
+                default => ColumnType::Float,
+            };
+        }
+
+        return $schema;
     }
 
     /**
