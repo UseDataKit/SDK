@@ -32,6 +32,9 @@ final class WordPressUsersBackend extends AbstractWpdbBackend
         'user_registered' => 'user_registered',
         'user_status' => 'user_status',
         'user_url' => 'user_url',
+        // Semantic aliases.
+        'created_at' => 'user_registered',
+        'updated_at' => 'user_registered',
     ];
 
     private const COMMON_META_KEYS = [
@@ -40,6 +43,11 @@ final class WordPressUsersBackend extends AbstractWpdbBackend
 
     /** @var string[] Accumulated JOINs. */
     private array $joins = [];
+
+    public static function isAvailable(): bool
+    {
+        return true;
+    }
 
     public function sourceType(): string
     {
@@ -85,6 +93,15 @@ final class WordPressUsersBackend extends AbstractWpdbBackend
             new FieldSchema('nickname', 'Nickname', ColumnType::String, $allOps),
             new FieldSchema('description', 'Bio', ColumnType::String, $allOps, sortable: false),
             new FieldSchema('locale', 'Locale', ColumnType::String, $allOps),
+            // Semantic aliases.
+            new FieldSchema('created_at', 'Created At', ColumnType::Datetime, $allOps,
+                aggregatable: true, timezone: 'utc',
+                description: 'Alias for user_registered.',
+            ),
+            new FieldSchema('updated_at', 'Updated At', ColumnType::Datetime, $allOps,
+                timezone: 'utc',
+                description: 'Alias for user_registered (users have no separate updated_at).',
+            ),
         ];
 
         return new BackendSchema(
@@ -162,9 +179,10 @@ final class WordPressUsersBackend extends AbstractWpdbBackend
         $schema = [];
 
         foreach ($compiled->columnMap as $key => $expr) {
-            $schema[$key] = match ($key) {
-                'user_id', 'user_status' => ColumnType::Integer,
-                'user_registered' => ColumnType::Datetime,
+            $schema[$key] = match (true) {
+                $key === 'user_id' || $key === 'user_status' => ColumnType::Integer,
+                $key === 'user_registered' || $key === 'created_at' || $key === 'updated_at' => ColumnType::Datetime,
+                str_ends_with($key, '_bucket') => ColumnType::Datetime,
                 default => ColumnType::String,
             };
         }

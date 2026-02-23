@@ -46,6 +46,11 @@ final class ArrayBackend implements QueryBackend
     ) {
     }
 
+    public static function isAvailable(): bool
+    {
+        return true;
+    }
+
     public function sourceType(): string
     {
         return $this->sourceType;

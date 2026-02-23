@@ -44,10 +44,28 @@ final class GravityFormsBackend extends AbstractWpdbBackend
         'is_read' => 'is_read',
         'created_by' => 'created_by',
         'transaction_type' => 'transaction_type',
+        'post_id' => 'post_id',
+        'is_fulfilled' => 'is_fulfilled',
+        // Semantic aliases used by template specs.
+        'created_at' => 'date_created',
+        'updated_at' => 'date_updated',
     ];
 
-    private const DATETIME_COLUMNS = ['date_created', 'date_updated', 'payment_date'];
-    private const NUMERIC_COLUMNS = ['payment_amount', 'is_starred', 'is_read', 'created_by', 'entry_id', 'form_id'];
+    /**
+     * Virtual columns that require JOINs to other tables (not entry_meta).
+     *
+     * Maps field_key => [table_alias, column, join_sql_template].
+     */
+    private const JOINED_COLUMNS = [
+        'form_title' => [
+            'alias' => 'gf_form',
+            'column' => 'title',
+            'join' => 'INNER JOIN %sgf_form AS gf_form ON gf_form.id = e.form_id',
+        ],
+    ];
+
+    private const DATETIME_COLUMNS = ['date_created', 'date_updated', 'payment_date', 'created_at', 'updated_at'];
+    private const NUMERIC_COLUMNS = ['payment_amount', 'is_starred', 'is_read', 'created_by', 'entry_id', 'form_id', 'post_id', 'is_fulfilled'];
 
     /** @var string[] Accumulated JOIN clauses during column map building. */
     private array $joins = [];
@@ -60,6 +78,11 @@ final class GravityFormsBackend extends AbstractWpdbBackend
     ) {
         parent::__construct();
         $this->schemaProvider = $schemaProvider;
+    }
+
+    public static function isAvailable(): bool
+    {
+        return class_exists( 'GFAPI' );
     }
 
     public function sourceType(): string
@@ -100,8 +123,11 @@ final class GravityFormsBackend extends AbstractWpdbBackend
 
     protected function buildColumnMap(Query $query, BackendSchema $schema): array
     {
+        global $wpdb;
+
         $this->joins = [];
         $columnMap = [];
+        $addedJoinedTables = [];
 
         // Collect all field keys referenced in the query
         $fieldKeys = $this->collectFieldKeys($query, $schema);
@@ -109,6 +135,16 @@ final class GravityFormsBackend extends AbstractWpdbBackend
         foreach ($fieldKeys as $key) {
             if (isset(self::ENTRY_COLUMNS[$key])) {
                 $columnMap[$key] = 'e.' . self::ENTRY_COLUMNS[$key];
+            } elseif (isset(self::JOINED_COLUMNS[$key])) {
+                // Virtual column from another table (e.g. form_title from wp_gf_form)
+                $joinDef = self::JOINED_COLUMNS[$key];
+                $alias = $joinDef['alias'];
+                $columnMap[$key] = "{$alias}.{$joinDef['column']}";
+
+                if (!isset($addedJoinedTables[$alias])) {
+                    $this->joins[] = sprintf($joinDef['join'], $wpdb->prefix);
+                    $addedJoinedTables[$alias] = true;
+                }
             } else {
                 // Meta field — add a JOIN
                 $alias = $this->nextJoinAlias();
@@ -189,6 +225,9 @@ final class GravityFormsBackend extends AbstractWpdbBackend
 
         foreach ($compiled->columnMap as $key => $expr) {
             if (in_array($key, self::DATETIME_COLUMNS, true)) {
+                $schema[$key] = ColumnType::Datetime;
+            } elseif (str_ends_with($key, '_bucket') && in_array(substr($key, 0, -7), self::DATETIME_COLUMNS, true)) {
+                // Time bucket aliases (e.g. created_at_bucket) are datetime-derived.
                 $schema[$key] = ColumnType::Datetime;
             } elseif (in_array($key, self::NUMERIC_COLUMNS, true)) {
                 $schema[$key] = ColumnType::Float;
@@ -286,6 +325,17 @@ final class GravityFormsBackend extends AbstractWpdbBackend
                 $allOps,
                 aggregatable: $type !== ColumnType::String,
                 timezone: $type === ColumnType::Datetime ? 'utc' : null,
+            );
+        }
+
+        // Joined virtual columns (e.g. form_title from wp_gf_form)
+        foreach (self::JOINED_COLUMNS as $key => $joinDef) {
+            $fields[] = new FieldSchema(
+                $key,
+                ucfirst(str_replace('_', ' ', $key)),
+                ColumnType::String,
+                $allOps,
+                description: "Virtual field joined from another table.",
             );
         }
 

@@ -35,6 +35,9 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         'payment_method' => 'payment_method',
         'customer_id' => 'customer_id',
         'billing_email' => 'billing_email',
+        // Semantic aliases.
+        'created_at' => 'date_created_gmt',
+        'updated_at' => 'date_updated_gmt',
     ];
 
     /**
@@ -45,6 +48,9 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         'status' => 'post_status',
         'date_created' => 'post_date_gmt',
         'date_modified' => 'post_modified_gmt',
+        // Semantic aliases.
+        'created_at' => 'post_date_gmt',
+        'updated_at' => 'post_modified_gmt',
     ];
 
     /**
@@ -61,6 +67,9 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         'orders_count' => 'orders_count',
         'total_spent' => 'total_spent',
         'avg_order_value' => 'avg_order_value',
+        // Semantic aliases.
+        'created_at' => 'date_registered',
+        'updated_at' => 'date_last_active',
     ];
 
     /**
@@ -72,12 +81,20 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         'product_status' => 'post_status',
         'date_created' => 'post_date_gmt',
         'date_modified' => 'post_modified_gmt',
+        // Semantic aliases.
+        'created_at' => 'post_date_gmt',
+        'updated_at' => 'post_modified_gmt',
     ];
 
     /** @var string[] Accumulated JOINs. */
     private array $joins = [];
 
     private readonly HposDetector $hposDetector;
+
+    public static function isAvailable(): bool
+    {
+        return class_exists( 'WooCommerce' );
+    }
 
     public function __construct(
         ?HposDetector $hposDetector = null,
@@ -198,7 +215,8 @@ final class WooCommerceBackend extends AbstractWpdbBackend
 
         foreach ($compiled->columnMap as $key => $expr) {
             $schema[$key] = match (true) {
-                str_contains($key, 'date') => ColumnType::Datetime,
+                str_contains($key, 'date') || $key === 'created_at' || $key === 'updated_at' => ColumnType::Datetime,
+                str_ends_with($key, '_bucket') => ColumnType::Datetime,
                 str_contains($key, 'amount') || str_contains($key, 'total') || str_contains($key, 'spent')
                     || str_contains($key, 'count') || str_contains($key, 'avg') => ColumnType::Float,
                 str_contains($key, 'id') => ColumnType::Integer,
@@ -399,6 +417,15 @@ final class WooCommerceBackend extends AbstractWpdbBackend
             new FieldSchema('billing_city', 'Billing City', ColumnType::String, $allOps),
             new FieldSchema('billing_state', 'Billing State', ColumnType::String, $allOps),
             new FieldSchema('billing_country', 'Billing Country', ColumnType::String, $allOps),
+            // Semantic aliases.
+            new FieldSchema('created_at', 'Created At', ColumnType::Datetime, $allOps,
+                aggregatable: true, timezone: 'utc',
+                description: 'Alias for date_created.',
+            ),
+            new FieldSchema('updated_at', 'Updated At', ColumnType::Datetime, $allOps,
+                timezone: 'utc',
+                description: 'Alias for date_modified.',
+            ),
         ];
     }
 
@@ -411,6 +438,15 @@ final class WooCommerceBackend extends AbstractWpdbBackend
             new FieldSchema('product_status', 'Status', ColumnType::String, $allOps),
             new FieldSchema('date_created', 'Date Created', ColumnType::Datetime, $allOps, timezone: 'utc'),
             new FieldSchema('date_modified', 'Date Modified', ColumnType::Datetime, $allOps, timezone: 'utc'),
+            // Semantic aliases.
+            new FieldSchema('created_at', 'Created At', ColumnType::Datetime, $allOps,
+                timezone: 'utc',
+                description: 'Alias for date_created.',
+            ),
+            new FieldSchema('updated_at', 'Updated At', ColumnType::Datetime, $allOps,
+                timezone: 'utc',
+                description: 'Alias for date_modified.',
+            ),
         ];
     }
 
@@ -428,6 +464,15 @@ final class WooCommerceBackend extends AbstractWpdbBackend
             new FieldSchema('orders_count', 'Orders Count', ColumnType::Integer, $allOps, aggregatable: true),
             new FieldSchema('total_spent', 'Total Spent', ColumnType::Float, $allOps, aggregatable: true),
             new FieldSchema('avg_order_value', 'Avg Order Value', ColumnType::Float, $allOps, aggregatable: true),
+            // Semantic aliases.
+            new FieldSchema('created_at', 'Created At', ColumnType::Datetime, $allOps,
+                timezone: 'utc',
+                description: 'Alias for date_registered.',
+            ),
+            new FieldSchema('updated_at', 'Updated At', ColumnType::Datetime, $allOps,
+                timezone: 'utc',
+                description: 'Alias for date_last_active.',
+            ),
         ];
     }
 }

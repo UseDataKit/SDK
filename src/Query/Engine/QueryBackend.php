@@ -57,4 +57,9 @@ interface QueryBackend
      * Execute a compiled query.
      */
     public function execute(CompiledQuery $compiled): Result;
+
+    /**
+     * Whether this backend's dependencies are available in the current environment.
+     */
+    public static function isAvailable(): bool;
 }
