@@ -29,7 +29,7 @@ final class DataNotFoundException extends DataSourceException {
 		DataSource $data_source,
 		$message = 'Dataset for id not found.',
 		$code = 404,
-		Throwable $previous = null
+		?Throwable $previous = null
 	) {
 		parent::__construct( $message, $code, $previous );
 

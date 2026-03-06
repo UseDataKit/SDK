@@ -70,7 +70,7 @@ final class ArrayDataMatcherTest extends TestCase {
 	 * Test case for {@see ArrayDataMatcher::is_data_matched_by_search()}.
 	 *
 	 * @since        $ver$
-	 * @dataProvider dataprovider_for_search_match The data provider.
+	 * @dataProvider dataprovider_for_search_match
 	 */
 	public function test_is_data_matched_by_search( string $query, bool $expected_result ): void {
 		$data = [

@@ -66,7 +66,7 @@ final class SearchTest extends TestCase {
 	 * Test case for {@see Search::parse()}.
 	 *
 	 * @since        $ver$
-	 * @dataProvider dataprovider_parse The dataprovider.
+	 * @dataProvider dataprovider_parse
 	 */
 	public function test_parse( string $query, array $expected_result ): void {
 		$search = Search::from_string( $query );
