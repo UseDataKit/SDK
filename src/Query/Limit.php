@@ -9,7 +9,7 @@ namespace DataKit\DataViews\Query;
  *
  * @since $ver$
  */
-final readonly class Limit
+final class Limit
 {
     public function __construct(
         public int $limit,

@@ -11,7 +11,7 @@ namespace DataKit\DataViews\Query\Engine;
  *
  * @since $ver$
  */
-final readonly class BackendSchema
+final class BackendSchema
 {
     /**
      * @param string        $sourceType   Backend source type identifier.

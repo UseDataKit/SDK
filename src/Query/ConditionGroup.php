@@ -11,7 +11,7 @@ use DataKit\DataViews\Query\Exception\QueryValidationException;
  *
  * @since $ver$
  */
-final readonly class ConditionGroup
+final class ConditionGroup
 {
     private const MAX_NESTING_DEPTH = 5;
 

@@ -9,7 +9,7 @@ namespace DataKit\DataViews\Query;
  *
  * @since $ver$
  */
-final readonly class AggregateField
+final class AggregateField
 {
     /**
      * @param AggregateFunction $function The aggregate function.

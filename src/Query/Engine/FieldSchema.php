@@ -12,7 +12,7 @@ use DataKit\DataViews\Query\ComparisonOperator;
  *
  * @since $ver$
  */
-final readonly class FieldSchema
+final class FieldSchema
 {
     /**
      * @param string               $key          Field key.

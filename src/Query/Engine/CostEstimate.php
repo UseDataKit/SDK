@@ -9,7 +9,7 @@ namespace DataKit\DataViews\Query\Engine;
  *
  * @since $ver$
  */
-final readonly class CostEstimate
+final class CostEstimate
 {
     /**
      * @param float  $score       Normalized cost score (0.0–1.0+).

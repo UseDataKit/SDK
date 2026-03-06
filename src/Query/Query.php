@@ -13,7 +13,7 @@ use DataKit\DataViews\Query\Exception\QueryValidationException;
  *
  * @since $ver$
  */
-final readonly class Query
+final class Query
 {
     /**
      * @param Source               $source     The data source.

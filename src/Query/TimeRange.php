@@ -9,7 +9,7 @@ namespace DataKit\DataViews\Query;
  *
  * @since $ver$
  */
-final readonly class TimeRange
+final class TimeRange
 {
     /**
      * @param string          $field  The datetime field key to filter on.

@@ -9,7 +9,7 @@ namespace DataKit\DataViews\Query;
  *
  * @since $ver$
  */
-final readonly class OrderBy
+final class OrderBy
 {
     public function __construct(
         public string $field,

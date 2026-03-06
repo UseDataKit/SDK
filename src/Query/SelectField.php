@@ -9,7 +9,7 @@ namespace DataKit\DataViews\Query;
  *
  * @since $ver$
  */
-final readonly class SelectField
+final class SelectField
 {
     /**
      * @param string      $field The field key.

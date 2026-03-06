@@ -11,7 +11,7 @@ use DataKit\DataViews\Query\Exception\QueryValidationException;
  *
  * @since $ver$
  */
-final readonly class Condition
+final class Condition
 {
     /**
      * @param string             $field    The field to filter on.
