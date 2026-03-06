@@ -126,12 +126,12 @@ final class QueryTest extends TestCase
 
     public function test_source_serialization(): void
     {
-        $source = new Source('gravity_forms', 'entries', ['form_id' => [1, 2]]);
+        $source = new Source('test_backend', 'items', ['ids' => [1, 2]]);
         $array = $source->toArray();
 
-        self::assertSame('gravity_forms', $array['type']);
-        self::assertSame('entries', $array['entity']);
-        self::assertSame([1, 2], $array['scope']['form_id']);
+        self::assertSame('test_backend', $array['type']);
+        self::assertSame('items', $array['entity']);
+        self::assertSame([1, 2], $array['scope']['ids']);
 
         $restored = Source::fromArray($array);
         self::assertSame($source->type, $restored->type);
@@ -358,7 +358,7 @@ final class QueryTest extends TestCase
     public function test_browse_query(): void
     {
         $query = new Query(
-            source: new Source('gravity_forms', 'entries', ['form_id' => [1]]),
+            source: new Source('test_backend', 'items', ['id' => [1]]),
             type: QueryType::Browse,
             where: ConditionGroup::and(
                 new Condition('status', ComparisonOperator::Eq, 'active'),
@@ -371,7 +371,7 @@ final class QueryTest extends TestCase
         $array = $query->toArray();
 
         self::assertSame('browse', $array['type']);
-        self::assertSame('gravity_forms', $array['source']['type']);
+        self::assertSame('test_backend', $array['source']['type']);
         self::assertArrayHasKey('where', $array);
         self::assertArrayHasKey('orderBy', $array);
         self::assertArrayHasKey('limit', $array);
@@ -380,7 +380,7 @@ final class QueryTest extends TestCase
     public function test_aggregate_query(): void
     {
         $query = new Query(
-            source: new Source('gravity_forms', 'entries', ['form_id' => [1]]),
+            source: new Source('test_backend', 'items', ['id' => [1]]),
             type: QueryType::Aggregate,
             time: new TimeRange('created_at', preset: TimePreset::Last30Days, grain: TimeBucket::Day),
             dimensions: [new SelectField('status')],
@@ -424,7 +424,7 @@ final class QueryTest extends TestCase
     public function test_query_from_array_roundtrip(): void
     {
         $query = new Query(
-            source: new Source('gravity_forms', 'entries', ['form_id' => [1]]),
+            source: new Source('test_backend', 'items', ['id' => [1]]),
             type: QueryType::Aggregate,
             dimensions: [new SelectField('status')],
             metrics: [new AggregateField(AggregateFunction::Sum, 'amount', 'total_amount')],

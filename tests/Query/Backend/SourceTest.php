@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DataKit\DataViews\Tests\Query;
+namespace DataKit\DataViews\Tests\Query\Backend;
 
 use DataKit\DataViews\Query\Backend\WordPress\GravityForms\GravityFormsBackend;
 use DataKit\DataViews\Query\Backend\WordPress\WooCommerce\WooCommerceBackend;
