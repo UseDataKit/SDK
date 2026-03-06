@@ -9,7 +9,7 @@ use InvalidArgumentException;
  *
  * @since $ver$
  */
-final class StatusIndicatorField extends Field {
+final class StatusIndicatorField extends FilterableField {
 	/**
 	 * The indicator types.
 	 *
