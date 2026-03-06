@@ -6,6 +6,7 @@ namespace DataKit\DataViews\Query\Backend\WordPress;
 
 use DataKit\DataViews\Query\AggregateField;
 use DataKit\DataViews\Query\AggregateFunction;
+use DataKit\DataViews\Query\Exception\QueryValidationException;
 
 /**
  * Compiles AggregateFunction enums to MySQL aggregate expressions.
@@ -29,9 +30,18 @@ final class SqlAggregateCompiler
      */
     public function compile(AggregateField $metric, ?string $colExpr): string
     {
+        // SUM, AVG, MIN, MAX require a column expression.
+        // A null/empty colExpr with these functions produces invalid SQL like "SUM()".
+        if (($colExpr === null || $colExpr === '') && !in_array($metric->function, [AggregateFunction::Count, AggregateFunction::CountDistinct], true)) {
+            throw QueryValidationException::invalidValue(
+                $metric->outputName(),
+                sprintf('%s() requires a field — wildcard (*) is only valid with COUNT.', $metric->function->value),
+            );
+        }
+
         $expr = match ($metric->function) {
-            AggregateFunction::Count => $colExpr !== null ? "COUNT({$colExpr})" : 'COUNT(*)',
-            AggregateFunction::CountDistinct => "COUNT(DISTINCT {$colExpr})",
+            AggregateFunction::Count => $colExpr !== null && $colExpr !== '' ? "COUNT({$colExpr})" : 'COUNT(*)',
+            AggregateFunction::CountDistinct => $colExpr !== null && $colExpr !== '' ? "COUNT(DISTINCT {$colExpr})" : 'COUNT(*)',
             AggregateFunction::Sum => "SUM({$colExpr})",
             AggregateFunction::Avg => "AVG({$colExpr})",
             AggregateFunction::Min => "MIN({$colExpr})",

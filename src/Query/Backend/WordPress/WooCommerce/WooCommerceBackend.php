@@ -29,11 +29,14 @@ final class WooCommerceBackend extends AbstractWpdbBackend
     private const HPOS_ORDER_COLUMNS = [
         'order_id' => 'id',
         'status' => 'status',
+        'type' => 'type',
         'date_created' => 'date_created_gmt',
         'date_modified' => 'date_updated_gmt',
         'total_amount' => 'total_amount',
+        'tax_amount' => 'tax_amount',
         'currency' => 'currency',
         'payment_method' => 'payment_method',
+        'payment_method_title' => 'payment_method_title',
         'customer_id' => 'customer_id',
         'billing_email' => 'billing_email',
         // Semantic aliases.
@@ -198,7 +201,9 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         return match ($entity) {
             'orders' => (int) $wpdb->get_var(
                 "SELECT COUNT(*) FROM " . $this->hposDetector->getOrdersTable()
-                . ($this->hposDetector->isHposEnabled() ? " WHERE type = 'shop_order'" : " WHERE post_type = 'shop_order'"),
+                . ($this->hposDetector->isHposEnabled()
+                    ? " WHERE type = 'shop_order' AND status != 'trash'"
+                    : " WHERE post_type = 'shop_order' AND post_status != 'trash'"),
             ),
             'products' => (int) $wpdb->get_var(
                 "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'product' AND post_status = 'publish'",
@@ -278,13 +283,13 @@ final class WooCommerceBackend extends AbstractWpdbBackend
     {
         if ($this->hposDetector->isHposEnabled()) {
             return [
-                'clause' => "o.type = 'shop_order'",
+                'clause' => "o.type = 'shop_order' AND o.status != 'trash'",
                 'params' => [],
             ];
         }
 
         return [
-            'clause' => "o.post_type = 'shop_order'",
+            'clause' => "o.post_type = 'shop_order' AND o.post_status != 'trash'",
             'params' => [],
         ];
     }

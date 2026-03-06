@@ -13,6 +13,7 @@ use DataKit\DataViews\Query\Engine\BackendSchema;
 use DataKit\DataViews\Query\Engine\Capability;
 use DataKit\DataViews\Query\Engine\FieldSchema;
 use DataKit\DataViews\Query\Query;
+use DataKit\DataViews\Query\QueryType;
 
 /**
  * WS Form query backend.
@@ -29,7 +30,7 @@ final class WSFormBackend extends AbstractWpdbBackend
     private const SUBMIT_COLUMNS = [
         'submit_id'    => 'id',
         'form_id'      => 'form_id',
-        'date_created' => 'date_created',
+        'date_created' => 'date_added',
         'date_updated' => 'date_updated',
         'user_id'      => 'user_id',
         'status'       => 'status',
@@ -277,6 +278,23 @@ final class WSFormBackend extends AbstractWpdbBackend
      */
     private function collectFieldKeys(Query $query, BackendSchema $schema): array
     {
+        // Browse mode: select all available fields from the schema.
+        if ($query->type === QueryType::Browse) {
+            $keys = $schema->fieldNames();
+
+            if ($query->time !== null) {
+                $keys[] = $query->time->field;
+            }
+            foreach ($query->orderBy as $order) {
+                if ($schema->hasField($order->field)) {
+                    $keys[] = $order->field;
+                }
+            }
+            $this->collectConditionKeys($query->where, $keys);
+
+            return array_unique($keys);
+        }
+
         $keys = [];
 
         foreach ($query->dimensions as $dim) {
