@@ -13,6 +13,7 @@ use DataKit\DataViews\Query\Engine\Capability;
 use DataKit\DataViews\Query\Engine\FieldSchema;
 use DataKit\DataViews\Query\Query;
 use DataKit\DataViews\Query\QueryType;
+use DataKit\DataViews\Query\Source;
 
 /**
  * WooCommerce query backend supporting 3 entities: orders, products, customers.
@@ -110,6 +111,16 @@ final class WooCommerceBackend extends AbstractWpdbBackend
     public function sourceType(): string
     {
         return 'woocommerce';
+    }
+
+    /**
+     * Create a source for WooCommerce data.
+     *
+     * @param string $entity Entity name (default: 'orders').
+     * @param array  $scope  Source-specific scope (e.g. ['statuses' => ['wc-completed']]).
+     */
+    public static function source( string $entity = 'orders', array $scope = [] ): Source {
+        return new Source( 'woocommerce', $entity, $scope );
     }
 
     public function capabilities(): array

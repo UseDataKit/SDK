@@ -14,6 +14,7 @@ use DataKit\DataViews\Query\Engine\Capability;
 use DataKit\DataViews\Query\Engine\FieldSchema;
 use DataKit\DataViews\Query\Query;
 use DataKit\DataViews\Query\QueryType;
+use DataKit\DataViews\Query\Source;
 
 /**
  * WordPress Users query backend.
@@ -53,6 +54,15 @@ final class WordPressUsersBackend extends AbstractWpdbBackend
     public function sourceType(): string
     {
         return 'wordpress_users';
+    }
+
+    /**
+     * Create a source for WordPress Users.
+     *
+     * @param array $scope Source-specific scope.
+     */
+    public static function source( array $scope = [] ): Source {
+        return new Source( 'wordpress_users', 'users', $scope );
     }
 
     public function capabilities(): array

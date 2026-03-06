@@ -9,7 +9,7 @@ namespace DataKit\DataViews\Query;
  *
  * @since $ver$
  */
-final readonly class Source
+final class Source
 {
     /**
      * @param string $type   Source type identifier (e.g. "gravity_forms", "woocommerce").

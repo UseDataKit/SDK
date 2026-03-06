@@ -13,6 +13,7 @@ use DataKit\DataViews\Query\Engine\Capability;
 use DataKit\DataViews\Query\Engine\FieldSchema;
 use DataKit\DataViews\Query\Query;
 use DataKit\DataViews\Query\QueryType;
+use DataKit\DataViews\Query\Source;
 
 /**
  * Gravity Forms query backend.
@@ -89,6 +90,32 @@ final class GravityFormsBackend extends AbstractWpdbBackend
     public function sourceType(): string
     {
         return 'gravity_forms';
+    }
+
+    /**
+     * Create a source for Gravity Forms entries.
+     *
+     * @param int[]    $form_ids Form IDs to include.
+     * @param string[] $status   Entry statuses (default: ['active']).
+     */
+    public static function source( array $form_ids, array $status = [ 'active' ] ): Source {
+        return new Source( 'gravity_forms', 'entries', [
+            'form_ids' => $form_ids,
+            'status'   => $status,
+        ] );
+    }
+
+    /**
+     * Create a source for a single form's entries.
+     *
+     * @param int      $form_id Single form ID.
+     * @param string[] $status  Entry statuses (default: ['active']).
+     */
+    public static function sourceForForm( int $form_id, array $status = [ 'active' ] ): Source {
+        return new Source( 'gravity_forms', 'entries', [
+            'form_ids' => $form_id > 0 ? [ $form_id ] : [],
+            'status'   => $status,
+        ] );
     }
 
     public function capabilities(): array
