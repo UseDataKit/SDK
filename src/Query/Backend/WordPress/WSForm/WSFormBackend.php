@@ -39,7 +39,7 @@ final class WSFormBackend extends AbstractWpdbBackend
         'starred'      => 'starred',
         'viewed'       => 'viewed',
         // Semantic aliases used by template specs.
-        'created_at'   => 'date_created',
+        'created_at'   => 'date_added',
         'updated_at'   => 'date_updated',
     ];
 
