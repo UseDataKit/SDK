@@ -97,6 +97,13 @@ final class WooCommerceBackend extends AbstractWpdbBackend
      * Core fields live on the orders table; billing_period and schedule dates
      * are stored in wc_orders_meta and require LEFT JOINs.
      */
+    /**
+     * Verified against wp_wc_orders DESCRIBE output:
+     * id, status, currency, type, tax_amount, total_amount, customer_id,
+     * billing_email, date_created_gmt, date_updated_gmt, parent_order_id,
+     * payment_method, payment_method_title, transaction_id, ip_address,
+     * user_agent, customer_note.
+     */
     private const HPOS_SUBSCRIPTION_COLUMNS = [
         'subscription_id'  => 'id',
         'status'           => 'status',
@@ -105,8 +112,11 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         'date_created'     => 'date_created_gmt',
         'date_modified'    => 'date_updated_gmt',
         'total_amount'     => 'total_amount',
+        'recurring_amount' => 'total_amount',
+        'tax_amount'       => 'tax_amount',
         'currency'         => 'currency',
         'payment_method'   => 'payment_method',
+        'parent_order_id'  => 'parent_order_id',
         // Semantic aliases.
         'created_at'       => 'date_created_gmt',
         'updated_at'       => 'date_updated_gmt',
@@ -130,12 +140,19 @@ final class WooCommerceBackend extends AbstractWpdbBackend
      *
      * These fields require LEFT JOINs to the meta table.
      */
+    /**
+     * Verified against actual wp_wc_orders_meta for shop_subscription rows.
+     * Meta keys: _billing_period, _billing_interval, _schedule_start,
+     * _schedule_end, _schedule_cancelled, _schedule_next_payment, _trial_period.
+     */
     private const SUBSCRIPTION_META_KEYS = [
-        'billing_period' => '_billing_period',
-        'start_date'     => '_schedule_start',
-        'end_date'       => '_schedule_end',
-        'cancel_date'    => '_schedule_cancelled',
-        'recurring_amount' => '_order_total',
+        'billing_period'    => '_billing_period',
+        'billing_interval'  => '_billing_interval',
+        'start_date'        => '_schedule_start',
+        'end_date'          => '_schedule_end',
+        'cancel_date'       => '_schedule_cancelled',
+        'next_payment_date' => '_schedule_next_payment',
+        'trial_period'      => '_trial_period',
     ];
 
     /** @var string[] Accumulated JOINs. */
@@ -637,6 +654,15 @@ final class WooCommerceBackend extends AbstractWpdbBackend
      *
      * @return FieldSchema[]
      */
+    /**
+     * Verified against:
+     * - wp_wc_orders DESCRIBE: id, status, customer_id, billing_email,
+     *   date_created_gmt, date_updated_gmt, total_amount, tax_amount,
+     *   currency, payment_method, parent_order_id.
+     * - wp_wc_orders_meta for shop_subscription: _billing_period,
+     *   _billing_interval, _schedule_start, _schedule_end,
+     *   _schedule_cancelled, _schedule_next_payment, _trial_period.
+     */
     private function describeSubscriptionFields(array $allOps): array
     {
         return [
@@ -661,19 +687,24 @@ final class WooCommerceBackend extends AbstractWpdbBackend
                     'year'  => 'Year',
                 ],
             ),
+            new FieldSchema('billing_interval', 'Billing Interval', ColumnType::Integer, $allOps),
             new FieldSchema('start_date', 'Start Date', ColumnType::Datetime, $allOps,
                 aggregatable: true, timezone: 'utc',
             ),
             new FieldSchema('end_date', 'End Date', ColumnType::Datetime, $allOps, timezone: 'utc'),
             new FieldSchema('cancel_date', 'Cancel Date', ColumnType::Datetime, $allOps, timezone: 'utc'),
+            new FieldSchema('next_payment_date', 'Next Payment Date', ColumnType::Datetime, $allOps, timezone: 'utc'),
+            new FieldSchema('trial_period', 'Trial Period', ColumnType::String, $allOps),
             new FieldSchema('recurring_amount', 'Recurring Amount', ColumnType::Float, $allOps, aggregatable: true),
             new FieldSchema('total_amount', 'Total Amount', ColumnType::Float, $allOps, aggregatable: true),
+            new FieldSchema('tax_amount', 'Tax Amount', ColumnType::Float, $allOps, aggregatable: true),
             new FieldSchema('date_created', 'Date Created', ColumnType::Datetime, $allOps,
                 aggregatable: true, timezone: 'utc',
             ),
             new FieldSchema('date_modified', 'Date Modified', ColumnType::Datetime, $allOps, timezone: 'utc'),
             new FieldSchema('currency', 'Currency', ColumnType::String, $allOps),
             new FieldSchema('payment_method', 'Payment Method', ColumnType::String, $allOps),
+            new FieldSchema('parent_order_id', 'Parent Order ID', ColumnType::Integer, $allOps),
             // Semantic aliases.
             new FieldSchema('created_at', 'Created At', ColumnType::Datetime, $allOps,
                 aggregatable: true, timezone: 'utc',
