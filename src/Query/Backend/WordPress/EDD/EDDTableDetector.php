@@ -119,6 +119,22 @@ final class EDDTableDetector
     }
 
     /**
+     * Get the subscriptions table name.
+     *
+     * Schema: id, customer_id, product_id, price_id, period, initial_amount,
+     * recurring_amount, bill_times, transaction_id, parent_payment_id, status,
+     * created, expiration, trial_period, profile_id, notes.
+     *
+     * @return string Prefixed table name (e.g. `wp_edd_subscriptions`).
+     */
+    public function getSubscriptionsTable(): string
+    {
+        global $wpdb;
+
+        return $wpdb->prefix . 'edd_subscriptions';
+    }
+
+    /**
      * Reset cached state (for testing).
      *
      * No-op for EDD — there is no runtime detection logic to cache,

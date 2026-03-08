@@ -16,7 +16,7 @@ use DataKit\DataViews\Query\QueryType;
 use DataKit\DataViews\Query\Source;
 
 /**
- * WooCommerce query backend supporting 3 entities: orders, products, customers.
+ * WooCommerce query backend supporting 4 entities: orders, products, customers, subscriptions.
  *
  * Supports both HPOS (custom orders table) and legacy (wp_posts) modes.
  *
@@ -91,6 +91,53 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         'updated_at' => 'post_modified_gmt',
     ];
 
+    /**
+     * HPOS subscription columns on wp_wc_orders (type = 'shop_subscription').
+     *
+     * Core fields live on the orders table; billing_period and schedule dates
+     * are stored in wc_orders_meta and require LEFT JOINs.
+     */
+    private const HPOS_SUBSCRIPTION_COLUMNS = [
+        'subscription_id'  => 'id',
+        'status'           => 'status',
+        'customer_id'      => 'customer_id',
+        'billing_email'    => 'billing_email',
+        'date_created'     => 'date_created_gmt',
+        'date_modified'    => 'date_updated_gmt',
+        'total_amount'     => 'total_amount',
+        'currency'         => 'currency',
+        'payment_method'   => 'payment_method',
+        // Semantic aliases.
+        'created_at'       => 'date_created_gmt',
+        'updated_at'       => 'date_updated_gmt',
+    ];
+
+    /**
+     * Legacy subscription columns on wp_posts (post_type = 'shop_subscription').
+     */
+    private const LEGACY_SUBSCRIPTION_COLUMNS = [
+        'subscription_id'  => 'ID',
+        'status'           => 'post_status',
+        'date_created'     => 'post_date_gmt',
+        'date_modified'    => 'post_modified_gmt',
+        // Semantic aliases.
+        'created_at'       => 'post_date_gmt',
+        'updated_at'       => 'post_modified_gmt',
+    ];
+
+    /**
+     * Subscription meta keys stored in wc_orders_meta / wp_postmeta.
+     *
+     * These fields require LEFT JOINs to the meta table.
+     */
+    private const SUBSCRIPTION_META_KEYS = [
+        'billing_period' => '_billing_period',
+        'start_date'     => '_schedule_start',
+        'end_date'       => '_schedule_end',
+        'cancel_date'    => '_schedule_cancelled',
+        'recurring_amount' => '_order_total',
+    ];
+
     /** @var string[] Accumulated JOINs. */
     private array $joins = [];
 
@@ -147,10 +194,11 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         $allOps = ComparisonOperator::cases();
 
         $fields = match ($entity) {
-            'orders' => $this->describeOrderFields($allOps),
-            'products' => $this->describeProductFields($allOps),
-            'customers' => $this->describeCustomerFields($allOps),
-            default => [],
+            'orders'        => $this->describeOrderFields($allOps),
+            'products'      => $this->describeProductFields($allOps),
+            'customers'     => $this->describeCustomerFields($allOps),
+            'subscriptions' => $this->describeSubscriptionFields($allOps),
+            default         => [],
         };
 
         return new BackendSchema(
@@ -168,10 +216,11 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         $entity = $query->source->scope['entity'] ?? $query->source->entity ?: 'orders';
 
         return match ($entity) {
-            'orders' => $this->buildOrderColumnMap($query, $schema),
-            'products' => $this->buildProductColumnMap($query, $schema),
-            'customers' => $this->buildCustomerColumnMap($query, $schema),
-            default => [],
+            'orders'        => $this->buildOrderColumnMap($query, $schema),
+            'products'      => $this->buildProductColumnMap($query, $schema),
+            'customers'     => $this->buildCustomerColumnMap($query, $schema),
+            'subscriptions' => $this->buildSubscriptionColumnMap($query, $schema),
+            default         => [],
         };
     }
 
@@ -180,10 +229,11 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         $entity = $query->source->scope['entity'] ?? $query->source->entity ?: 'orders';
 
         return match ($entity) {
-            'orders' => $this->hposDetector->getOrdersTable() . ' AS o',
-            'products' => $this->getProductsTable() . ' AS o',
-            'customers' => $this->hposDetector->getCustomerLookupTable() . ' AS c',
-            default => '',
+            'orders'        => $this->hposDetector->getOrdersTable() . ' AS o',
+            'products'      => $this->getProductsTable() . ' AS o',
+            'customers'     => $this->hposDetector->getCustomerLookupTable() . ' AS c',
+            'subscriptions' => $this->hposDetector->getOrdersTable() . ' AS o',
+            default         => '',
         };
     }
 
@@ -197,10 +247,11 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         $entity = $query->source->scope['entity'] ?? $query->source->entity ?: 'orders';
 
         return match ($entity) {
-            'orders' => $this->orderScopeWhere($query),
-            'products' => $this->productScopeWhere(),
-            'customers' => ['clause' => '', 'params' => []],
-            default => ['clause' => '', 'params' => []],
+            'orders'        => $this->orderScopeWhere($query),
+            'products'      => $this->productScopeWhere(),
+            'customers'     => ['clause' => '', 'params' => []],
+            'subscriptions' => $this->subscriptionScopeWhere(),
+            default         => ['clause' => '', 'params' => []],
         };
     }
 
@@ -221,6 +272,12 @@ final class WooCommerceBackend extends AbstractWpdbBackend
             ),
             'customers' => (int) $wpdb->get_var(
                 "SELECT COUNT(*) FROM " . $this->hposDetector->getCustomerLookupTable(),
+            ),
+            'subscriptions' => (int) $wpdb->get_var(
+                "SELECT COUNT(*) FROM " . $this->hposDetector->getOrdersTable()
+                . ($this->hposDetector->isHposEnabled()
+                    ? " WHERE type = 'shop_subscription'"
+                    : " WHERE post_type = 'shop_subscription'"),
             ),
             default => null,
         };
@@ -348,6 +405,63 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         }
 
         return $columnMap;
+    }
+
+    // --- Subscription-specific ---
+
+    /**
+     * Build the column map for subscription queries.
+     *
+     * WooCommerce Subscriptions stores subscriptions as `shop_subscription`
+     * type in the orders table. Core fields come from the orders table
+     * directly; billing_period and schedule dates are stored in meta.
+     */
+    private function buildSubscriptionColumnMap(Query $query, BackendSchema $schema): array
+    {
+        $columnMap = [];
+        $fieldKeys = $this->collectAllFieldKeys($query, $schema);
+        $isHpos = $this->hposDetector->isHposEnabled();
+        $columns = $isHpos ? self::HPOS_SUBSCRIPTION_COLUMNS : self::LEGACY_SUBSCRIPTION_COLUMNS;
+
+        foreach ($fieldKeys as $key) {
+            if (isset($columns[$key])) {
+                $columnMap[$key] = 'o.' . $columns[$key];
+            } elseif (isset(self::SUBSCRIPTION_META_KEYS[$key])) {
+                // Meta field — LEFT JOIN to meta table.
+                $alias = $this->nextJoinAlias();
+                $metaTable = $this->hposDetector->getOrderMetaTable();
+                $idCol = $isHpos ? 'order_id' : 'post_id';
+                $pkCol = $isHpos ? 'id' : 'ID';
+                $metaKey = self::SUBSCRIPTION_META_KEYS[$key];
+                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.{$idCol} = o.{$pkCol} AND {$alias}.meta_key = '{$metaKey}'";
+                $columnMap[$key] = "{$alias}.meta_value";
+            } else {
+                // Arbitrary meta fallback.
+                $alias = $this->nextJoinAlias();
+                $metaTable = $this->hposDetector->getOrderMetaTable();
+                $idCol = $isHpos ? 'order_id' : 'post_id';
+                $pkCol = $isHpos ? 'id' : 'ID';
+                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.{$idCol} = o.{$pkCol} AND {$alias}.meta_key = %s";
+                $columnMap[$key] = "{$alias}.meta_value";
+            }
+        }
+
+        return $columnMap;
+    }
+
+    private function subscriptionScopeWhere(): array
+    {
+        if ($this->hposDetector->isHposEnabled()) {
+            return [
+                'clause' => "o.type = 'shop_subscription'",
+                'params' => [],
+            ];
+        }
+
+        return [
+            'clause' => "o.post_type = 'shop_subscription'",
+            'params' => [],
+        ];
     }
 
     // --- Helpers ---
@@ -508,6 +622,66 @@ final class WooCommerceBackend extends AbstractWpdbBackend
             new FieldSchema('updated_at', 'Updated At', ColumnType::Datetime, $allOps,
                 timezone: 'utc',
                 description: 'Alias for date_last_active.',
+            ),
+        ];
+    }
+
+    /**
+     * Describe all available subscription fields for the backend schema.
+     *
+     * WooCommerce Subscriptions stores subscriptions as `shop_subscription`
+     * type in the orders table. Schedule dates and billing period are
+     * stored as order meta.
+     *
+     * @param ComparisonOperator[] $allOps All available comparison operators.
+     *
+     * @return FieldSchema[]
+     */
+    private function describeSubscriptionFields(array $allOps): array
+    {
+        return [
+            new FieldSchema('subscription_id', 'Subscription ID', ColumnType::Integer, $allOps),
+            new FieldSchema('status', 'Status', ColumnType::String, $allOps,
+                enumValues: [
+                    'wc-active'         => 'Active',
+                    'wc-on-hold'        => 'On Hold',
+                    'wc-cancelled'      => 'Cancelled',
+                    'wc-expired'        => 'Expired',
+                    'wc-pending'        => 'Pending',
+                    'wc-pending-cancel' => 'Pending Cancellation',
+                ],
+            ),
+            new FieldSchema('customer_id', 'Customer ID', ColumnType::Integer, $allOps),
+            new FieldSchema('billing_email', 'Billing Email', ColumnType::String, $allOps),
+            new FieldSchema('billing_period', 'Billing Period', ColumnType::String, $allOps,
+                enumValues: [
+                    'day'   => 'Day',
+                    'week'  => 'Week',
+                    'month' => 'Month',
+                    'year'  => 'Year',
+                ],
+            ),
+            new FieldSchema('start_date', 'Start Date', ColumnType::Datetime, $allOps,
+                aggregatable: true, timezone: 'utc',
+            ),
+            new FieldSchema('end_date', 'End Date', ColumnType::Datetime, $allOps, timezone: 'utc'),
+            new FieldSchema('cancel_date', 'Cancel Date', ColumnType::Datetime, $allOps, timezone: 'utc'),
+            new FieldSchema('recurring_amount', 'Recurring Amount', ColumnType::Float, $allOps, aggregatable: true),
+            new FieldSchema('total_amount', 'Total Amount', ColumnType::Float, $allOps, aggregatable: true),
+            new FieldSchema('date_created', 'Date Created', ColumnType::Datetime, $allOps,
+                aggregatable: true, timezone: 'utc',
+            ),
+            new FieldSchema('date_modified', 'Date Modified', ColumnType::Datetime, $allOps, timezone: 'utc'),
+            new FieldSchema('currency', 'Currency', ColumnType::String, $allOps),
+            new FieldSchema('payment_method', 'Payment Method', ColumnType::String, $allOps),
+            // Semantic aliases.
+            new FieldSchema('created_at', 'Created At', ColumnType::Datetime, $allOps,
+                aggregatable: true, timezone: 'utc',
+                description: 'Alias for date_created.',
+            ),
+            new FieldSchema('updated_at', 'Updated At', ColumnType::Datetime, $allOps,
+                timezone: 'utc',
+                description: 'Alias for date_modified.',
             ),
         ];
     }

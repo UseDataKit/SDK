@@ -18,7 +18,7 @@ use DataKit\DataViews\Query\Source;
 /**
  * Easy Digital Downloads 3.0+ query backend.
  *
- * Supports three entities:
+ * Supports four entities:
  *
  * - **orders** — from `edd_orders` custom table, with optional JOINs to
  *   `edd_order_addresses` (billing fields) and `edd_ordermeta` (custom meta).
@@ -29,6 +29,9 @@ use DataKit\DataViews\Query\Source;
  *
  * - **customers** — from `edd_customers` custom table, with optional JOINs to
  *   `edd_customermeta` for custom meta fields.
+ *
+ * - **subscriptions** — from `edd_subscriptions` custom table (EDD Recurring
+ *   Payments extension). All fields are direct columns, no JOINs needed.
  *
  * Column maps and FK column names are validated against EDD 3.0 schema definitions:
  * - `edd_ordermeta.edd_order_id` (FK to edd_orders.id)
@@ -125,6 +128,35 @@ final class EDDBackend extends AbstractWpdbBackend
         'price'    => 'edd_price',
         'earnings' => '_edd_download_earnings',
         'sales'    => '_edd_download_sales',
+    ];
+
+    /**
+     * Column map for the `edd_subscriptions` table.
+     *
+     * Maps field keys used in queries to actual database column names.
+     * The EDD Recurring Payments extension stores subscriptions in a
+     * dedicated custom table with direct columns (no meta needed).
+     *
+     * @var array<string, string>
+     */
+    private const SUBSCRIPTION_COLUMNS = [
+        'subscription_id'  => 'id',
+        'customer_id'      => 'customer_id',
+        'product_id'       => 'product_id',
+        'price_id'         => 'price_id',
+        'status'           => 'status',
+        'billing_period'   => 'period',
+        'start_date'       => 'created',
+        'end_date'         => 'expiration',
+        'cancel_date'      => 'expiration',
+        'initial_amount'   => 'initial_amount',
+        'recurring_amount' => 'recurring_amount',
+        'renewal_count'    => 'bill_times',
+        'parent_payment_id' => 'parent_payment_id',
+        'profile_id'       => 'profile_id',
+        // Semantic aliases.
+        'created_at'       => 'created',
+        'updated_at'       => 'expiration',
     ];
 
     /**
@@ -246,10 +278,11 @@ final class EDDBackend extends AbstractWpdbBackend
         $allOps = ComparisonOperator::cases();
 
         $fields = match ($entity) {
-            'orders'    => $this->describeOrderFields($allOps),
-            'downloads' => $this->describeDownloadFields($allOps),
-            'customers' => $this->describeCustomerFields($allOps),
-            default     => [],
+            'orders'        => $this->describeOrderFields($allOps),
+            'downloads'     => $this->describeDownloadFields($allOps),
+            'customers'     => $this->describeCustomerFields($allOps),
+            'subscriptions' => $this->describeSubscriptionFields($allOps),
+            default         => [],
         };
 
         return new BackendSchema(
@@ -275,10 +308,11 @@ final class EDDBackend extends AbstractWpdbBackend
         $entity = $query->source->scope['entity'] ?? $query->source->entity ?: 'orders';
 
         return match ($entity) {
-            'orders'    => $this->buildOrderColumnMap($query, $schema),
-            'downloads' => $this->buildDownloadColumnMap($query, $schema),
-            'customers' => $this->buildCustomerColumnMap($query, $schema),
-            default     => [],
+            'orders'        => $this->buildOrderColumnMap($query, $schema),
+            'downloads'     => $this->buildDownloadColumnMap($query, $schema),
+            'customers'     => $this->buildCustomerColumnMap($query, $schema),
+            'subscriptions' => $this->buildSubscriptionColumnMap($query, $schema),
+            default         => [],
         };
     }
 
@@ -296,10 +330,11 @@ final class EDDBackend extends AbstractWpdbBackend
         $entity = $query->source->scope['entity'] ?? $query->source->entity ?: 'orders';
 
         return match ($entity) {
-            'orders'    => $this->tableDetector->getOrdersTable() . ' AS o',
-            'downloads' => $this->getPostsTable() . ' AS o',
-            'customers' => $this->tableDetector->getCustomersTable() . ' AS c',
-            default     => '',
+            'orders'        => $this->tableDetector->getOrdersTable() . ' AS o',
+            'downloads'     => $this->getPostsTable() . ' AS o',
+            'customers'     => $this->tableDetector->getCustomersTable() . ' AS c',
+            'subscriptions' => $this->tableDetector->getSubscriptionsTable() . ' AS o',
+            default         => '',
         };
     }
 
@@ -327,10 +362,11 @@ final class EDDBackend extends AbstractWpdbBackend
         $entity = $query->source->scope['entity'] ?? $query->source->entity ?: 'orders';
 
         return match ($entity) {
-            'orders'    => $this->orderScopeWhere($query),
-            'downloads' => $this->downloadScopeWhere(),
-            'customers' => ['clause' => '', 'params' => []],
-            default     => ['clause' => '', 'params' => []],
+            'orders'        => $this->orderScopeWhere($query),
+            'downloads'     => $this->downloadScopeWhere(),
+            'customers'     => ['clause' => '', 'params' => []],
+            'subscriptions' => ['clause' => '', 'params' => []],
+            default         => ['clause' => '', 'params' => []],
         };
     }
 
@@ -357,6 +393,9 @@ final class EDDBackend extends AbstractWpdbBackend
             ),
             'customers' => (int) $wpdb->get_var(
                 "SELECT COUNT(*) FROM " . $this->tableDetector->getCustomersTable(),
+            ),
+            'subscriptions' => (int) $wpdb->get_var(
+                "SELECT COUNT(*) FROM " . $this->tableDetector->getSubscriptionsTable(),
             ),
             default => null,
         };
@@ -574,6 +613,35 @@ final class EDDBackend extends AbstractWpdbBackend
                 $metaTable = $this->tableDetector->getCustomerMetaTable();
                 $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.edd_customer_id = c.id AND {$alias}.meta_key = %s";
                 $columnMap[$key] = "{$alias}.meta_value";
+            }
+        }
+
+        return $columnMap;
+    }
+
+    // -------------------------------------------------------------------------
+    // Subscription entity
+    // -------------------------------------------------------------------------
+
+    /**
+     * Build the column map for subscription queries.
+     *
+     * All subscription fields are direct columns on `edd_subscriptions` —
+     * no JOINs are needed.
+     *
+     * @param Query         $query  The query being compiled.
+     * @param BackendSchema $schema The entity schema for field discovery.
+     *
+     * @return array<string, string> Field key → SQL expression map.
+     */
+    private function buildSubscriptionColumnMap(Query $query, BackendSchema $schema): array
+    {
+        $columnMap = [];
+        $fieldKeys = $this->collectAllFieldKeys($query, $schema);
+
+        foreach ($fieldKeys as $key) {
+            if (isset(self::SUBSCRIPTION_COLUMNS[$key])) {
+                $columnMap[$key] = 'o.' . self::SUBSCRIPTION_COLUMNS[$key];
             }
         }
 
@@ -830,6 +898,64 @@ final class EDDBackend extends AbstractWpdbBackend
             new FieldSchema('updated_at', 'Updated At', ColumnType::Datetime, $allOps,
                 timezone: 'utc',
                 description: 'Alias for date_modified.',
+            ),
+        ];
+    }
+
+    /**
+     * Describe all available subscription fields for the backend schema.
+     *
+     * Maps directly to `edd_subscriptions` table columns. The EDD Recurring
+     * Payments extension stores subscriptions in a dedicated custom table.
+     *
+     * @param ComparisonOperator[] $allOps All available comparison operators.
+     *
+     * @return FieldSchema[]
+     */
+    private function describeSubscriptionFields(array $allOps): array
+    {
+        return [
+            new FieldSchema('subscription_id', 'Subscription ID', ColumnType::Integer, $allOps),
+            new FieldSchema('customer_id', 'Customer ID', ColumnType::Integer, $allOps),
+            new FieldSchema('product_id', 'Product ID', ColumnType::Integer, $allOps),
+            new FieldSchema('price_id', 'Price ID', ColumnType::Integer, $allOps),
+            new FieldSchema('status', 'Status', ColumnType::String, $allOps,
+                enumValues: [
+                    'active'    => 'Active',
+                    'pending'   => 'Pending',
+                    'cancelled' => 'Cancelled',
+                    'expired'   => 'Expired',
+                    'trialling' => 'Trialling',
+                    'failing'   => 'Failing',
+                    'completed' => 'Completed',
+                ],
+            ),
+            new FieldSchema('billing_period', 'Billing Period', ColumnType::String, $allOps,
+                enumValues: [
+                    'day'   => 'Day',
+                    'week'  => 'Week',
+                    'month' => 'Month',
+                    'year'  => 'Year',
+                ],
+            ),
+            new FieldSchema('start_date', 'Start Date', ColumnType::Datetime, $allOps,
+                aggregatable: true, timezone: 'utc',
+            ),
+            new FieldSchema('end_date', 'End Date', ColumnType::Datetime, $allOps, timezone: 'utc'),
+            new FieldSchema('cancel_date', 'Cancel Date', ColumnType::Datetime, $allOps, timezone: 'utc'),
+            new FieldSchema('initial_amount', 'Initial Amount', ColumnType::Float, $allOps, aggregatable: true),
+            new FieldSchema('recurring_amount', 'Recurring Amount', ColumnType::Float, $allOps, aggregatable: true),
+            new FieldSchema('renewal_count', 'Renewal Count', ColumnType::Integer, $allOps, aggregatable: true),
+            new FieldSchema('parent_payment_id', 'Parent Payment ID', ColumnType::Integer, $allOps),
+            new FieldSchema('profile_id', 'Profile ID', ColumnType::String, $allOps),
+            // Semantic aliases.
+            new FieldSchema('created_at', 'Created At', ColumnType::Datetime, $allOps,
+                aggregatable: true, timezone: 'utc',
+                description: 'Alias for start_date (created column).',
+            ),
+            new FieldSchema('updated_at', 'Updated At', ColumnType::Datetime, $allOps,
+                timezone: 'utc',
+                description: 'Alias for end_date (expiration column).',
             ),
         ];
     }
