@@ -69,7 +69,11 @@ final class QueryEngine
         $query->validate();
 
         // 3. Get schema and validate fields
-        $schema = $backend->describe($query->source->scope);
+        $describeScope = $query->source->scope;
+        if ($query->source->entity !== '' && !isset($describeScope['entity'])) {
+            $describeScope['entity'] = $query->source->entity;
+        }
+        $schema = $backend->describe($describeScope);
         $this->validateFields($query, $schema);
         $this->validateCapabilities($query, $backend);
 
