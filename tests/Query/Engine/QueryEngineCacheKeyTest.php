@@ -83,9 +83,9 @@ final class QueryEngineCacheKeyTest extends TestCase
 
         $key = $keys[0];
         self::assertStringContainsString(
-            'form_42',
+            'form_id_42',
             $key,
-            'Cache key must contain form_id so deleteByTag("form_42") can invalidate it.',
+            'Cache key must contain form_id so deleteByTag("form_id_42") can invalidate it.',
         );
     }
 
@@ -141,12 +141,12 @@ final class QueryEngineCacheKeyTest extends TestCase
         self::assertSame(2, $this->cache->count());
 
         // Invalidate only form 1.
-        $this->cache->deleteByTag('form_1');
+        $this->cache->deleteByTag('form_id_1');
 
         self::assertSame(1, $this->cache->count(), 'Only form 2 entry should remain.');
 
         $remainingKey = $this->cache->keys()[0];
-        self::assertStringContainsString('form_2', $remainingKey);
+        self::assertStringContainsString('form_id_2', $remainingKey);
     }
 
     public function test_different_source_types_produce_different_cache_keys(): void

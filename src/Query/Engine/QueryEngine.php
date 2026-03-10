@@ -417,25 +417,26 @@ final class QueryEngine
     /**
      * Build a versioned cache key.
      *
-     * Embeds the source type and scope identifiers (e.g. form IDs) so that
-     * tag-based invalidation via CacheProvider::deleteByTag() can match
-     * entries by substring.
+     * Embeds the source type and all scope identifiers so that tag-based
+     * invalidation via CacheProvider::deleteByTag() can match entries
+     * by substring for any source type.
      */
     private function cacheKey(QueryBackend $backend, Query $query): ?string
     {
-        $tags = $query->source->type;
+        $prefix = $query->source->type;
 
-        // Append form-specific tags for Gravity Forms scope.
-        $formIds = $query->source->scope['form_ids'] ?? $query->source->scope['form_id'] ?? [];
-
-        if (!is_array($formIds)) {
-            $formIds = [$formIds];
+        // Flatten all scope key-value pairs into the key so deleteByTag
+        // works generically (e.g. "form_id_42", "shop_id_5").
+        foreach ($query->source->scope as $key => $value) {
+            if (is_array($value)) {
+                foreach ($value as $v) {
+                    $prefix .= '_' . $key . '_' . $v;
+                }
+            } else {
+                $prefix .= '_' . $key . '_' . $value;
+            }
         }
 
-        foreach ($formIds as $formId) {
-            $tags .= '_form_' . (int) $formId;
-        }
-
-        return sprintf('%s_%d_%s', $tags, $backend->schemaVersion(), $query->hash());
+        return sprintf('%s_%d_%s', $prefix, $backend->schemaVersion(), $query->hash());
     }
 }
