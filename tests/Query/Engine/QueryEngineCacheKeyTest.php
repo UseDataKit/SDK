@@ -71,7 +71,7 @@ final class QueryEngineCacheKeyTest extends TestCase
     public function test_cache_key_contains_form_id_for_gravity_forms(): void
     {
         $query = new Query(
-            source: Source::gravityFormsEntry(42),
+            source: new Source('gravity_forms', 'entries', ['form_id' => 42]),
             type: QueryType::Aggregate,
             metrics: [new AggregateField(AggregateFunction::Count, 'id', 'count')],
         );
@@ -124,13 +124,13 @@ final class QueryEngineCacheKeyTest extends TestCase
     {
         // Cache results for two different forms.
         $form1Query = new Query(
-            source: Source::gravityFormsEntry(1),
+            source: new Source('gravity_forms', 'entries', ['form_id' => 1]),
             type: QueryType::Aggregate,
             metrics: [new AggregateField(AggregateFunction::Count, 'id', 'count')],
         );
 
         $form2Query = new Query(
-            source: Source::gravityFormsEntry(2),
+            source: new Source('gravity_forms', 'entries', ['form_id' => 2]),
             type: QueryType::Aggregate,
             metrics: [new AggregateField(AggregateFunction::Count, 'id', 'count')],
         );
