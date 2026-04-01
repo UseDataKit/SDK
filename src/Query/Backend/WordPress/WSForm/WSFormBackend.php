@@ -209,8 +209,10 @@ final class WSFormBackend extends AbstractWpdbBackend
             $columnType = $this->inferColumnType($fieldType);
             $aggregatable = in_array($columnType, [ColumnType::Integer, ColumnType::Float], true);
 
+            // Prefix with "field:" to prevent PHP int-casting numeric string keys.
+            // buildColumnMap strips this prefix when building the meta JOIN.
             $fields[] = new FieldSchema(
-                $fieldId,
+                'field:' . $fieldId,
                 $label,
                 $columnType,
                 $allOps,
@@ -248,8 +250,14 @@ final class WSFormBackend extends AbstractWpdbBackend
 
             if (isset(self::SUBMIT_COLUMNS[$key])) {
                 $columnMap[$key] = 's.' . self::SUBMIT_COLUMNS[$key];
-            } else {
-                // Form field meta — add a JOIN keyed by field_id.
+            } elseif (str_starts_with($key, 'field:')) {
+                // Form field with "field:" prefix — strip prefix for the meta JOIN.
+                $numericId = substr($key, 6);
+                $alias = $this->nextJoinAlias();
+                $this->addMetaJoin($alias, $numericId);
+                $columnMap[$key] = "{$alias}.meta_value";
+            } elseif (ctype_digit($key)) {
+                // Legacy bare numeric field ID (from query dimensions/filters).
                 $alias = $this->nextJoinAlias();
                 $this->addMetaJoin($alias, $key);
                 $columnMap[$key] = "{$alias}.meta_value";
