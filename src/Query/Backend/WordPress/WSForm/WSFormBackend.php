@@ -184,8 +184,9 @@ final class WSFormBackend extends AbstractWpdbBackend
             $params[] = (int) $formIds;
         }
 
-        // Default status filter (exclude trashed).
-        $clauses[] = "s.status IN ('publish')";
+        // Default status filter — include all non-trashed submissions.
+        // WS Form uses 'publish' for submitted, 'draft' for in-progress.
+        $clauses[] = "s.status NOT IN ('trash')";
 
         return [
             'clause' => implode(' AND ', $clauses),
@@ -237,7 +238,7 @@ final class WSFormBackend extends AbstractWpdbBackend
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
         $count = $wpdb->get_var(
             $wpdb->prepare(
-                "SELECT COUNT(*) FROM {$table} WHERE form_id IN ({$placeholders}) AND status = 'publish'",
+                "SELECT COUNT(*) FROM {$table} WHERE form_id IN ({$placeholders}) AND status NOT IN ('trash')",
                 ...$formIds,
             ),
         );
