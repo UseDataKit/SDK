@@ -184,9 +184,18 @@ final class WSFormBackend extends AbstractWpdbBackend
             $params[] = (int) $formIds;
         }
 
-        // Default status filter — include all non-trashed submissions.
+        // Status filtering with cross-plugin normalization.
         // WS Form uses 'publish' for submitted, 'draft' for in-progress.
-        $clauses[] = "s.status NOT IN ('trash')";
+        // Normalize GF's 'active' to WS Form's 'publish'.
+        $scopeStatuses = $query->source->scope['status'] ?? [];
+        if (is_array($scopeStatuses) && $scopeStatuses !== []) {
+            $normalized = array_map(static fn(string $s) => $s === 'active' ? 'publish' : $s, $scopeStatuses);
+            $placeholders = implode(', ', array_fill(0, count($normalized), '%s'));
+            $clauses[] = "s.status IN ({$placeholders})";
+            $params = array_merge($params, $normalized);
+        } else {
+            $clauses[] = "s.status NOT IN ('trash')";
+        }
 
         return [
             'clause' => implode(' AND ', $clauses),
