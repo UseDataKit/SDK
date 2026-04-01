@@ -25,6 +25,9 @@ final class FieldSchema
      * @param bool                 $filterable   Whether the field supports WHERE conditions.
      * @param bool                 $aggregatable Whether the field can be used in aggregate functions.
      * @param string|null          $timezone     Timezone info: 'utc', 'local', or null (assumed UTC).
+     * @param string[]             $aliases      Alternative names that resolve to this field
+     *                                           (e.g. 'created_at' as alias for 'date_created').
+     *                                           Aliases pass validation but don't appear in browse output.
      */
     public function __construct(
         public string $key,
@@ -37,6 +40,7 @@ final class FieldSchema
         public bool $filterable = true,
         public bool $aggregatable = false,
         public ?string $timezone = null,
+        public array $aliases = [],
     ) {
     }
 

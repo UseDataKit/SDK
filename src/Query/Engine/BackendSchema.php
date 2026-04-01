@@ -43,7 +43,7 @@ final class BackendSchema
     public function hasField(string $key): bool
     {
         foreach ($this->fields as $field) {
-            if ($field->key === $key) {
+            if ($field->key === $key || in_array($key, $field->aliases, true)) {
                 return true;
             }
         }
@@ -54,7 +54,7 @@ final class BackendSchema
     public function getField(string $key): ?FieldSchema
     {
         foreach ($this->fields as $field) {
-            if ($field->key === $key) {
+            if ($field->key === $key || in_array($key, $field->aliases, true)) {
                 return $field;
             }
         }

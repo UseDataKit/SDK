@@ -119,10 +119,10 @@ final class WSFormBackend extends AbstractWpdbBackend
             new FieldSchema('submit_id', 'Submission ID', ColumnType::Integer, $allOps, aggregatable: true),
             new FieldSchema('form_id', 'Form ID', ColumnType::Integer, $allOps),
             new FieldSchema('date_created', 'Date Created', ColumnType::Datetime, $allOps,
-                aggregatable: true, timezone: 'utc',
+                aggregatable: true, timezone: 'utc', aliases: ['created_at'],
             ),
             new FieldSchema('date_updated', 'Date Updated', ColumnType::Datetime, $allOps,
-                aggregatable: true, timezone: 'utc',
+                aggregatable: true, timezone: 'utc', aliases: ['updated_at'],
             ),
             new FieldSchema('user_id', 'User ID', ColumnType::Integer, $allOps),
             new FieldSchema('status', 'Status', ColumnType::String, $allOps,
@@ -142,15 +142,6 @@ final class WSFormBackend extends AbstractWpdbBackend
             ),
             new FieldSchema('viewed', 'Viewed', ColumnType::Integer, $allOps,
                 enumValues: ['0' => 'No', '1' => 'Yes'],
-            ),
-            // Semantic aliases.
-            new FieldSchema('created_at', 'Created At', ColumnType::Datetime, $allOps,
-                aggregatable: true, timezone: 'utc',
-                description: 'Alias for date_created.',
-            ),
-            new FieldSchema('updated_at', 'Updated At', ColumnType::Datetime, $allOps,
-                timezone: 'utc',
-                description: 'Alias for date_updated.',
             ),
         ];
     }
