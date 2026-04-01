@@ -244,6 +244,8 @@ final class WSFormBackend extends AbstractWpdbBackend
         $fieldKeys = $this->collectFieldKeys($query, $schema);
 
         foreach ($fieldKeys as $key) {
+            $key = (string) $key;
+
             if (isset(self::SUBMIT_COLUMNS[$key])) {
                 $columnMap[$key] = 's.' . self::SUBMIT_COLUMNS[$key];
             } else {
@@ -362,6 +364,8 @@ final class WSFormBackend extends AbstractWpdbBackend
         $schema = [];
 
         foreach ($compiled->columnMap as $key => $expr) {
+            $key = (string) $key;
+
             if (in_array($key, self::DATETIME_COLUMNS, true)) {
                 $schema[$key] = ColumnType::Datetime;
             } elseif (str_ends_with($key, '_bucket') && in_array(substr($key, 0, -7), self::DATETIME_COLUMNS, true)) {
