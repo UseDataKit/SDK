@@ -211,9 +211,16 @@ abstract class AbstractWpdbBackend implements QueryBackend
             $select[] = $this->aggregateCompiler->compile($metric, $colExpr);
         }
 
-        // Browse mode — select all mapped fields if no explicit dimensions
+        // Browse mode — select all mapped fields if no explicit dimensions.
+        // Skip aliases that resolve to a column already selected (e.g.
+        // created_at → date_created, updated_at → date_updated).
         if ($query->type === QueryType::Browse && $select === []) {
+            $seenExprs = [];
             foreach ($columnMap as $key => $expr) {
+                if (isset($seenExprs[$expr])) {
+                    continue;
+                }
+                $seenExprs[$expr] = true;
                 $select[] = "{$expr} AS `{$key}`";
             }
         }
