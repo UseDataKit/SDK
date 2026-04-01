@@ -84,9 +84,38 @@ final class WSFormBackend extends AbstractWpdbBackend
 
     public function describe(array $scope): BackendSchema
     {
+        $fields = $this->getSystemFieldSchemas();
+
+        // Discover form-specific fields when form_ids are in scope.
+        $formIds = $scope['form_id'] ?? $scope['form_ids'] ?? [];
+        if (!is_array($formIds)) {
+            $formIds = [$formIds];
+        }
+
+        foreach ($formIds as $formId) {
+            $formFields = $this->discoverFormFields((int) $formId);
+            $fields = array_merge($fields, $formFields);
+        }
+
+        return new BackendSchema(
+            'ws_form',
+            'WS Form Submissions',
+            'WS Form submissions with form field metadata.',
+            $this->capabilities(),
+            $fields,
+        );
+    }
+
+    /**
+     * System columns on wsf_submit that are always available.
+     *
+     * @return FieldSchema[]
+     */
+    private function getSystemFieldSchemas(): array
+    {
         $allOps = ComparisonOperator::cases();
 
-        $fields = [
+        return [
             new FieldSchema('submit_id', 'Submission ID', ColumnType::Integer, $allOps, aggregatable: true),
             new FieldSchema('form_id', 'Form ID', ColumnType::Integer, $allOps),
             new FieldSchema('date_created', 'Date Created', ColumnType::Datetime, $allOps,
@@ -124,14 +153,87 @@ final class WSFormBackend extends AbstractWpdbBackend
                 description: 'Alias for date_updated.',
             ),
         ];
+    }
 
-        return new BackendSchema(
-            'ws_form',
-            'WS Form Submissions',
-            'WS Form submissions with form field metadata.',
-            $this->capabilities(),
-            $fields,
+    /**
+     * Discover form-specific fields from the wsf_field table.
+     *
+     * @param int $formId WS Form form ID.
+     *
+     * @return FieldSchema[]
+     */
+    private function discoverFormFields(int $formId): array
+    {
+        global $wpdb;
+
+        $prefix = $wpdb->prefix . 'wsf_';
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT f.id AS field_id, f.label, f.type
+                FROM {$prefix}field AS f
+                INNER JOIN {$prefix}section AS sec ON f.section_id = sec.id
+                INNER JOIN {$prefix}group AS g ON sec.group_id = g.id
+                WHERE g.form_id = %d
+                ORDER BY g.sort_index, sec.sort_index, f.sort_index",
+                $formId
+            ),
+            ARRAY_A
         );
+
+        if (empty($rows)) {
+            return [];
+        }
+
+        $allOps = ComparisonOperator::cases();
+        $fields = [];
+        $excludedTypes = [
+            'html', 'divider', 'spacer', 'message', 'note',
+            'submit', 'save', 'reset', 'clear',
+            'tab_previous', 'tab_next', 'button',
+            'section_add', 'section_delete', 'section_up', 'section_down', 'section_icons',
+            'recaptcha', 'hcaptcha', 'turnstile',
+            'progress', 'meter', 'googleroute',
+        ];
+
+        foreach ($rows as $row) {
+            $fieldType = $row['type'] ?? '';
+            $fieldId = (string) ($row['field_id'] ?? '');
+            $label = $row['label'] ?? 'Field ' . $fieldId;
+
+            if ($fieldId === '' || in_array($fieldType, $excludedTypes, true)) {
+                continue;
+            }
+
+            $columnType = $this->inferColumnType($fieldType);
+            $aggregatable = in_array($columnType, [ColumnType::Integer, ColumnType::Float], true);
+
+            $fields[] = new FieldSchema(
+                $fieldId,
+                $label,
+                $columnType,
+                $allOps,
+                aggregatable: $aggregatable,
+                description: "Form field: {$fieldType}",
+            );
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Infer the ColumnType for a WS Form field type.
+     */
+    private function inferColumnType(string $fieldType): ColumnType
+    {
+        return match ($fieldType) {
+            'number', 'range', 'rating', 'quantity' => ColumnType::Float,
+            'price', 'price_select', 'price_checkbox', 'price_radio',
+            'price_range', 'price_subtotal', 'cart_price', 'cart_total' => ColumnType::Float,
+            'datetime' => ColumnType::Datetime,
+            default => ColumnType::String,
+        };
     }
 
     protected function buildColumnMap(Query $query, BackendSchema $schema): array
