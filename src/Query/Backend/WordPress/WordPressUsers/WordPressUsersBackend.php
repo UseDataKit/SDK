@@ -205,7 +205,7 @@ final class WordPressUsersBackend extends AbstractWpdbBackend
     {
         global $wpdb;
 
-        $this->joins[] = "LEFT JOIN {$wpdb->usermeta} AS {$alias} ON {$alias}.user_id = u.ID AND {$alias}.meta_key = %s";
+        $this->joins[] = "LEFT JOIN {$wpdb->usermeta} AS {$alias} ON {$alias}.user_id = u.ID AND {$alias}.meta_key = '{$metaKey}'";
     }
 
     private function collectAllFieldKeys(Query $query, BackendSchema $schema): array
