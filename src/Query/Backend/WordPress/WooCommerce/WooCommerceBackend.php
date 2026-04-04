@@ -479,7 +479,7 @@ final class WooCommerceBackend extends AbstractWpdbBackend
                 $metaTable = $this->hposDetector->getOrderMetaTable();
                 $idCol = $isHpos ? 'order_id' : 'post_id';
                 $pkCol = $isHpos ? 'id' : 'ID';
-                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.{$idCol} = o.{$pkCol} AND {$alias}.meta_key = %s";
+                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.{$idCol} = o.{$pkCol} AND {$alias}.meta_key = '{$key}'";
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }

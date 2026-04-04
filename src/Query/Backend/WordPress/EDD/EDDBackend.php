@@ -488,7 +488,7 @@ final class EDDBackend extends AbstractWpdbBackend
                 // Custom meta field via edd_ordermeta.
                 $alias = $this->nextJoinAlias();
                 $metaTable = $this->tableDetector->getOrderMetaTable();
-                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.edd_order_id = o.id AND {$alias}.meta_key = %s";
+                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.edd_order_id = o.id AND {$alias}.meta_key = '{$key}'";
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }
@@ -574,7 +574,7 @@ final class EDDBackend extends AbstractWpdbBackend
             } else {
                 // Arbitrary postmeta fallback.
                 $alias = $this->nextJoinAlias();
-                $this->joins[] = "LEFT JOIN {$this->getPostMetaTable()} AS {$alias} ON {$alias}.post_id = o.ID AND {$alias}.meta_key = %s";
+                $this->joins[] = "LEFT JOIN {$this->getPostMetaTable()} AS {$alias} ON {$alias}.post_id = o.ID AND {$alias}.meta_key = '{$key}'";
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }
@@ -626,7 +626,7 @@ final class EDDBackend extends AbstractWpdbBackend
                 // Customer meta via edd_customermeta.
                 $alias = $this->nextJoinAlias();
                 $metaTable = $this->tableDetector->getCustomerMetaTable();
-                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.edd_customer_id = c.id AND {$alias}.meta_key = %s";
+                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.edd_customer_id = c.id AND {$alias}.meta_key = '{$key}'";
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }
