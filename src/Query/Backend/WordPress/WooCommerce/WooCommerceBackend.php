@@ -155,6 +155,21 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         'trial_period'      => '_trial_period',
     ];
 
+    /**
+     * Product meta keys stored in wp_postmeta.
+     *
+     * These fields require LEFT JOINs to the postmeta table.
+     */
+    private const PRODUCT_META_KEYS = [
+        'total_sales' => 'total_sales',
+        '_price'      => '_price',
+        '_regular_price' => '_regular_price',
+        '_sale_price' => '_sale_price',
+        '_sku'        => '_sku',
+        '_stock'      => '_stock',
+        '_stock_status' => '_stock_status',
+    ];
+
     /** @var string[] Accumulated JOINs. */
     private array $joins = [];
 
@@ -389,10 +404,16 @@ final class WooCommerceBackend extends AbstractWpdbBackend
         foreach ($fieldKeys as $key) {
             if (isset(self::PRODUCT_COLUMNS[$key])) {
                 $columnMap[$key] = 'o.' . self::PRODUCT_COLUMNS[$key];
-            } else {
-                // Meta via product_meta_lookup or postmeta
+            } elseif (isset(self::PRODUCT_META_KEYS[$key])) {
+                // Known meta field — LEFT JOIN to postmeta with literal meta_key.
                 $alias = $this->nextJoinAlias();
-                $this->joins[] = "LEFT JOIN {$this->getPostMetaTable()} AS {$alias} ON {$alias}.post_id = o.ID AND {$alias}.meta_key = %s";
+                $metaKey = self::PRODUCT_META_KEYS[$key];
+                $this->joins[] = "LEFT JOIN {$this->getPostMetaTable()} AS {$alias} ON {$alias}.post_id = o.ID AND {$alias}.meta_key = '{$metaKey}'";
+                $columnMap[$key] = "{$alias}.meta_value";
+            } else {
+                // Arbitrary meta fallback — use field key as meta_key directly.
+                $alias = $this->nextJoinAlias();
+                $this->joins[] = "LEFT JOIN {$this->getPostMetaTable()} AS {$alias} ON {$alias}.post_id = o.ID AND {$alias}.meta_key = '{$key}'";
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }
@@ -603,6 +624,14 @@ final class WooCommerceBackend extends AbstractWpdbBackend
             new FieldSchema('product_id', 'Product ID', ColumnType::Integer, $allOps),
             new FieldSchema('product_name', 'Product Name', ColumnType::String, $allOps),
             new FieldSchema('product_status', 'Status', ColumnType::String, $allOps),
+            new FieldSchema('total_sales', 'Total Sales', ColumnType::Integer, $allOps,
+                aggregatable: true,
+                description: 'Lifetime unit sales count from _total_sales postmeta.',
+            ),
+            new FieldSchema('_price', 'Price', ColumnType::Float, $allOps,
+                aggregatable: true,
+                description: 'Regular product price from _price postmeta.',
+            ),
             new FieldSchema('date_created', 'Date Created', ColumnType::Datetime, $allOps, timezone: 'utc'),
             new FieldSchema('date_modified', 'Date Modified', ColumnType::Datetime, $allOps, timezone: 'utc'),
             // Semantic aliases.
