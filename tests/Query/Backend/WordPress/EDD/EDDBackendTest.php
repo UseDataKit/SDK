@@ -364,7 +364,8 @@ final class EDDBackendTest extends TestCase
         $joinsStr = implode(' ', $compiled->joins);
         self::assertStringContainsString('wp_edd_ordermeta', $joinsStr);
         self::assertStringContainsString('edd_order_id = o.id', $joinsStr);
-        self::assertStringContainsString('meta_key = %s', $joinsStr);
+        self::assertStringContainsString("meta_key = 'custom_meta_key'", $joinsStr);
+        self::assertStringNotContainsString('meta_key = %s', $joinsStr);
     }
 
     public function test_order_semantic_aliases_map_correctly(): void
@@ -452,7 +453,8 @@ final class EDDBackendTest extends TestCase
 
         $joinsStr = implode(' ', $compiled->joins);
         self::assertStringContainsString('wp_postmeta', $joinsStr);
-        self::assertStringContainsString('meta_key = %s', $joinsStr);
+        self::assertStringContainsString("meta_key = 'some_custom_meta'", $joinsStr);
+        self::assertStringNotContainsString('meta_key = %s', $joinsStr);
     }
 
     public function test_download_semantic_aliases(): void
@@ -505,7 +507,8 @@ final class EDDBackendTest extends TestCase
         $joinsStr = implode(' ', $compiled->joins);
         self::assertStringContainsString('wp_edd_customermeta', $joinsStr);
         self::assertStringContainsString('edd_customer_id = c.id', $joinsStr);
-        self::assertStringContainsString('meta_key = %s', $joinsStr);
+        self::assertStringContainsString("meta_key = 'custom_field'", $joinsStr);
+        self::assertStringNotContainsString('meta_key = %s', $joinsStr);
     }
 
     public function test_customer_no_joins_for_direct_columns(): void
