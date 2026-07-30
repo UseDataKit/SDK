@@ -15,24 +15,35 @@ use DataKit\DataViews\Query\Engine\FieldSchema;
  *
  * @since $ver$
  */
-final class GravityFormsSchemaProvider
+final class GravityFormsSchemaProvider implements FormSchemaProvider
 {
+    /**
+     * Gravity Forms field types that hold no submitted answer.
+     *
+     * @var string[]
+     */
+    private const EXCLUDED_FIELD_TYPES = [
+        'html', 'section', 'page', 'captcha', 'honeypot',
+    ];
+
+    private GravityFormsFormRepository $forms;
+
+    public function __construct(?GravityFormsFormRepository $forms = null)
+    {
+        $this->forms = $forms ?? new GFAPIFormRepository();
+    }
+
     /**
      * Describe the schema for a given scope (form_ids).
      */
     public function describe(array $scope): BackendSchema
     {
-        $formIds = $scope['form_id'] ?? $scope['form_ids'] ?? [];
-
-        if (!is_array($formIds)) {
-            $formIds = [$formIds];
-        }
-
         $fields = $this->getSystemFields();
 
-        foreach ($formIds as $formId) {
-            $formFields = $this->discoverFormFields((int) $formId);
-            $fields = array_merge($fields, $formFields);
+        foreach ($this->scopeFormIds($scope) as $formId) {
+            foreach ($this->discoverFormFields($formId) as $field) {
+                $fields[] = $field;
+            }
         }
 
         return new BackendSchema(
@@ -42,6 +53,25 @@ final class GravityFormsSchemaProvider
             $this->getCapabilities(),
             $fields,
         );
+    }
+
+    /**
+     * @return int[]
+     */
+    private function scopeFormIds(array $scope): array
+    {
+        $formIds = $scope['form_ids'] ?? $scope['form_id'] ?? [];
+
+        if (!is_array($formIds)) {
+            $formIds = [$formIds];
+        }
+
+        $formIds = array_filter(
+            array_map('intval', $formIds),
+            static fn (int $id): bool => $id > 0,
+        );
+
+        return array_values(array_unique($formIds));
     }
 
     /**
@@ -78,7 +108,7 @@ final class GravityFormsSchemaProvider
             new FieldSchema('transaction_type', 'Transaction Type', ColumnType::String, $allOps),
             new FieldSchema('post_id', 'Post ID', ColumnType::Integer, $allOps),
             new FieldSchema('is_fulfilled', 'Fulfilled', ColumnType::Boolean, $allOps),
-            new FieldSchema('form_title', 'Form Title', ColumnType::String, $allOps,
+            new FieldSchema('form_title', 'Form title', ColumnType::String, $allOps,
                 description: 'Title of the form (joined from wp_gf_form).',
             ),
         ];
@@ -91,13 +121,9 @@ final class GravityFormsSchemaProvider
      */
     private function discoverFormFields(int $formId): array
     {
-        if (!class_exists('\GFAPI')) {
-            return [];
-        }
+        $form = $this->forms->getForm($formId);
 
-        $form = \GFAPI::get_form($formId);
-
-        if (!$form || !isset($form['fields'])) {
+        if ($form === null || !isset($form['fields']) || !is_iterable($form['fields'])) {
             return [];
         }
 
@@ -105,19 +131,29 @@ final class GravityFormsSchemaProvider
         $allOps = ComparisonOperator::cases();
 
         foreach ($form['fields'] as $field) {
-            $fieldId = (string) ($field->id ?? '');
-            $label = $field->label ?? 'Field ' . $fieldId;
-            $type = $field->type ?? 'text';
+            $fieldId = (string) ($this->property($field, 'id') ?? '');
+            $type = (string) ($this->property($field, 'type') ?? 'text');
 
-            // Multi-input fields (name, address) — expand sub-fields
-            if ($this->isMultiInputField($type) && !empty($field->inputs)) {
-                foreach ($field->inputs as $input) {
-                    $inputId = (string) ($input['id'] ?? '');
-                    $inputLabel = $label . ' (' . ($input['label'] ?? $inputId) . ')';
+            if ($fieldId === '' || in_array($type, self::EXCLUDED_FIELD_TYPES, true)) {
+                continue;
+            }
+
+            $label = (string) ($this->property($field, 'label') ?? ('Field ' . $fieldId));
+            $inputs = $this->property($field, 'inputs');
+
+            // Multi-input fields (name, address) store one meta row per input,
+            // so the sub-input ID is the queryable key, not the parent ID.
+            if ($this->isMultiInputField($type) && is_iterable($inputs)) {
+                foreach ($inputs as $input) {
+                    $inputId = (string) ($this->property($input, 'id') ?? '');
+
+                    if ($inputId === '') {
+                        continue;
+                    }
 
                     $fields[] = new FieldSchema(
-                        $inputId,
-                        $inputLabel,
+                        GravityFormsBackend::FIELD_PREFIX . $inputId,
+                        $label . ' (' . ($this->property($input, 'label') ?? $inputId) . ')',
                         ColumnType::String,
                         $allOps,
                         description: "Form field: {$type} (sub-input)",
@@ -128,27 +164,71 @@ final class GravityFormsSchemaProvider
             }
 
             $columnType = $this->inferColumnType($type);
-            $enumValues = null;
-
-            if (in_array($type, ['select', 'radio', 'multiselect', 'checkbox'], true) && !empty($field->choices)) {
-                $enumValues = [];
-                foreach ($field->choices as $choice) {
-                    $enumValues[$choice['value'] ?? $choice['text']] = $choice['text'] ?? $choice['value'];
-                }
-            }
 
             $fields[] = new FieldSchema(
-                $fieldId,
+                GravityFormsBackend::FIELD_PREFIX . $fieldId,
                 $label,
                 $columnType,
                 $allOps,
-                enumValues: $enumValues,
+                enumValues: $this->enumValues($field, $type),
                 description: "Form field: {$type}",
-                aggregatable: $columnType === ColumnType::Float || $columnType === ColumnType::Integer,
+                aggregatable: in_array($columnType, [ColumnType::Float, ColumnType::Integer], true),
             );
         }
 
         return $fields;
+    }
+
+    /**
+     * Read a property off a field definition.
+     *
+     * `GFAPI::get_form()` returns GF_Field objects, while a stored or filtered
+     * form definition can carry plain arrays; both shapes reach here.
+     *
+     * @param mixed $definition Field or input definition.
+     */
+    private function property(mixed $definition, string $key): mixed
+    {
+        if (is_array($definition)) {
+            return $definition[$key] ?? null;
+        }
+
+        if (is_object($definition)) {
+            return $definition->{$key} ?? null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Choice values advertised for a choice-based field.
+     *
+     * @param mixed $definition Field definition.
+     *
+     * @return array<string, string>|null
+     */
+    private function enumValues(mixed $definition, string $type): ?array
+    {
+        $choices = $this->property($definition, 'choices');
+
+        if (!in_array($type, ['select', 'radio', 'multiselect', 'checkbox'], true) || !is_iterable($choices)) {
+            return null;
+        }
+
+        $values = [];
+
+        foreach ($choices as $choice) {
+            $value = $this->property($choice, 'value') ?? $this->property($choice, 'text');
+            $text = $this->property($choice, 'text') ?? $value;
+
+            if ($value === null) {
+                continue;
+            }
+
+            $values[(string) $value] = (string) $text;
+        }
+
+        return $values === [] ? null : $values;
     }
 
     private function isMultiInputField(string $type): bool

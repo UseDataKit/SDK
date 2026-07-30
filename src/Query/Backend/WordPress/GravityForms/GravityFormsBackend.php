@@ -7,10 +7,10 @@ namespace DataKit\DataViews\Query\Backend\WordPress\GravityForms;
 use DataKit\DataViews\Query\Backend\WordPress\AbstractWpdbBackend;
 use DataKit\DataViews\Query\Backend\WordPress\WpdbCompiledQuery;
 use DataKit\DataViews\Query\ColumnType;
-use DataKit\DataViews\Query\ComparisonOperator;
+use DataKit\DataViews\Query\Condition;
+use DataKit\DataViews\Query\ConditionGroup;
 use DataKit\DataViews\Query\Engine\BackendSchema;
 use DataKit\DataViews\Query\Engine\Capability;
-use DataKit\DataViews\Query\Engine\FieldSchema;
 use DataKit\DataViews\Query\Query;
 use DataKit\DataViews\Query\QueryType;
 use DataKit\DataViews\Query\Source;
@@ -18,14 +18,32 @@ use DataKit\DataViews\Query\Source;
 /**
  * Gravity Forms query backend.
  *
- * Queries wp_gf_entry with LEFT JOIN wp_gf_entry_meta per field.
+ * Queries `gf_entry` for system columns, LEFT JOINing `gf_entry_meta` once per
+ * referenced form field.
  *
  * @since $ver$
  */
 final class GravityFormsBackend extends AbstractWpdbBackend
 {
+    public const SOURCE_TYPE = 'gravity_forms';
+
     /**
-     * System columns on wp_gf_entry that don't require JOINs.
+     * Prefix for per-form field keys.
+     *
+     * Keeps keys as strings. A bare field ID ("3") would be cast to `int` by
+     * PHP the moment it became an array key, and the string helpers in
+     * {@see getResultSchema()} throw a TypeError on an int.
+     */
+    public const FIELD_PREFIX = 'field:';
+
+    /**
+     * System columns on `gf_entry` that require no JOIN.
+     *
+     * `created_at` / `updated_at` are the cross-source semantic names other
+     * backends expose, carried here so a spec written against one source still
+     * resolves against this one.
+     *
+     * @var array<string, string>
      */
     private const ENTRY_COLUMNS = [
         'entry_id' => 'id',
@@ -48,15 +66,14 @@ final class GravityFormsBackend extends AbstractWpdbBackend
         'transaction_type' => 'transaction_type',
         'post_id' => 'post_id',
         'is_fulfilled' => 'is_fulfilled',
-        // Semantic aliases used by template specs.
         'created_at' => 'date_created',
         'updated_at' => 'date_updated',
     ];
 
     /**
-     * Virtual columns that require JOINs to other tables (not entry_meta).
+     * Virtual columns resolved by joining another table.
      *
-     * Maps field_key => [table_alias, column, join_sql_template].
+     * @var array<string, array{alias: string, column: string, join: string}>
      */
     private const JOINED_COLUMNS = [
         'form_title' => [
@@ -66,30 +83,38 @@ final class GravityFormsBackend extends AbstractWpdbBackend
         ],
     ];
 
+    /** @var string[] */
     private const DATETIME_COLUMNS = ['date_created', 'date_updated', 'payment_date', 'created_at', 'updated_at'];
+
+    /** @var string[] */
     private const NUMERIC_COLUMNS = ['payment_amount', 'is_starred', 'is_read', 'created_by', 'entry_id', 'form_id', 'post_id', 'is_fulfilled'];
 
-    /** @var string[] Accumulated JOIN clauses during column map building. */
+    /** @var string[] Entry statuses a scope may ask for. */
+    private const ALLOWED_STATUSES = ['active', 'spam', 'trash'];
+
+    /** @var string[] Accumulated JOIN clauses for the query being compiled. */
     private array $joins = [];
 
-    /** @var GravityFormsSchemaProvider|null Cached schema provider. */
-    private ?GravityFormsSchemaProvider $schemaProvider;
+    /** @var array<string, ColumnType> Column types by field key, captured during compile. */
+    private array $fieldTypes = [];
 
-    public function __construct(
-        ?GravityFormsSchemaProvider $schemaProvider = null,
-    ) {
+    private FormSchemaProvider $schemaProvider;
+
+    public function __construct(?FormSchemaProvider $schemaProvider = null)
+    {
         parent::__construct();
-        $this->schemaProvider = $schemaProvider;
+
+        $this->schemaProvider = $schemaProvider ?? new GravityFormsSchemaProvider();
     }
 
     public static function isAvailable(): bool
     {
-        return class_exists( 'GFAPI' );
+        return class_exists('GFAPI');
     }
 
     public function sourceType(): string
     {
-        return 'gravity_forms';
+        return self::SOURCE_TYPE;
     }
 
     /**
@@ -98,11 +123,12 @@ final class GravityFormsBackend extends AbstractWpdbBackend
      * @param int[]    $form_ids Form IDs to include.
      * @param string[] $status   Entry statuses (default: ['active']).
      */
-    public static function source( array $form_ids, array $status = [ 'active' ] ): Source {
-        return new Source( 'gravity_forms', 'entries', [
+    public static function source(array $form_ids, array $status = ['active']): Source
+    {
+        return new Source(self::SOURCE_TYPE, 'entries', [
             'form_ids' => $form_ids,
-            'status'   => $status,
-        ] );
+            'status' => $status,
+        ]);
     }
 
     /**
@@ -111,13 +137,16 @@ final class GravityFormsBackend extends AbstractWpdbBackend
      * @param int      $form_id Single form ID.
      * @param string[] $status  Entry statuses (default: ['active']).
      */
-    public static function sourceForForm( int $form_id, array $status = [ 'active' ] ): Source {
-        return new Source( 'gravity_forms', 'entries', [
-            'form_ids' => $form_id > 0 ? [ $form_id ] : [],
-            'status'   => $status,
-        ] );
+    public static function sourceForForm(int $form_id, array $status = ['active']): Source
+    {
+        return self::source($form_id > 0 ? [$form_id] : [], $status);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return Capability[]
+     */
     public function capabilities(): array
     {
         return [
@@ -140,13 +169,21 @@ final class GravityFormsBackend extends AbstractWpdbBackend
         ];
     }
 
+    /**
+     * Schema version for cache key versioning.
+     *
+     * Past the base version because per-form fields changed both the field set
+     * and the key format, so results cached against the entry-columns-only
+     * schema must not be served.
+     */
+    public function schemaVersion(): int
+    {
+        return 2;
+    }
+
     public function describe(array $scope): BackendSchema
     {
-        if ($this->schemaProvider !== null) {
-            return $this->schemaProvider->describe($scope);
-        }
-
-        return $this->describeDefault($scope);
+        return $this->schemaProvider->describe($scope);
     }
 
     protected function buildColumnMap(Query $query, BackendSchema $schema): array
@@ -154,17 +191,28 @@ final class GravityFormsBackend extends AbstractWpdbBackend
         global $wpdb;
 
         $this->joins = [];
+        $this->fieldTypes = [];
+
+        foreach ($schema->fields as $field) {
+            $this->fieldTypes[$field->key] = $field->type;
+
+            foreach ($field->aliases as $alias) {
+                $this->fieldTypes[$alias] = $field->type;
+            }
+        }
+
         $columnMap = [];
         $addedJoinedTables = [];
 
-        // Collect all field keys referenced in the query
-        $fieldKeys = $this->collectFieldKeys($query, $schema);
+        foreach ($this->collectFieldKeys($query, $schema) as $key) {
+            $key = (string) $key;
 
-        foreach ($fieldKeys as $key) {
             if (isset(self::ENTRY_COLUMNS[$key])) {
                 $columnMap[$key] = 'e.' . self::ENTRY_COLUMNS[$key];
-            } elseif (isset(self::JOINED_COLUMNS[$key])) {
-                // Virtual column from another table (e.g. form_title from wp_gf_form)
+                continue;
+            }
+
+            if (isset(self::JOINED_COLUMNS[$key])) {
                 $joinDef = self::JOINED_COLUMNS[$key];
                 $alias = $joinDef['alias'];
                 $columnMap[$key] = "{$alias}.{$joinDef['column']}";
@@ -173,15 +221,61 @@ final class GravityFormsBackend extends AbstractWpdbBackend
                     $this->joins[] = sprintf($joinDef['join'], $wpdb->prefix);
                     $addedJoinedTables[$alias] = true;
                 }
-            } else {
-                // Meta field — add a JOIN
-                $alias = $this->nextJoinAlias();
-                $this->addMetaJoin($alias, $key);
-                $columnMap[$key] = "{$alias}.meta_value";
+
+                continue;
             }
+
+            $metaKey = $this->metaKeyFor($key);
+
+            if ($metaKey === null) {
+                continue;
+            }
+
+            $alias = $this->nextJoinAlias();
+            $this->joins[] = $this->metaJoin($alias, $metaKey);
+            $columnMap[$key] = "{$alias}.meta_value";
         }
 
         return $columnMap;
+    }
+
+    /**
+     * Resolve the `gf_entry_meta.meta_key` a field key selects.
+     *
+     * Returns null for anything that could not be a meta key, so a bogus key
+     * never reaches the SQL string.
+     */
+    private function metaKeyFor(string $key): ?string
+    {
+        $metaKey = str_starts_with($key, self::FIELD_PREFIX)
+            ? substr($key, strlen(self::FIELD_PREFIX))
+            : $key;
+
+        // Gravity Forms meta keys are field IDs ("3", "1.3") or add-on slugs.
+        return preg_match('/^[A-Za-z0-9_.\-]+$/', $metaKey) === 1 ? $metaKey : null;
+    }
+
+    /**
+     * JOIN one field's answers.
+     *
+     * The meta key is inlined rather than bound: the executor runs the whole
+     * compiled statement through `wpdb::prepare()` with only the WHERE params,
+     * so a `%s` left in a JOIN is a placeholder/argument mismatch, not a bound
+     * value. {@see metaKeyFor()} restricts the literal to `[A-Za-z0-9_.-]`, so
+     * it can carry neither a quote nor a stray `%`.
+     */
+    private function metaJoin(string $alias, string $metaKey): string
+    {
+        global $wpdb;
+
+        return sprintf(
+            "LEFT JOIN %sgf_entry_meta AS %s ON %s.entry_id = e.id AND %s.meta_key = '%s'",
+            $wpdb->prefix,
+            $alias,
+            $alias,
+            $alias,
+            $metaKey,
+        );
     }
 
     protected function getFrom(Query $query): string
@@ -198,25 +292,22 @@ final class GravityFormsBackend extends AbstractWpdbBackend
 
     protected function compileScopeWhere(Query $query): array
     {
-        global $wpdb;
-
         $clauses = [];
         $params = [];
 
-        // Form ID scope
-        $formIds = $query->source->scope['form_id'] ?? $query->source->scope['form_ids'] ?? [];
+        $formIds = $this->scopeFormIds($query->source->scope);
 
-        if (is_array($formIds) && $formIds !== []) {
+        if ($formIds !== []) {
             $placeholders = implode(', ', array_fill(0, count($formIds), '%d'));
             $clauses[] = "e.form_id IN ({$placeholders})";
-            $params = array_merge($params, array_map('intval', $formIds));
-        } elseif (is_numeric($formIds)) {
-            $clauses[] = 'e.form_id = %d';
-            $params[] = (int) $formIds;
+            $params = array_merge($params, $formIds);
         }
 
-        // Default status filter (exclude trash)
-        $clauses[] = "e.status IN ('active')";
+        $quoted = implode(', ', array_map(
+            static fn (string $status): string => "'" . $status . "'",
+            $this->scopeStatuses($query->source->scope),
+        ));
+        $clauses[] = "e.status IN ({$quoted})";
 
         return [
             'clause' => implode(' AND ', $clauses),
@@ -224,13 +315,57 @@ final class GravityFormsBackend extends AbstractWpdbBackend
         ];
     }
 
+    /**
+     * @return int[]
+     */
+    private function scopeFormIds(array $scope): array
+    {
+        $formIds = $scope['form_ids'] ?? $scope['form_id'] ?? [];
+
+        if (!is_array($formIds)) {
+            $formIds = [$formIds];
+        }
+
+        $formIds = array_filter(
+            array_map('intval', $formIds),
+            static fn (int $id): bool => $id > 0,
+        );
+
+        return array_values(array_unique($formIds));
+    }
+
+    /**
+     * Entry statuses a scope asked for.
+     *
+     * Checked against {@see ALLOWED_STATUSES} because the values are inlined:
+     * Gravity Forms' status vocabulary is closed, so an unlisted value is a
+     * caller error rather than a status this backend has not heard of.
+     *
+     * @return string[]
+     */
+    private function scopeStatuses(array $scope): array
+    {
+        $statuses = $scope['status'] ?? [];
+
+        if (!is_array($statuses)) {
+            $statuses = [$statuses];
+        }
+
+        $statuses = array_values(array_intersect(
+            array_map('strval', $statuses),
+            self::ALLOWED_STATUSES,
+        ));
+
+        return $statuses === [] ? ['active'] : $statuses;
+    }
+
     protected function estimateRowCount(Query $query): ?int
     {
         global $wpdb;
 
-        $formIds = $query->source->scope['form_id'] ?? $query->source->scope['form_ids'] ?? [];
+        $formIds = $this->scopeFormIds($query->source->scope);
 
-        if (!is_array($formIds) || $formIds === []) {
+        if ($formIds === []) {
             return null;
         }
 
@@ -252,6 +387,8 @@ final class GravityFormsBackend extends AbstractWpdbBackend
         $schema = [];
 
         foreach ($compiled->columnMap as $key => $expr) {
+            $key = (string) $key;
+
             if (in_array($key, self::DATETIME_COLUMNS, true)) {
                 $schema[$key] = ColumnType::Datetime;
             } elseif (str_ends_with($key, '_bucket') && in_array(substr($key, 0, -7), self::DATETIME_COLUMNS, true)) {
@@ -260,56 +397,28 @@ final class GravityFormsBackend extends AbstractWpdbBackend
             } elseif (in_array($key, self::NUMERIC_COLUMNS, true)) {
                 $schema[$key] = ColumnType::Float;
             } else {
-                $schema[$key] = ColumnType::String;
+                $schema[$key] = $this->fieldTypes[$key] ?? ColumnType::String;
             }
         }
 
         return $schema;
     }
 
-    private function addMetaJoin(string $alias, string $metaKey): void
-    {
-        global $wpdb;
-
-        $this->joins[] = sprintf(
-            "LEFT JOIN {$wpdb->prefix}gf_entry_meta AS %s ON %s.entry_id = e.id AND %s.meta_key = %%s",
-            $alias,
-            $alias,
-            $alias,
-        );
-        // Note: The meta_key parameter will be collected and added to params.
-        // We store it as a prepared statement placeholder pattern. The actual binding
-        // happens through the WpdbCompiledQuery params.
-    }
-
     /**
-     * Collect all unique field keys referenced by the query.
+     * Collect every field key the query references.
+     *
+     * @return string[]
      */
     private function collectFieldKeys(Query $query, BackendSchema $schema): array
     {
-        // Browse mode: select all available fields from the schema.
-        if ($query->type === QueryType::Browse) {
-            $keys = $schema->fieldNames();
-
-            // Also include time/orderBy/condition fields that may not be in
-            // the schema (rare, but keeps parity with the aggregate path).
-            if ($query->time !== null) {
-                $keys[] = $query->time->field;
-            }
-            foreach ($query->orderBy as $order) {
-                if ($schema->hasField($order->field)) {
-                    $keys[] = $order->field;
-                }
-            }
-            $this->collectConditionKeys($query->where, $keys);
-
-            return array_unique($keys);
-        }
-
         $keys = [];
 
-        foreach ($query->dimensions as $dim) {
-            $keys[] = $dim->field;
+        if ($query->type === QueryType::Browse) {
+            $keys = $schema->fieldNames();
+        }
+
+        foreach ($query->dimensions as $dimension) {
+            $keys[] = $dimension->field;
         }
 
         foreach ($query->metrics as $metric) {
@@ -328,70 +437,22 @@ final class GravityFormsBackend extends AbstractWpdbBackend
             }
         }
 
-        // Collect from conditions
         $this->collectConditionKeys($query->where, $keys);
 
-        return array_unique($keys);
-    }
-
-    private function collectConditionKeys(?object $group, array &$keys): void
-    {
-        if ($group === null) {
-            return;
-        }
-
-        if ($group instanceof \DataKit\DataViews\Query\ConditionGroup) {
-            foreach ($group->conditions as $condition) {
-                $this->collectConditionKeys($condition, $keys);
-            }
-        } elseif ($group instanceof \DataKit\DataViews\Query\Condition) {
-            $keys[] = $group->field;
-        }
+        return array_values(array_unique($keys));
     }
 
     /**
-     * Default schema when no provider is configured.
+     * @param string[] $keys
      */
-    private function describeDefault(array $scope): BackendSchema
+    private function collectConditionKeys(?object $group, array &$keys): void
     {
-        $allOps = ComparisonOperator::cases();
-
-        $fields = [];
-
-        foreach (self::ENTRY_COLUMNS as $key => $column) {
-            $type = match (true) {
-                in_array($key, self::DATETIME_COLUMNS, true) => ColumnType::Datetime,
-                in_array($key, self::NUMERIC_COLUMNS, true) => ColumnType::Float,
-                default => ColumnType::String,
-            };
-
-            $fields[] = new FieldSchema(
-                $key,
-                ucfirst(str_replace('_', ' ', $key)),
-                $type,
-                $allOps,
-                aggregatable: $type !== ColumnType::String,
-                timezone: $type === ColumnType::Datetime ? 'utc' : null,
-            );
+        if ($group instanceof ConditionGroup) {
+            foreach ($group->conditions as $condition) {
+                $this->collectConditionKeys($condition, $keys);
+            }
+        } elseif ($group instanceof Condition) {
+            $keys[] = $group->field;
         }
-
-        // Joined virtual columns (e.g. form_title from wp_gf_form)
-        foreach (self::JOINED_COLUMNS as $key => $joinDef) {
-            $fields[] = new FieldSchema(
-                $key,
-                ucfirst(str_replace('_', ' ', $key)),
-                ColumnType::String,
-                $allOps,
-                description: "Virtual field joined from another table.",
-            );
-        }
-
-        return new BackendSchema(
-            'gravity_forms',
-            'Gravity Forms Entries',
-            'Form submissions including payment data, metadata, and user-submitted fields.',
-            $this->capabilities(),
-            $fields,
-        );
     }
 }
