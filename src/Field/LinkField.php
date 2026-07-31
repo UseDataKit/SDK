@@ -131,7 +131,7 @@ final class LinkField extends Field {
 	 * @return string The value.
 	 */
 	public function get_value( array $data ): string {
-		$href = $this->href( $data );
+		$href = self::safe_href( $this->href( $data ) );
 
 		if ( ! $href ) {
 			return '';
@@ -139,10 +139,54 @@ final class LinkField extends Field {
 
 		return sprintf(
 			'<a href="%s" target="%s">%s</a>',
-			esc_attr( $this->href( $data ) ),
+			esc_attr( $href ),
 			esc_attr( $this->target() ),
 			esc_html( $this->link_label( $data ) ),
 		);
+	}
+
+	/**
+	 * Schemes a link may use.
+	 *
+	 * @since $ver$
+	 *
+	 * @var string[]
+	 */
+	private const ALLOWED_SCHEMES = [ 'http', 'https', 'mailto', 'tel', 'ftp', 'ftps' ];
+
+	/**
+	 * Returns the href if its scheme is one a link may safely use.
+	 *
+	 * An href arrives in row data, so its scheme is submitted content.
+	 * `esc_attr()` makes a value safe to sit inside a quoted attribute and
+	 * says nothing about what the attribute then does: `javascript:alert(1)`
+	 * contains no character it touches. Escaping and scheme filtering are
+	 * different jobs and only the first was being done.
+	 *
+	 * Whitespace and control characters are removed before the scheme is
+	 * read, because browsers ignore them when parsing a URL — `java\tscript:`
+	 * is a working javascript URL that a leading-trim would pass through.
+	 *
+	 * @since $ver$
+	 *
+	 * @param string $href The candidate href.
+	 *
+	 * @return string The href, or an empty string if it may not be linked.
+	 */
+	private static function safe_href( string $href ): string {
+		$stripped = preg_replace( '/[\x00-\x20\x7F]+/', '', $href ) ?? '';
+
+		if ( '' === $stripped ) {
+			return '';
+		}
+
+		// No scheme means a relative or protocol-relative URL, which cannot
+		// carry one.
+		if ( ! preg_match( '/^([A-Za-z][A-Za-z0-9+.\-]*):/', $stripped, $matches ) ) {
+			return $href;
+		}
+
+		return in_array( strtolower( $matches[1] ), self::ALLOWED_SCHEMES, true ) ? $href : '';
 	}
 
 	/**
