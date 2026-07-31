@@ -7,6 +7,7 @@ namespace DataKit\DataViews\Query\Backend\WordPress;
 use DataKit\DataViews\Query\ComparisonOperator;
 use DataKit\DataViews\Query\Condition;
 use DataKit\DataViews\Query\ConditionGroup;
+use DataKit\DataViews\Query\Exception\QueryValidationException;
 use DataKit\DataViews\Query\LogicOperator;
 
 /**
@@ -48,8 +49,16 @@ final class SqlFilterCompiler
             } elseif ($condition instanceof Condition) {
                 $colExpr = $columnMap[$condition->field] ?? null;
 
-                if ($colExpr === null) {
-                    continue;
+                // Refuse rather than skip. A dropped filter widens the result
+                // set, so the failure mode is a query that runs and returns
+                // more rows than it was asked for — indistinguishable from
+                // success, and there is no warnings channel on CompiledQuery
+                // for it to surface through.
+                if ($colExpr === null || $colExpr === '') {
+                    throw QueryValidationException::invalidValue(
+                        $condition->field,
+                        'Field has no column mapping in this backend, so this filter cannot be compiled.',
+                    );
                 }
 
                 $sub = $this->compileCondition($condition, $colExpr);

@@ -136,7 +136,11 @@ final class WordPressUsersBackend extends AbstractWpdbBackend
             } else {
                 // Usermeta field
                 $alias = $this->nextJoinAlias();
-                $this->addMetaJoin($alias, $key);
+
+                if (!$this->addMetaJoin($alias, $key)) {
+                    continue;
+                }
+
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }
@@ -201,11 +205,24 @@ final class WordPressUsersBackend extends AbstractWpdbBackend
         return $schema;
     }
 
-    private function addMetaJoin(string $alias, string $metaKey): void
+    /**
+     * Add a usermeta join, refusing a key that cannot be a quoted literal.
+     *
+     * @return bool Whether the join was added.
+     */
+    private function addMetaJoin(string $alias, string $key): bool
     {
         global $wpdb;
 
+        $metaKey = $this->metaKeyLiteral($key);
+
+        if ($metaKey === null) {
+            return false;
+        }
+
         $this->joins[] = "LEFT JOIN {$wpdb->usermeta} AS {$alias} ON {$alias}.user_id = u.ID AND {$alias}.meta_key = '{$metaKey}'";
+
+        return true;
     }
 
     private function collectAllFieldKeys(Query $query, BackendSchema $schema): array

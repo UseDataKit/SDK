@@ -190,8 +190,8 @@ abstract class AbstractWpdbBackend implements QueryBackend
      * `buildColumnMap()` omits every key it cannot express as a column, so a
      * miss means the backend has no SQL for this field. Falling back to the
      * key itself would splice an unresolved name into the statement as a bare
-     * expression; `SqlFilterCompiler` drops the condition on the same miss, so
-     * refusing here makes the two halves agree.
+     * expression. `SqlFilterCompiler` refuses the same miss, so a field the
+     * backend cannot express fails the query wherever it appears.
      *
      * @param array<string, string> $columnMap
      *
@@ -209,6 +209,23 @@ abstract class AbstractWpdbBackend implements QueryBackend
         }
 
         return $colExpr;
+    }
+
+    /**
+     * Accept a meta key only if it is safe as a single-quoted SQL literal.
+     *
+     * EAV joins are assembled as raw strings, so a meta key reaches SQL as a
+     * literal rather than a bound parameter: a quote in the key closes it. The
+     * character set is the one Gravity Forms keys already had to satisfy —
+     * field ids, add-on slugs, and ordinary underscore-prefixed meta names.
+     *
+     * Returns null for a key that cannot be expressed, which leaves the field
+     * out of the column map; `resolveColumn()` then refuses it rather than
+     * letting an unmapped field through.
+     */
+    protected function metaKeyLiteral(string $key): ?string
+    {
+        return preg_match('/^[A-Za-z0-9_.\-]+$/', $key) === 1 ? $key : null;
     }
 
     /**
@@ -382,8 +399,20 @@ abstract class AbstractWpdbBackend implements QueryBackend
             return [[], []];
         }
 
-        // For HAVING, we need output alias mapping
+        // HAVING resolves against output names, so the map has to carry every
+        // name the SELECT produces. Built from metrics alone, a HAVING on a
+        // dimension alias found nothing.
         $outputMap = [];
+
+        foreach ($query->dimensions as $dim) {
+            $outputMap[$dim->outputName()] = $this->resolveColumn($columnMap, $dim->field);
+        }
+
+        if ($query->time?->grain !== null) {
+            $colExpr = $this->resolveColumn($columnMap, $query->time->field);
+            $outputMap[$query->time->field . '_bucket'] = $this->timeBucketCompiler->compile($colExpr, $query->time->grain);
+        }
+
         foreach ($query->metrics as $metric) {
             $colExpr = $metric->field !== null ? $this->resolveColumn($columnMap, $metric->field) : null;
             $outputMap[$metric->outputName()] = $this->aggregateCompiler->compile($metric, $colExpr);

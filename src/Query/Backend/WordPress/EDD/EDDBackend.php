@@ -488,7 +488,13 @@ final class EDDBackend extends AbstractWpdbBackend
                 // Custom meta field via edd_ordermeta.
                 $alias = $this->nextJoinAlias();
                 $metaTable = $this->tableDetector->getOrderMetaTable();
-                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.edd_order_id = o.id AND {$alias}.meta_key = '{$key}'";
+                $metaKey = $this->metaKeyLiteral($key);
+
+                if ($metaKey === null) {
+                    continue;
+                }
+
+                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.edd_order_id = o.id AND {$alias}.meta_key = '{$metaKey}'";
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }
@@ -572,9 +578,16 @@ final class EDDBackend extends AbstractWpdbBackend
                 $this->joins[] = "LEFT JOIN {$wpdb->terms} AS {$tAlias} ON {$tAlias}.term_id = {$ttAlias}.term_id";
                 $columnMap[$key] = "{$tAlias}.name";
             } else {
-                // Arbitrary postmeta fallback.
+                // Arbitrary postmeta fallback. A key that cannot be a quoted
+                // literal is left unmapped rather than interpolated.
+                $metaKey = $this->metaKeyLiteral($key);
+
+                if ($metaKey === null) {
+                    continue;
+                }
+
                 $alias = $this->nextJoinAlias();
-                $this->joins[] = "LEFT JOIN {$this->getPostMetaTable()} AS {$alias} ON {$alias}.post_id = o.ID AND {$alias}.meta_key = '{$key}'";
+                $this->joins[] = "LEFT JOIN {$this->getPostMetaTable()} AS {$alias} ON {$alias}.post_id = o.ID AND {$alias}.meta_key = '{$metaKey}'";
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }
@@ -626,7 +639,13 @@ final class EDDBackend extends AbstractWpdbBackend
                 // Customer meta via edd_customermeta.
                 $alias = $this->nextJoinAlias();
                 $metaTable = $this->tableDetector->getCustomerMetaTable();
-                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.edd_customer_id = c.id AND {$alias}.meta_key = '{$key}'";
+                $metaKey = $this->metaKeyLiteral($key);
+
+                if ($metaKey === null) {
+                    continue;
+                }
+
+                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.edd_customer_id = c.id AND {$alias}.meta_key = '{$metaKey}'";
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }

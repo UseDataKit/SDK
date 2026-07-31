@@ -8,6 +8,7 @@ use DataKit\DataViews\Query\Backend\WordPress\SqlFilterCompiler;
 use DataKit\DataViews\Query\ComparisonOperator;
 use DataKit\DataViews\Query\Condition;
 use DataKit\DataViews\Query\ConditionGroup;
+use DataKit\DataViews\Query\Exception\QueryValidationException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -173,15 +174,21 @@ final class SqlFilterCompilerTest extends TestCase
         self::assertSame([0, 'active', 'pending'], $result['params']);
     }
 
-    public function test_skips_unmapped_fields(): void
+    /**
+     * Was test_skips_unmapped_fields, which pinned the opposite: an unmapped
+     * field compiled to nothing and the filter silently vanished, widening
+     * the result set with no way for a caller to notice.
+     */
+    public function test_refuses_unmapped_fields(): void
     {
         $group = ConditionGroup::and(
             new Condition('unknown_field', ComparisonOperator::Eq, 'test'),
         );
-        $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('', $result['clause']);
-        self::assertSame([], $result['params']);
+        $this->expectException(QueryValidationException::class);
+        $this->expectExceptionMessageMatches('/unknown_field/');
+
+        $this->compiler->compile($group, $this->columnMap);
     }
 
     public function test_escape_like_characters(): void

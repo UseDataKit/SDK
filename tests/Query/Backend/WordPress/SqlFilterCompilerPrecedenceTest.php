@@ -125,17 +125,20 @@ final class SqlFilterCompilerPrecedenceTest extends TestCase
     }
 
     /**
-     * The other way, and the one that is reachable: every condition dropped
-     * as unmapped. Must be empty rather than "()", which is a syntax error
-     * the moment it is ANDed to a scope.
+     * The other route to a clause-less group is now closed too: an unmapped
+     * field is refused rather than skipped, so "" is unreachable in practice
+     * and the `''` guard on the return is a belt-and-braces invariant rather
+     * than a live branch.
      */
-    public function testAGroupOfOnlyUnmappedFieldsCompilesToNothing(): void
+    public function testAGroupOfOnlyUnmappedFieldsIsRefused(): void
     {
         $group = new ConditionGroup(LogicOperator::Or, [
             new Condition('not_a_column', ComparisonOperator::Gt, 0),
         ]);
 
-        self::assertSame('', $this->compile($group, $this->columnMap())['clause']);
+        $this->expectException(QueryValidationException::class);
+
+        $this->compile($group, $this->columnMap());
     }
 
     public function testNestedGroupsRemainCorrectlyGrouped(): void

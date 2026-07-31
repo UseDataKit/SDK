@@ -413,7 +413,13 @@ final class WooCommerceBackend extends AbstractWpdbBackend
             } else {
                 // Arbitrary meta fallback — use field key as meta_key directly.
                 $alias = $this->nextJoinAlias();
-                $this->joins[] = "LEFT JOIN {$this->getPostMetaTable()} AS {$alias} ON {$alias}.post_id = o.ID AND {$alias}.meta_key = '{$key}'";
+                $metaKey = $this->metaKeyLiteral($key);
+
+                if ($metaKey === null) {
+                    continue;
+                }
+
+                $this->joins[] = "LEFT JOIN {$this->getPostMetaTable()} AS {$alias} ON {$alias}.post_id = o.ID AND {$alias}.meta_key = '{$metaKey}'";
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }
@@ -479,7 +485,13 @@ final class WooCommerceBackend extends AbstractWpdbBackend
                 $metaTable = $this->hposDetector->getOrderMetaTable();
                 $idCol = $isHpos ? 'order_id' : 'post_id';
                 $pkCol = $isHpos ? 'id' : 'ID';
-                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.{$idCol} = o.{$pkCol} AND {$alias}.meta_key = '{$key}'";
+                $metaKey = $this->metaKeyLiteral($key);
+
+                if ($metaKey === null) {
+                    continue;
+                }
+
+                $this->joins[] = "LEFT JOIN {$metaTable} AS {$alias} ON {$alias}.{$idCol} = o.{$pkCol} AND {$alias}.meta_key = '{$metaKey}'";
                 $columnMap[$key] = "{$alias}.meta_value";
             }
         }
