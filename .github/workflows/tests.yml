@@ -11,7 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: [ '7.4', '8.0','8.1', '8.2', '8.3' ]
+        # Every version this library supports, and only those.
+        # `composer.json` requires php >=8.1, so the 7.4 and 8.0 legs
+        # could never install: composer's platform_check aborted before
+        # a single test ran, and fail-fast then cancelled the versions
+        # that do work. develop had been red since April for this alone.
+        php-versions: [ '8.1', '8.2', '8.3', '8.4' ]
     steps:
       - uses: actions/checkout@v4
       - name: Install PHP
