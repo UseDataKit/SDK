@@ -42,7 +42,7 @@ final class SqlFilterCompiler
                 $sub = $this->compileGroup($condition, $columnMap);
 
                 if ($sub['clause'] !== '') {
-                    $clauses[] = '(' . $sub['clause'] . ')';
+                    $clauses[] = $sub['clause'];
                     $params = array_merge($params, $sub['params']);
                 }
             } elseif ($condition instanceof Condition) {
@@ -58,8 +58,15 @@ final class SqlFilterCompiler
             }
         }
 
+        // Every group parenthesises itself, top level included: backends
+        // assemble `WHERE {scope} AND {this}`, and AND binds tighter than OR,
+        // so a bare top-level OR would scope only its left disjunct and leave
+        // the right one reading the whole table. An empty group must stay
+        // empty — `()` is a syntax error once ANDed to a scope.
+        $clause = implode($glue, $clauses);
+
         return [
-            'clause' => implode($glue, $clauses),
+            'clause' => '' === $clause ? '' : '(' . $clause . ')',
             'params' => $params,
         ];
     }

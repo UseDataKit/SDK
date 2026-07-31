@@ -13,6 +13,7 @@ use DataKit\DataViews\Query\Engine\CompiledQuery;
 use DataKit\DataViews\Query\Engine\CostEstimate;
 use DataKit\DataViews\Query\Engine\QueryBackend;
 use DataKit\DataViews\Query\Engine\Result;
+use DataKit\DataViews\Query\Exception\QueryValidationException;
 use DataKit\DataViews\Query\OrderBy;
 use DataKit\DataViews\Query\Query;
 use DataKit\DataViews\Query\QueryType;
@@ -184,6 +185,44 @@ abstract class AbstractWpdbBackend implements QueryBackend
     // --- Shared compilation methods ---
 
     /**
+     * Resolve a field key to its SQL expression, refusing unmapped keys.
+     *
+     * `buildColumnMap()` omits every key it cannot express as a column, so a
+     * miss means the backend has no SQL for this field. Falling back to the
+     * key itself would splice an unresolved name into the statement as a bare
+     * expression; `SqlFilterCompiler` drops the condition on the same miss, so
+     * refusing here makes the two halves agree.
+     *
+     * @param array<string, string> $columnMap
+     *
+     * @throws QueryValidationException When the field has no column mapping.
+     */
+    protected function resolveColumn(array $columnMap, string $field): string
+    {
+        $colExpr = $columnMap[$field] ?? null;
+
+        if ($colExpr === null || $colExpr === '') {
+            throw QueryValidationException::invalidValue(
+                $field,
+                'Field has no column mapping in this backend and cannot be compiled to SQL.',
+            );
+        }
+
+        return $colExpr;
+    }
+
+    /**
+     * Quote an output alias, escaping backticks so it cannot close its quoting.
+     *
+     * Schema field names come out of databases (meta keys, form field labels),
+     * so "no identifier contains a backtick" is an assumption about data.
+     */
+    protected function quoteIdentifier(string $name): string
+    {
+        return '`' . str_replace('`', '``', $name) . '`';
+    }
+
+    /**
      * @return string[] SELECT expressions.
      */
     protected function compileSelect(Query $query, array $columnMap): array
@@ -192,29 +231,29 @@ abstract class AbstractWpdbBackend implements QueryBackend
 
         // Dimensions
         foreach ($query->dimensions as $dim) {
-            $colExpr = $columnMap[$dim->field] ?? $dim->field;
+            $colExpr = $this->resolveColumn($columnMap, $dim->field);
             $alias = $dim->outputName();
-            $select[] = "{$colExpr} AS `{$alias}`";
+            $select[] = $colExpr . ' AS ' . $this->quoteIdentifier($alias);
         }
 
         // Time bucket
         if ($query->time?->grain !== null) {
-            $colExpr = $columnMap[$query->time->field] ?? $query->time->field;
+            $colExpr = $this->resolveColumn($columnMap, $query->time->field);
             $bucketExpr = $this->timeBucketCompiler->compile($colExpr, $query->time->grain);
             $bucketAlias = $query->time->field . '_bucket';
-            $select[] = "{$bucketExpr} AS `{$bucketAlias}`";
+            $select[] = $bucketExpr . ' AS ' . $this->quoteIdentifier($bucketAlias);
         }
 
         // Metrics
         foreach ($query->metrics as $metric) {
-            $colExpr = $metric->field !== null ? ($columnMap[$metric->field] ?? $metric->field) : null;
+            $colExpr = $metric->field !== null ? $this->resolveColumn($columnMap, $metric->field) : null;
             $select[] = $this->aggregateCompiler->compile($metric, $colExpr);
         }
 
         // Browse mode — select all mapped fields if no explicit dimensions
         if ($query->type === QueryType::Browse && $select === []) {
             foreach ($columnMap as $key => $expr) {
-                $select[] = "{$expr} AS `{$key}`";
+                $select[] = $expr . ' AS ' . $this->quoteIdentifier((string) $key);
             }
         }
 
@@ -239,7 +278,7 @@ abstract class AbstractWpdbBackend implements QueryBackend
         // Time range filter
         if ($query->time !== null) {
             $range = $query->time->resolveRange();
-            $colExpr = $columnMap[$query->time->field] ?? $query->time->field;
+            $colExpr = $this->resolveColumn($columnMap, $query->time->field);
 
             if ($range['start'] !== null) {
                 $clauses[] = "{$colExpr} >= %s";
@@ -323,11 +362,11 @@ abstract class AbstractWpdbBackend implements QueryBackend
         $groupBy = [];
 
         foreach ($query->dimensions as $dim) {
-            $groupBy[] = $columnMap[$dim->field] ?? $dim->field;
+            $groupBy[] = $this->resolveColumn($columnMap, $dim->field);
         }
 
         if ($query->time?->grain !== null) {
-            $colExpr = $columnMap[$query->time->field] ?? $query->time->field;
+            $colExpr = $this->resolveColumn($columnMap, $query->time->field);
             $groupBy[] = $this->timeBucketCompiler->compile($colExpr, $query->time->grain);
         }
 
@@ -346,7 +385,7 @@ abstract class AbstractWpdbBackend implements QueryBackend
         // For HAVING, we need output alias mapping
         $outputMap = [];
         foreach ($query->metrics as $metric) {
-            $colExpr = $metric->field !== null ? ($columnMap[$metric->field] ?? $metric->field) : null;
+            $colExpr = $metric->field !== null ? $this->resolveColumn($columnMap, $metric->field) : null;
             $outputMap[$metric->outputName()] = $this->aggregateCompiler->compile($metric, $colExpr);
             // Strip the alias for HAVING clause
             $outputMap[$metric->outputName()] = preg_replace('/ AS `.+`$/', '', $outputMap[$metric->outputName()]);
@@ -389,9 +428,9 @@ abstract class AbstractWpdbBackend implements QueryBackend
 
             // Use backtick-quoted alias for output names
             if (in_array($order->field, $outputAliases, true)) {
-                $orderBy[] = "`{$order->field}` {$dir}";
+                $orderBy[] = $this->quoteIdentifier($order->field) . ' ' . $dir;
             } else {
-                $colExpr = $columnMap[$order->field] ?? $order->field;
+                $colExpr = $this->resolveColumn($columnMap, $order->field);
                 $orderBy[] = "{$colExpr} {$dir}";
             }
         }

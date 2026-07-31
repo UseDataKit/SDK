@@ -33,7 +33,7 @@ final class SqlFilterCompilerTest extends TestCase
         $group = ConditionGroup::and(new Condition('status', ComparisonOperator::Eq, 'active'));
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('e.status = %s', $result['clause']);
+        self::assertSame('(e.status = %s)', $result['clause']);
         self::assertSame(['active'], $result['params']);
     }
 
@@ -42,7 +42,7 @@ final class SqlFilterCompilerTest extends TestCase
         $group = ConditionGroup::and(new Condition('status', ComparisonOperator::Neq, 'trash'));
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('e.status != %s', $result['clause']);
+        self::assertSame('(e.status != %s)', $result['clause']);
         self::assertSame(['trash'], $result['params']);
     }
 
@@ -54,7 +54,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('m1.meta_value > %s AND m1.meta_value < %s', $result['clause']);
+        self::assertSame('(m1.meta_value > %s AND m1.meta_value < %s)', $result['clause']);
         self::assertSame([100, 500], $result['params']);
     }
 
@@ -65,7 +65,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('e.status IN (%s, %s, %s)', $result['clause']);
+        self::assertSame('(e.status IN (%s, %s, %s))', $result['clause']);
         self::assertSame(['active', 'pending', 'processing'], $result['params']);
     }
 
@@ -76,7 +76,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('e.status NOT IN (%s, %s)', $result['clause']);
+        self::assertSame('(e.status NOT IN (%s, %s))', $result['clause']);
         self::assertSame(['trash', 'spam'], $result['params']);
     }
 
@@ -87,7 +87,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('m1.meta_value BETWEEN %s AND %s', $result['clause']);
+        self::assertSame('(m1.meta_value BETWEEN %s AND %s)', $result['clause']);
         self::assertSame([10, 100], $result['params']);
     }
 
@@ -98,7 +98,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('m2.meta_value LIKE %s', $result['clause']);
+        self::assertSame('(m2.meta_value LIKE %s)', $result['clause']);
         self::assertSame(['%test%'], $result['params']);
     }
 
@@ -109,7 +109,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('m2.meta_value NOT LIKE %s', $result['clause']);
+        self::assertSame('(m2.meta_value NOT LIKE %s)', $result['clause']);
         self::assertSame(['%spam%'], $result['params']);
     }
 
@@ -120,7 +120,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('m2.meta_value LIKE %s', $result['clause']);
+        self::assertSame('(m2.meta_value LIKE %s)', $result['clause']);
         self::assertSame(['Acme%'], $result['params']);
     }
 
@@ -131,7 +131,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame("(m2.meta_value IS NULL OR m2.meta_value = '')", $result['clause']);
+        self::assertSame("((m2.meta_value IS NULL OR m2.meta_value = ''))", $result['clause']);
         self::assertSame([], $result['params']);
     }
 
@@ -142,7 +142,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame("(m2.meta_value IS NOT NULL AND m2.meta_value != '')", $result['clause']);
+        self::assertSame("((m2.meta_value IS NOT NULL AND m2.meta_value != ''))", $result['clause']);
         self::assertSame([], $result['params']);
     }
 
@@ -154,7 +154,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('e.status = %s OR e.status = %s', $result['clause']);
+        self::assertSame('(e.status = %s OR e.status = %s)', $result['clause']);
         self::assertSame(['active', 'pending'], $result['params']);
     }
 
@@ -169,7 +169,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('m1.meta_value > %s AND (e.status = %s OR e.status = %s)', $result['clause']);
+        self::assertSame('(m1.meta_value > %s AND (e.status = %s OR e.status = %s))', $result['clause']);
         self::assertSame([0, 'active', 'pending'], $result['params']);
     }
 
@@ -191,7 +191,7 @@ final class SqlFilterCompilerTest extends TestCase
         );
         $result = $this->compiler->compile($group, $this->columnMap);
 
-        self::assertSame('m2.meta_value LIKE %s', $result['clause']);
+        self::assertSame('(m2.meta_value LIKE %s)', $result['clause']);
         self::assertSame('%50\\% off\\_sale%', $result['params'][0]);
     }
 }

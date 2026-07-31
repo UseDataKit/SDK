@@ -15,6 +15,7 @@ use DataKit\DataViews\Query\ComparisonOperator;
 use DataKit\DataViews\Query\ConditionGroup;
 use DataKit\DataViews\Query\LogicOperator;
 use DataKit\DataViews\Query\Engine\Capability;
+use DataKit\DataViews\Query\Exception\QueryValidationException;
 use DataKit\DataViews\Query\Query;
 use DataKit\DataViews\Query\QueryType;
 use DataKit\DataViews\Query\SelectField;
@@ -238,18 +239,32 @@ final class FluentFormsBackendTest extends TestCase
 
     public function test_a_field_key_that_cannot_be_a_field_name_is_dropped(): void
     {
-        $compiled = $this->compile($this->aggregateBy("field:email' OR 1=1 --"));
+        $query = $this->aggregateBy("field:email' OR 1=1 --");
 
-        self::assertSame([], $compiled->joins);
-        self::assertSame([], $compiled->columnMap);
+        self::assertSame([], $this->columnMapFor($query), 'The key must not reach the column map.');
+
+        // Absence from the map was only half the guarantee. The SELECT path
+        // used to fall back to the raw field key, so the string this test
+        // called "dropped" was still spliced into the statement as a bare SQL
+        // expression. Compilation now refuses the unmapped key outright.
+        $this->expectException(QueryValidationException::class);
+
+        $this->backend->compile($query, $this->backend->describe($query->source->scope));
     }
 
     public function test_a_sub_field_key_with_an_injection_sub_segment_is_dropped(): void
     {
-        $compiled = $this->compile($this->aggregateBy("field:names.first' --"));
+        $query = $this->aggregateBy("field:names.first' --");
 
-        self::assertSame([], $compiled->joins);
-        self::assertSame([], $compiled->columnMap);
+        self::assertSame([], $this->columnMapFor($query), 'The key must not reach the column map.');
+
+        // Absence from the map was only half the guarantee. The SELECT path
+        // used to fall back to the raw field key, so the string this test
+        // called "dropped" was still spliced into the statement as a bare SQL
+        // expression. Compilation now refuses the unmapped key outright.
+        $this->expectException(QueryValidationException::class);
+
+        $this->backend->compile($query, $this->backend->describe($query->source->scope));
     }
 
     public function test_the_same_field_referenced_twice_joins_once(): void
@@ -298,11 +313,14 @@ final class FluentFormsBackendTest extends TestCase
             metrics: [new AggregateField(AggregateFunction::Count, null, 'total')],
         );
 
-        $schema = $backend->describe($query->source->scope);
-        $compiled = $backend->compile($query, $schema);
+        self::assertLessThanOrEqual(40, count($this->columnMapFor($query, $backend)));
 
-        self::assertInstanceOf(WpdbCompiledQuery::class, $compiled);
-        self::assertLessThanOrEqual(40, count($compiled->joins));
+        // Fields past the cap are unmapped, and the SELECT path used to fall
+        // back to their raw keys, so the statement the cap was meant to keep
+        // runnable was not. Over the cap is now an explicit refusal.
+        $this->expectException(QueryValidationException::class);
+
+        $backend->compile($query, $backend->describe($query->source->scope));
     }
 
     // =====================================================================
@@ -466,5 +484,18 @@ final class FluentFormsBackendTest extends TestCase
         self::assertInstanceOf(WpdbCompiledQuery::class, $compiled);
 
         return $compiled;
+    }
+
+    /**
+     * Build the column map for a query without compiling it.
+     *
+     * @return array<string, string>
+     */
+    private function columnMapFor(Query $query, object $backend = null): array
+    {
+        $backend ??= $this->backend;
+        $schema = $backend->describe($query->source->scope);
+
+        return (new \ReflectionMethod($backend, 'buildColumnMap'))->invoke($backend, $query, $schema);
     }
 }

@@ -15,6 +15,7 @@ use DataKit\DataViews\Query\ComparisonOperator;
 use DataKit\DataViews\Query\ConditionGroup;
 use DataKit\DataViews\Query\LogicOperator;
 use DataKit\DataViews\Query\Engine\Capability;
+use DataKit\DataViews\Query\Exception\QueryValidationException;
 use DataKit\DataViews\Query\Query;
 use DataKit\DataViews\Query\QueryType;
 use DataKit\DataViews\Query\SelectField;
@@ -222,10 +223,17 @@ final class WPFormsBackendTest extends TestCase
 
     public function test_a_field_key_that_cannot_be_a_field_id_is_dropped(): void
     {
-        $compiled = $this->compile($this->aggregateBy("field:3' OR 1=1 --"));
+        $query = $this->aggregateBy("field:3' OR 1=1 --");
 
-        self::assertSame([], $compiled->joins);
-        self::assertSame([], $compiled->columnMap);
+        self::assertSame([], $this->columnMapFor($query), 'The key must not reach the column map.');
+
+        // Absence from the map was only half the guarantee. The SELECT path
+        // used to fall back to the raw field key, so the string this test
+        // called "dropped" was still spliced into the statement as a bare SQL
+        // expression. Compilation now refuses the unmapped key outright.
+        $this->expectException(QueryValidationException::class);
+
+        $this->backend->compile($query, $this->backend->describe($query->source->scope));
     }
 
     public function test_quiz_meta_joins_the_entry_meta_table_on_type(): void
@@ -288,7 +296,15 @@ final class WPFormsBackendTest extends TestCase
             metrics: [new AggregateField(AggregateFunction::Count, null, 'total')],
         );
 
-        self::assertLessThanOrEqual(40, count($this->compile($query)->joins));
+        self::assertLessThanOrEqual(40, count($this->columnMapFor($query)));
+
+        // The cap leaves the fields past it unmapped. Compilation used to fall
+        // back to the raw key for those, emitting `field:41 AS ...` — a syntax
+        // error, so the "unrunnable query" the cap exists to prevent is exactly
+        // what it produced. Over the cap is now an explicit refusal.
+        $this->expectException(QueryValidationException::class);
+
+        $this->backend->compile($query, $this->backend->describe($query->source->scope));
     }
 
     // =====================================================================
@@ -452,5 +468,18 @@ final class WPFormsBackendTest extends TestCase
         self::assertInstanceOf(WpdbCompiledQuery::class, $compiled);
 
         return $compiled;
+    }
+
+    /**
+     * Build the column map for a query without compiling it.
+     *
+     * @return array<string, string>
+     */
+    private function columnMapFor(Query $query, object $backend = null): array
+    {
+        $backend ??= $this->backend;
+        $schema = $backend->describe($query->source->scope);
+
+        return (new \ReflectionMethod($backend, 'buildColumnMap'))->invoke($backend, $query, $schema);
     }
 }

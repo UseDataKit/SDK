@@ -18,6 +18,7 @@ use DataKit\DataViews\Query\ConditionGroup;
 use DataKit\DataViews\Query\Engine\BackendSchema;
 use DataKit\DataViews\Query\Engine\FieldSchema;
 use DataKit\DataViews\Query\LogicOperator;
+use DataKit\DataViews\Query\Exception\QueryValidationException;
 use DataKit\DataViews\Query\Query;
 use DataKit\DataViews\Query\QueryType;
 use DataKit\DataViews\Query\SelectField;
@@ -97,10 +98,17 @@ final class GravityFormsBackendQueryTest extends TestCase
 
     public function test_a_key_that_cannot_be_a_meta_key_is_dropped(): void
     {
-        $compiled = $this->compile($this->aggregateBy("field:3' OR 1=1 --"));
+        $query = $this->aggregateBy("field:3' OR 1=1 --");
 
-        self::assertSame([], $compiled->joins);
-        self::assertSame([], $compiled->columnMap);
+        self::assertSame([], $this->columnMapFor($query), 'The key must not reach the column map.');
+
+        // Absence from the map was only half the guarantee. The SELECT path
+        // used to fall back to the raw field key, so the string this test
+        // called "dropped" was still spliced into the statement as a bare SQL
+        // expression. Compilation now refuses the unmapped key outright.
+        $this->expectException(QueryValidationException::class);
+
+        $this->backend->compile($query, $this->backend->describe($query->source->scope));
     }
 
     public function test_a_bare_numeric_key_compiles_without_a_type_error(): void
@@ -318,5 +326,18 @@ final class GravityFormsBackendQueryTest extends TestCase
                 ];
             }
         };
+    }
+
+    /**
+     * Build the column map for a query without compiling it.
+     *
+     * @return array<string, string>
+     */
+    private function columnMapFor(Query $query, object $backend = null): array
+    {
+        $backend ??= $this->backend;
+        $schema = $backend->describe($query->source->scope);
+
+        return (new \ReflectionMethod($backend, 'buildColumnMap'))->invoke($backend, $query, $schema);
     }
 }
