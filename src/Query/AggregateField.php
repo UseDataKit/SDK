@@ -21,6 +21,9 @@ final class AggregateField
         public ?string $field = null,
         public ?string $alias = null,
     ) {
+        if ($alias !== null) {
+            OutputAlias::assertValid($alias, 'Metric');
+        }
     }
 
     public function outputName(): string

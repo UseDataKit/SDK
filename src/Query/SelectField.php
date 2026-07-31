@@ -19,6 +19,9 @@ final class SelectField
         public string $field,
         public ?string $alias = null,
     ) {
+        if ($alias !== null) {
+            OutputAlias::assertValid($alias, 'Dimension');
+        }
     }
 
     public function outputName(): string
