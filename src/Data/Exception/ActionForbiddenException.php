@@ -29,7 +29,7 @@ final class ActionForbiddenException extends DataSourceException {
 		DataSource $data_source,
 		$message = 'Action is forbidden.',
 		$code = 403,
-		Throwable $previous = null
+		?Throwable $previous = null
 	) {
 		parent::__construct( $message, $code, $previous );
 

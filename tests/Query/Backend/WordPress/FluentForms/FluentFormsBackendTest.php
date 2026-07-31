@@ -491,7 +491,7 @@ final class FluentFormsBackendTest extends TestCase
      *
      * @return array<string, string>
      */
-    private function columnMapFor(Query $query, object $backend = null): array
+    private function columnMapFor(Query $query, ?object $backend = null): array
     {
         $backend ??= $this->backend;
         $schema = $backend->describe($query->source->scope);
